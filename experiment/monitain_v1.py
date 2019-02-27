@@ -33,7 +33,24 @@ win.flip()
 grating = psychopy.visual.GratingStim(
 	win=win,
 	units="pix",
-	size=[150,150])
+	size=[80,80]) #size of box with grating in pixels
+
+
+
+grating.sf = 5.0 / 80.0 #spatialFrequency = # of cycles / length in pixels 
+
+grating.mask = "circle" 
+
+orientations = [0.0, 45.0, 90.0, 135.0]
+grating_hpos = [-150, -50, 50, 150]
+
+for i_grating in range(4): 
+	grating.ori = orientations[i_grating]
+	grating.pos = [grating_hpos[i_grating], 0]
+
+	grating.draw()
+
+win.flip()
 
 psychopy.event.waitKeys()
 
