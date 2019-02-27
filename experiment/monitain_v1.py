@@ -53,74 +53,51 @@ win.flip()
 
 text = visual.TextStim(
 	win=win, 
-	text="word", 
+	text="apple", 
 	color=color_black, 
 	height = 40.0)
 text.draw()
-
 
 win.flip()
 
 sec = 2 
 core.wait(sec)
 
+# Second word just for show
+
+text.text = "boat"
+text.draw()
+win.flip()
+core.wait(sec)
+
 # End loop
 
 ###Target probe
 
+grating_hpos = [-150, 150]
+
+for i_grating in range(2): 
+	grating.pos = [0, grating_hpos[i_grating]]
+	grating.draw()
+
+text.text = "glorb"
+text.draw()
+
+win.flip()
+core.wait(sec)
 
 win.close() #Close window
 
+##############
 
 
+## MONITOR ##
+
+#############
 
 
-
-
-
-
-
-
-
-
-text = psychopy.visual.TextStim(
-	win=win, 
-	text="Welcome to the experiment!", 
-	color=color_white)
-text.draw()
-
-text.color = [-1,0,-1]
-text.pos = [1,1]
-text.draw()
-
-win.flip()
-
-grating = psychopy.visual.GratingStim(
-	win=win,
-	units="pix",
-	size=[80,80]) #size of box with grating in pixels
-
-
-
-grating.sf = 5.0 / 80.0 #spatialFrequency = # of cycles / length in pixels 
-
-grating.mask = "circle" 
-
-orientations = [0.0, 45.0, 90.0, 135.0]
-grating_hpos = [-150, -50, 50, 150]
-
-for i_grating in range(4): 
-	grating.ori = orientations[i_grating]
-	grating.pos = [grating_hpos[i_grating], 0]
-
-	grating.draw()
-
-win.flip()
-
-psychopy.event.waitKeys()
-
-win.close()
-
+## MAINTAIN AND MONITOR ##
+##########################
 
 ##Save output 
 np.savetxt() 
