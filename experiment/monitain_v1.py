@@ -15,6 +15,13 @@ color_white = [1,1,1]
 color_black = [-1,-1,-1]
 color_gray = [0,0,0]
 
+# Timings
+sec_target = 2 
+sec_delay = 1 
+sec_probe = 2 
+sec_iti = 1
+
+
 win = visual.Window(
 	size=[1024,576], #Small size of screen for testing it out
 	units="pix", 
@@ -41,8 +48,7 @@ grating.draw()
 
 win.flip()
 
-sec = 3
-core.wait(sec)
+core.wait(sec_target)
 
 win.color=color_gray
 win.flip()
@@ -60,15 +66,14 @@ text.draw()
 
 win.flip()
 
-sec = 2 
-core.wait(sec)
+core.wait(sec_probe)
 
 # Second word just for show
 
 text.text = "boat"
 text.draw()
 win.flip()
-core.wait(sec)
+core.wait(sec_probe)
 
 # End loop
 
@@ -84,7 +89,14 @@ text.text = "glorb"
 text.draw()
 
 win.flip()
-core.wait(sec)
+core.wait(sec_probe)
+
+###ITI with fixation cross 
+
+text.text = "+"
+text.draw()
+win.flip()
+core.wait(sec_iti)
 
 win.close()
 
@@ -110,7 +122,7 @@ for i_grating in range(2):
 	text.text = "jalp"
 	text.draw()
 win.flip()
-core.wait(sec)
+core.wait(sec_probe)
 
 
 grating_ori = [135.0, 15.0]
@@ -122,7 +134,7 @@ for i_grating in range(2):
 	text.text = "apple"
 	text.draw()
 win.flip()
-core.wait(sec)
+core.wait(sec_probe)
 
 
 grating_ori = [45.0, 15.0]
@@ -134,7 +146,7 @@ for i_grating in range(2):
 	text.text = "boat"
 	text.draw()
 win.flip()
-core.wait(sec)
+core.wait(sec_probe)
 
 
 grating_ori = [135.0, 135.0]
@@ -146,7 +158,14 @@ for i_grating in range(2):
 	text.text = "glorb"
 	text.draw()
 win.flip()
-core.wait(sec)
+core.wait(sec_probe)
+
+###ITI with fixation cross 
+
+text.text = "+"
+text.draw()
+win.flip()
+core.wait(sec_iti)
 
 win.close()
 
@@ -181,8 +200,7 @@ grating.draw()
 
 win.flip()
 
-sec = 3
-core.wait(sec)
+core.wait(sec_target)
 
 win.color=color_gray
 win.flip()
@@ -196,7 +214,7 @@ for i_grating in range(2):
 	text.text = "apple"
 	text.draw()
 win.flip()
-core.wait(sec)
+core.wait(sec_probe)
 
 
 grating_ori = [135.0, 15.0]
@@ -208,7 +226,7 @@ for i_grating in range(2):
 	text.text = "boat"
 	text.draw()
 win.flip()
-core.wait(sec)
+core.wait(sec_probe)
 
 
 grating_ori = [45.0, 15.0] #TARGET
@@ -220,7 +238,15 @@ for i_grating in range(2):
 	text.text = "glorb"
 	text.draw()
 win.flip()
-core.wait(sec)
+core.wait(sec_probe)
+
+
+###ITI with fixation cross 
+
+text.text = "+"
+text.draw()
+win.flip()
+core.wait(sec_iti)
 
 ##########################
 
