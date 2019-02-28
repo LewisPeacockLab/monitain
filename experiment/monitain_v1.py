@@ -9,8 +9,25 @@
 
 import random
 import numpy as np 
-from psychopy import visual, event, core
+from psychopy import visual, event, core, gui
 
+
+gui = gui.Dlg()
+gui.addField("Subject ID:")
+gui.addField("Initials:")
+gui.addField("Slack?")
+gui.addField("Screen size:")
+gui.show()
+
+subj_id = gui.data[0]
+subj_initials = gui.data[1]
+slack = gui.data[2]
+screenSize = gui.data[3]
+
+
+## SET UP ##
+
+# Colors
 color_white = [1,1,1]
 color_black = [-1,-1,-1]
 color_gray = [0,0,0]
