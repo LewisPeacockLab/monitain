@@ -45,6 +45,8 @@ win = visual.Window(
 	fullscr=False, #set to True when running for real
 	color=color_white)
 
+clock = core.Clock()
+
 ## MAINTAIN ## 
 
 ###Target
@@ -69,6 +71,9 @@ core.wait(sec_target)
 
 win.color=color_gray
 win.flip()
+keys = event.waitKeys(timeStamped=clock)
+print keys 
+win.close()
 
 ###OG task
 
@@ -107,6 +112,7 @@ text.draw()
 
 win.flip()
 core.wait(sec_probe)
+
 
 ###ITI with fixation cross 
 
@@ -266,6 +272,11 @@ win.flip()
 core.wait(sec_iti)
 
 ##########################
+
+
+###Waiting for a response to move on 
+keys = psychopy.event.waitKeys(keyList=["space"])
+
 
 win.close() #Close window
 
