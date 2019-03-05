@@ -9,10 +9,37 @@
 
 import random
 import numpy as np 
+import pandas as pd
 import os
 import sys
 import pprint 
+import argparse
 from psychopy import visual, event, core#, gui
+
+
+## Thank yoooouuu Remy
+SCREENS = {
+    'animal':      dict(distance_cm= 60,width_cm=47.3,pixel_dims=[1920,1080]),
+    'beauregard':  dict(distance_cm= 60,width_cm=47.3,pixel_dims=[1920,1080]),
+    'camilla':     dict(distance_cm= 60,width_cm=47.3,pixel_dims=[1920,1080]),
+    'scooter':     dict(distance_cm= 67,width_cm=28.5,pixel_dims=[1440, 900]),
+    'snuffy':      dict(distance_cm= 67,width_cm=59.3,pixel_dims=[2560,1440]),
+    'swedishchef': dict(distance_cm= 67,width_cm=33.0,pixel_dims=[1440, 900]),
+    'alice':       dict(distance_cm= 67,width_cm=28.5,pixel_dims=[1440, 900]),
+}
+
+parser = argparse.ArgumentParser(description="Monitain experimental display")
+parser.add_argument('--subj', default='s999', type=str, help='sXXX format')
+parser.add_argument('--scrn', default='animal', type=str, choices=SCREENS.keys(), help = 'computer used for experiment')
+args = parser.parse_args()
+
+subj = args.subj
+scrn = args.scrn
+
+
+####################################
+############ Parameters ############
+####################################
 
 ##
 #gui = gui.Dlg()
@@ -32,14 +59,25 @@ from psychopy import visual, event, core#, gui
 data_path = "monitain_v1_" + str(subj_id)
 data_path_exists = os.path.exists(data_path)
 
+filename = data_path + ".csv"
+
 if data_path_exists: 
 	sys.exit("Filename " + data_path + "already exists!")
 
+
+
+####################################
+########## Build dataframe #########
+#### for individual participant ####
+####################################
+
+columns = ['subj_id', 'block_num', 'trial', ]
 
 ## SET UP ##
 
 data = []
 coded_data = []
+responses = []
 
 # Colors
 color_white = [1,1,1]
@@ -117,6 +155,8 @@ for trial in range(10):
 	core.wait(sec_probe)
 	keys = event.waitKeys(timeStamped=clock)
 	print keys
+
+	responses.append([keys[0][0], keys[0][1]])
 
 win.flip()
 
