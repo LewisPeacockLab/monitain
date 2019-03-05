@@ -41,6 +41,31 @@ scrn = args.scrn
 ############ Parameters ############
 ####################################
 
+## Check to see if file exists
+data_path = "monitain_v1_" + str(subj_id)
+data_path_exists = os.path.exists(data_path)
+
+filename = data_path + ".csv"
+
+if data_path_exists: 
+	sys.exit("Filename " + data_path + "already exists!")
+
+# Colors
+color_white = [1,1,1]
+color_black = [-1,-1,-1]
+color_gray = [0,0,0]
+
+# Timings
+sec_target = 2 
+sec_delay = 1 
+sec_probe = 2 
+sec_iti = 1
+
+# Slack 
+############ NEED TO ADD 
+
+
+
 ##
 #gui = gui.Dlg()
 #gui.addField("Subject ID:")
@@ -55,14 +80,7 @@ scrn = args.scrn
 #screenSize = gui.data[3]
 ##
 
-## Check to see if file exists
-data_path = "monitain_v1_" + str(subj_id)
-data_path_exists = os.path.exists(data_path)
 
-filename = data_path + ".csv"
-
-if data_path_exists: 
-	sys.exit("Filename " + data_path + "already exists!")
 
 
 
@@ -79,25 +97,46 @@ data = []
 coded_data = []
 responses = []
 
-# Colors
-color_white = [1,1,1]
-color_black = [-1,-1,-1]
-color_gray = [0,0,0]
 
-# Timings
-sec_target = 2 
-sec_delay = 1 
-sec_probe = 2 
-sec_iti = 1
+####################################
+############# Psychopy #############
+####################################
 
+clock = core.Clock()
 
+# Window set up
 win = visual.Window(
 	size=[1024,576], #Small size of screen for testing it out
 	units="pix", 
 	fullscr=False, #set to True when running for real
-	color=color_white)
+	color=color_gray)
 
-clock = core.Clock()
+# Grating set up 
+grating = visual.GratingStim(
+	win=win,
+	units="pix", 
+	size=[150,150], #size of box with grating in pixels
+	mask = "circle"
+	) 
+
+# Text set up 
+text = visual.TextStim(
+	win=win, 
+	#text=, 
+	color=color_black, 
+	height=40.0
+	)
+
+
+
+####################################
+############## Events ##############
+####################################
+
+def 
+
+
+
 
 ## MAINTAIN ## 
 
@@ -105,12 +144,7 @@ clock = core.Clock()
 
 
 
-grating = visual.GratingStim(
-	win=win,
-	units="pix", 
-	size=[150,150], #size of box with grating in pixels
-	mask = "circle"
-	) 
+
 
 grating.pos = [0.0,0.0]
 grating.ori = 45.0
