@@ -9,21 +9,21 @@
 
 import random
 import numpy as np 
-from psychopy import visual, event, core, gui
+from psychopy import visual, event, core#, gui
 
+##
+#gui = gui.Dlg()
+#gui.addField("Subject ID:")
+#gui.addField("Initials:")
+#gui.addField("Slack?")
+#gui.addField("Screen size:")
+#gui.show()
 
-gui = gui.Dlg()
-gui.addField("Subject ID:")
-gui.addField("Initials:")
-gui.addField("Slack?")
-gui.addField("Screen size:")
-gui.show()
-
-subj_id = gui.data[0]
-subj_initials = gui.data[1]
-slack = gui.data[2]
-screenSize = gui.data[3]
-
+#subj_id = gui.data[0]
+#subj_initials = gui.data[1]
+#slack = gui.data[2]
+#screenSize = gui.data[3]
+##
 
 ## SET UP ##
 
@@ -72,7 +72,15 @@ core.wait(sec_target)
 win.color=color_gray
 win.flip()
 keys = event.waitKeys(timeStamped=clock)
-print keys 
+#s key for same, d key for different
+
+print keys
+if keys[0][0] == 's':
+	print 'same'
+elif keys[0][0] == 'd': 
+	print 'diff'
+else: 
+	print 'yikes'
 win.close()
 
 ###OG task
