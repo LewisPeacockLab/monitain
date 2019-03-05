@@ -133,6 +133,13 @@ text = visual.TextStim(
 ############## Events ##############
 ####################################
 
+
+def presentTarget(): 
+	win.color = color_white
+	win.flip()
+def maintainProbe(): 
+
+
 def iti(): 
 	win.color = color_gray
 	win.flip()
