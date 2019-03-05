@@ -11,6 +11,7 @@ import random
 import numpy as np 
 import os
 import sys
+import pprint 
 from psychopy import visual, event, core#, gui
 
 ##
@@ -37,6 +38,9 @@ if data_path_exists:
 
 ## SET UP ##
 
+data = []
+coded_data = []
+
 # Colors
 color_white = [1,1,1]
 color_black = [-1,-1,-1]
@@ -60,6 +64,8 @@ clock = core.Clock()
 ## MAINTAIN ## 
 
 ###Target
+
+
 
 grating = visual.GratingStim(
 	win=win,
@@ -97,12 +103,20 @@ win.close()
 
 # Start a loop for this
 
-text = visual.TextStim(
-	win=win, 
-	text="apple", 
-	color=color_black, 
-	height = 40.0)
-text.draw()
+textList = ["apple", "boat", "glorb", "laser", "jalp", "book", "ser", "paper", "lent", "olev"]
+
+for trial in range(10): 
+
+	text = visual.TextStim(
+		win=win, 
+		text=textList[trial], 
+		color=color_black, 
+		height = 40.0)
+	text.draw()
+	win.flip()
+	core.wait(sec_probe)
+	keys = event.waitKeys(timeStamped=clock)
+	print keys
 
 win.flip()
 
