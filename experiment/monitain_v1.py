@@ -9,6 +9,8 @@
 
 import random
 import numpy as np 
+import os
+import sys
 from psychopy import visual, event, core#, gui
 
 ##
@@ -24,6 +26,14 @@ from psychopy import visual, event, core#, gui
 #slack = gui.data[2]
 #screenSize = gui.data[3]
 ##
+
+## Check to see if file exists
+data_path = "monitain_v1_" + str(subj_id)
+data_path_exists = os.path.exists(data_path)
+
+if data_path_exists: 
+	sys.exit("Filename " + data_path + "already exists!")
+
 
 ## SET UP ##
 
