@@ -133,8 +133,28 @@ text = visual.TextStim(
 ############## Events ##############
 ####################################
 
-def 
+def iti(): 
+	win.color = color_gray
+	win.flip()
+	text = visual.TextStim(
+		win=win, 
+		text="+", 
+		color=color_black, 
+		height = 40.0)
+	text.draw()
+	win.flip()
 
+
+
+
+
+####################################
+############ Experiment ############
+####################################
+
+## Maintain
+
+iti()
 
 
 
