@@ -61,6 +61,9 @@ sec_delay = 1
 sec_probe = 2 
 sec_iti = 1
 
+# Keys to hit 
+sd_keyList = ['1', '2']
+
 # Slack 
 ############ NEED TO ADD 
 
@@ -89,7 +92,7 @@ sec_iti = 1
 #### for individual participant ####
 ####################################
 
-columns = ['subj_id', 'block_num', 'trial', ]
+columns = ['subj_id', 'block_num', 'trial'] ## Add more to this! 
 
 ## SET UP ##
 
@@ -132,12 +135,33 @@ text = visual.TextStim(
 ####################################
 ############## Events ##############
 ####################################
+responses = []
 
+def baseline_og(wordStims_df): 
+	#responses = []
+	win.color = color_gray
+	for trial in range(10): ## Change to length of baseline block once I have stims
+		text = visual.TextStim(
+			win=win, 
+			text=wordStims_df.loc[trial, 'word'], 
+			color=color_black, 
+			height = 40.0)
+		text.draw()
+		win.flip()
+		keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
+		print keys
+		responses.append([keys])
+		#responses.append([keys[0][0], keys[0][1]])
+	
 
-def presentTarget(): 
+def presentTarget_maintain(): 
 	win.color = color_white
 	win.flip()
-def maintainProbe(): 
+
+def probe_maintain(): 
+	for probes in ?????
+	win.color()
+	win.flip()
 
 
 def iti(): 
@@ -159,8 +183,23 @@ def iti():
 ############ Experiment ############
 ####################################
 
+## Baseline
+textList = ["apple", "boat", "glorb", "laser", "jalp", "book", "ser", "paper", "lent", "olev"]
+
+# Make dataframe of words and nonwords
+wordData = [['apple',1], ['boat', 1], ['glorb', 2], ['laser',1], ['jalp',2], 
+	['book',1], ['ser',2], ['paper',1], ['lenp',2], ['olev',2]]
+# 1 = word, 2 = nonword
+wordStims_df = pd.DataFrame(wordData, columns=['word', 'type'])
+
+baseline_og(wordStims_df)
+
+
+
 ## Maintain
 
+presentTarget_maintain()
+probe_maintain()
 iti()
 
 
