@@ -152,6 +152,7 @@ def baseline_og(wordStims_df):
 		print keys
 		responses.append([keys])
 		#responses.append([keys[0][0], keys[0][1]])
+	
 
 def presentTarget_maintain(): 
 	win.color = color_white
