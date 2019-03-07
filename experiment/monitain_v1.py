@@ -219,12 +219,12 @@ wordStims_df = pd.DataFrame(wordData, columns=['word', 'type'])
 ogOnly(wordStims_df)
 
 
-## Baseline
+## Baseline, 1 block 
 for trial in range(10): ## Change to length of baseline block once I have stims
 	ogOnly(wordStims_df)	
 
 
-## Maintain
+## Maintain, 2 blocks
 for trial in range(2): ## Change to maintain block length
 	target()
 	delay()
@@ -233,13 +233,21 @@ for trial in range(2): ## Change to maintain block length
 	targetProbe()
 	iti()
 
-## Monitor 
+
+
+## Monitor, 2 blocks 
 for trial in range(2): ##Change to number of trials
 	for probe in range(2): ##Will range from 1 to 15
 		OGnPMprobe()
 	targetProbe()
 	iti()
 
+## M&M, 2 blocks
+for trial in range(2): ## Change to total number of trials
+	for probe in range(2): ## Will also range from 1 to 15 
+		OGnPMprobe(): 
+	targetProbe()
+	iti()
 
 
 ## MAINTAIN ## 
