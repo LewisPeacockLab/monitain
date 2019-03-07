@@ -143,6 +143,7 @@ responses = []
 
 
 def ogOnly(wordStims_df):  
+	win.flip()
 	win.color = color_gray
 	text = visual.TextStim(
 		win=win, 
@@ -280,7 +281,7 @@ for monitorBlock in range(2):
 for mnmBlock in range(2): 
 	for trial in range(2): ## Change to total number of trials
 		for probe in range(2): ## Will also range from 1 to 15 
-			OGnPMprobe(): 
+			OGnPMprobe()
 		targetProbe()
 		iti()
 
