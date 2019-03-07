@@ -153,8 +153,30 @@ def ogOnly(wordStims_df):
 	responses.append([keys])
 		#responses.append([keys[0][0], keys[0][1]])
 
-def target(): 
-	pass
+def target():
+	win.color = color_white
+	grating.pos = [0.0,0.0] 
+	grating.ori = 45.0 ## Change everytime
+	grating.sf = 5.0 / 80.0
+	grating.contrast = 1.0
+	grating.draw()
+
+	win.flip() 
+
+	core.wait(sec_target)
+
+
+win.color = color_white
+grating.pos = [0.0,0.0] 
+grating.ori = 45.0 ## Change everytime
+grating.sf = 5.0 / 80.0
+grating.contrast = 1.0
+grating.draw()
+
+win.flip() 
+
+core.wait(sec_target)
+
 
 def delay(): 
 	win.flip()
@@ -225,29 +247,34 @@ for trial in range(10): ## Change to length of baseline block once I have stims
 
 
 ## Maintain, 2 blocks
-for trial in range(2): ## Change to maintain block length
-	target()
-	delay()
-	for maintain_probe in range(2): ## Change length
-		ogOnly(wordStims_df)
-	targetProbe()
-	iti()
-
-
+for maintainBlock in range(2): 
+	for trial in range(2): ## Change to maintain block length
+		target()
+		delay()
+		for maintain_probe in range(2): ## Change length
+			ogOnly(wordStims_df)
+		targetProbe()
+		iti()
 
 ## Monitor, 2 blocks 
-for trial in range(2): ##Change to number of trials
-	for probe in range(2): ##Will range from 1 to 15
-		OGnPMprobe()
-	targetProbe()
-	iti()
+for monitorBlock in range(2):	
+	for trial in range(2): ##Change to number of trials
+		for probe in range(2): ##Will range from 1 to 15
+			OGnPMprobe()
+		targetProbe()
+		iti()
 
 ## M&M, 2 blocks
-for trial in range(2): ## Change to total number of trials
-	for probe in range(2): ## Will also range from 1 to 15 
-		OGnPMprobe(): 
-	targetProbe()
-	iti()
+for mnmBlock in range(2): 
+	for trial in range(2): ## Change to total number of trials
+		for probe in range(2): ## Will also range from 1 to 15 
+			OGnPMprobe(): 
+		targetProbe()
+		iti()
+
+## Baseline, 1 block 
+for trial in range(10): ## Change to length of baseline block once I have stims
+	ogOnly(wordStims_df)	
 
 
 ## MAINTAIN ## 
