@@ -100,6 +100,8 @@ data = []
 coded_data = []
 responses = []
 
+# Need column for number of probes in monitoring and total trials
+
 
 ####################################
 ############# Psychopy #############
@@ -160,7 +162,13 @@ def delay():
 def probe(): 
 	pass
 
-def probewithOG(): 
+def OGprobe(): 
+	pass
+
+def OGnPMprobe(): 
+	pass
+
+def targetProbe(): 
 	pass
 
 def iti(): 
@@ -211,7 +219,7 @@ wordStims_df = pd.DataFrame(wordData, columns=['word', 'type'])
 ogOnly(wordStims_df)
 
 
-# Baseline
+## Baseline
 for trial in range(10): ## Change to length of baseline block once I have stims
 	ogOnly(wordStims_df)	
 
@@ -222,13 +230,15 @@ for trial in range(2): ## Change to maintain block length
 	delay()
 	for maintain_probe in range(2): ## Change length
 		ogOnly(wordStims_df)
-	probe()
+	targetProbe()
 	iti()
 
-
-
-probe_maintain()
-iti()
+## Monitor 
+for trial in range(2): ##Change to number of trials
+	for probe in range(2): ##Will range from 1 to 15
+		OGnPMprobe()
+	targetProbe()
+	iti()
 
 
 
