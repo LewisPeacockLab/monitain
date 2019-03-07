@@ -124,6 +124,8 @@ grating = visual.GratingStim(
 	mask = "circle"
 	) 
 
+grating_ypos = [-150, 150]  ## need to change
+
 # Text set up 
 text = visual.TextStim(
 	win=win, 
@@ -141,6 +143,7 @@ responses = []
 
 
 def ogOnly(wordStims_df):  
+	win.color = color_gray
 	text = visual.TextStim(
 		win=win, 
 		text=wordStims_df.loc[trial, 'word'], 
@@ -153,10 +156,10 @@ def ogOnly(wordStims_df):
 	responses.append([keys])
 		#responses.append([keys[0][0], keys[0][1]])
 
-def target():
+def target(targetOri_df):
 	win.color = color_white
 	grating.pos = [0.0,0.0] 
-	grating.ori = 45.0 ## Change everytime
+	grating.ori = targetOri_df.loc[trial, 'orientation'] ## Change everytime
 	grating.sf = 5.0 / 80.0
 	grating.contrast = 1.0
 	grating.draw()
@@ -166,19 +169,8 @@ def target():
 	core.wait(sec_target)
 
 
-win.color = color_white
-grating.pos = [0.0,0.0] 
-grating.ori = 45.0 ## Change everytime
-grating.sf = 5.0 / 80.0
-grating.contrast = 1.0
-grating.draw()
-
-win.flip() 
-
-core.wait(sec_target)
-
-
 def delay(): 
+	win.color = color_gray
 	win.flip()
 
 def probe(): 
@@ -191,7 +183,24 @@ def OGnPMprobe():
 	pass
 
 def targetProbe(): 
-	pass
+	win.color = color_gray
+	#text
+	text = visual.TextStim(
+		win=win, 
+		text=wordStims_df.loc[trial, 'word'], 
+		color=color_black, 
+		height = 40.0)
+	text.draw()
+	#gratings
+	for i_grating in range(2): 
+		grating.ori = 20 ## need to change
+		grating.pos = [0,grating_ypos[i_grating]]
+		grating.draw()
+	win.flip()
+	#response
+	keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
+	print keys
+	responses.append([keys])
 
 def iti(): 
 	win.flip()
@@ -238,6 +247,9 @@ wordData = [['apple',1], ['boat', 1], ['glorb', 2], ['laser',1], ['jalp',2],
 # 1 = word, 2 = nonword
 wordStims_df = pd.DataFrame(wordData, columns=['word', 'type'])
 
+oriData = [10, 20, 80, 110, 30, 50, 170, 150, 20, 120]
+targetOri_df = pd.DataFrame(oriData, columns = ['orientation'])
+
 ogOnly(wordStims_df)
 
 
@@ -249,7 +261,7 @@ for trial in range(10): ## Change to length of baseline block once I have stims
 ## Maintain, 2 blocks
 for maintainBlock in range(2): 
 	for trial in range(2): ## Change to maintain block length
-		target()
+		target(targetOri_df)
 		delay()
 		for maintain_probe in range(2): ## Change length
 			ogOnly(wordStims_df)
