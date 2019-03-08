@@ -80,25 +80,6 @@ sd_keyList = ['1', '2']
 ############ NEED TO ADD 
 
 
-
-##
-#gui = gui.Dlg()
-#gui.addField("Subject ID:")
-#gui.addField("Initials:")
-#gui.addField("Slack?")
-#gui.addField("Screen size:")
-#gui.show()
-
-#subj_id = gui.data[0]
-#subj_initials = gui.data[1]
-#slack = gui.data[2]
-#screenSize = gui.data[3]
-##
-
-
-
-
-
 ####################################
 ########## Build dataframe #########
 #### for individual participant ####
@@ -224,26 +205,6 @@ def iti():
 		height = 40.0)
 	text.draw()
 	win.flip()
-
-## Maintain
-
-def presentTarget_maintain(): 
-	win.color = color_white
-	win.flip()
-
-
-
-def probe_maintain(): 
-	for probes in ?????
-	win.color()
-	win.flip()
-
-
-
-
-# Monitor
-
-# Maintain and monitor
 
 
 
