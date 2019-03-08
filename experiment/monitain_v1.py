@@ -36,6 +36,18 @@ args = parser.parse_args()
 subj = args.subj
 scrn = args.scrn
 
+# Put .txt files into dataframes
+words_df = pd.read_table("words.txt", header=-1)
+words_df = words_df.rename(columns={0:'stimuli'})
+words_df['type'] = 1
+
+nonwords_df = pd.read_table("nonwords.txt", header=-1)
+nonwords_df = nonwords_df = nonwords_df.rename(columns={0:'stimuli'})
+nonwords_df['type'] = 2
+
+stimCombine = [words_df, nonwords_df]
+ogStims = pd.concat(stimCombine, ignore_index=True)
+
 
 ####################################
 ############ Parameters ############
@@ -142,12 +154,12 @@ text = visual.TextStim(
 responses = []
 
 
-def ogOnly(wordStims_df):  
+def ogOnly(words_df):  
 	win.flip()
 	win.color = color_gray
 	text = visual.TextStim(
 		win=win, 
-		text=wordStims_df.loc[trial, 'word'], 
+		text=words_df.loc[trial, 'stimuli'], 
 		color=color_black, 
 		height = 40.0)
 	text.draw()
@@ -256,7 +268,7 @@ ogOnly(wordStims_df)
 
 ## Baseline, 1 block 
 for trial in range(10): ## Change to length of baseline block once I have stims
-	ogOnly(wordStims_df)	
+	ogOnly(words_df)	
 
 
 ## Maintain, 2 blocks
