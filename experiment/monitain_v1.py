@@ -137,9 +137,9 @@ responses = []
 
 
 def ogOnly(words_df):  
-	
-	win.color = color_gray
 	win.flip()
+	win.color = color_gray
+	#win.flip()
 	text = visual.TextStim(
 		win=win, 
 		text=ogStims_df.loc[trial, 'stimuli'], 
@@ -168,6 +168,7 @@ def target(targetOri_df):
 
 
 def delay(): 
+	win.flip()
 	win.color = color_gray
 	win.flip()
 
@@ -181,6 +182,7 @@ def OGnPMprobe():
 	pass
 
 def targetProbe(): 
+	win.flip()
 	win.color = color_gray
 	#text
 	text = visual.TextStim(
@@ -235,6 +237,7 @@ for trial in range(10): ## Change to length of baseline block once I have stims
 
 
 ## Maintain, 2 blocks
+
 for maintainBlock in range(2): 
 	for trial in range(2): ## Change to maintain block length
 		target(targetOri_df)
@@ -243,6 +246,7 @@ for maintainBlock in range(2):
 			ogOnly(ogStims_df)
 		targetProbe()
 		iti()
+		print 'iti'
 
 ## Monitor, 2 blocks 
 for monitorBlock in range(2):	
