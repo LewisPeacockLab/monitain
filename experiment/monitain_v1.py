@@ -14,7 +14,7 @@ import os
 import sys
 import pprint 
 import argparse
-from psychopy import visual, event, core#, gui
+from psychopy import visual, event, core
 
 
 ## Thank yoooouuu Remy
@@ -46,7 +46,7 @@ nonwords_df = nonwords_df = nonwords_df.rename(columns={0:'stimuli'})
 nonwords_df['type'] = 2
 
 stimCombine = [words_df, nonwords_df]
-ogStims = pd.concat(stimCombine, ignore_index=True)
+ogStims_df = pd.concat(stimCombine, ignore_index=True)
 
 
 ####################################
@@ -107,7 +107,8 @@ win = visual.Window(
 	size=[1024,576], #Small size of screen for testing it out
 	units="pix", 
 	fullscr=False, #set to True when running for real
-	color=color_gray)
+	#color=color
+	)
 
 # Grating set up 
 grating = visual.GratingStim(
@@ -136,11 +137,12 @@ responses = []
 
 
 def ogOnly(words_df):  
-	win.flip()
+	
 	win.color = color_gray
+	win.flip()
 	text = visual.TextStim(
 		win=win, 
-		text=words_df.loc[trial, 'stimuli'], 
+		text=ogStims_df.loc[trial, 'stimuli'], 
 		color=color_black, 
 		height = 40.0)
 	text.draw()
@@ -152,15 +154,17 @@ def ogOnly(words_df):
 
 def target(targetOri_df):
 	win.color = color_white
+	win.flip()
 	grating.pos = [0.0,0.0] 
 	grating.ori = targetOri_df.loc[trial, 'orientation'] ## Change everytime
 	grating.sf = 5.0 / 80.0
 	grating.contrast = 1.0
 	grating.draw()
-
+	win.color = color_white
 	win.flip() 
 
 	core.wait(sec_target)
+	
 
 
 def delay(): 
@@ -181,7 +185,7 @@ def targetProbe():
 	#text
 	text = visual.TextStim(
 		win=win, 
-		text=wordStims_df.loc[trial, 'word'], 
+		text=ogStims_df.loc[trial, 'stimuli'], 
 		color=color_black, 
 		height = 40.0)
 	text.draw()
@@ -216,20 +220,18 @@ def iti():
 # textList = ["apple", "boat", "glorb", "laser", "jalp", "book", "ser", "paper", "lent", "olev"]
 
 # Make dataframe of words and nonwords
-wordData = [['apple',1], ['boat', 1], ['glorb', 2], ['laser',1], ['jalp',2], 
-	['book',1], ['ser',2], ['paper',1], ['lenp',2], ['olev',2]]
-# 1 = word, 2 = nonword
-wordStims_df = pd.DataFrame(wordData, columns=['word', 'type'])
+# wordData = [['apple',1], ['boat', 1], ['glorb', 2], ['laser',1], ['jalp',2], 
+# 	['book',1], ['ser',2], ['paper',1], ['lenp',2], ['olev',2]]
+# # 1 = word, 2 = nonword
+# wordStims_df = pd.DataFrame(wordData, columns=['word', 'type'])
 
 oriData = [10, 20, 80, 110, 30, 50, 170, 150, 20, 120]
 targetOri_df = pd.DataFrame(oriData, columns = ['orientation'])
 
-ogOnly(wordStims_df)
-
 
 ## Baseline, 1 block 
 for trial in range(10): ## Change to length of baseline block once I have stims
-	ogOnly(words_df)	
+	ogOnly(ogStims_df)	
 
 
 ## Maintain, 2 blocks
@@ -238,7 +240,7 @@ for maintainBlock in range(2):
 		target(targetOri_df)
 		delay()
 		for maintain_probe in range(2): ## Change length
-			ogOnly(wordStims_df)
+			ogOnly(ogStims_df)
 		targetProbe()
 		iti()
 
@@ -260,7 +262,7 @@ for mnmBlock in range(2):
 
 ## Baseline, 1 block 
 for trial in range(10): ## Change to length of baseline block once I have stims
-	ogOnly(wordStims_df)	
+	ogOnly(ogStims_df)	
 
 
 ## MAINTAIN ## 
