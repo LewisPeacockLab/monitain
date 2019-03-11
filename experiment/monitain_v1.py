@@ -161,21 +161,15 @@ def target(targetOri_df):
 	grating.contrast = 1.0
 	grating.draw()
 	win.flip() 
-
 	core.wait(sec_target)
-	
 
 
 def delay(): 
-	win.flip()
 	win.color = color_gray
 	win.flip()
-
-def probe(): 
-	pass
-
-def OGprobe(): 
-	pass
+	win.flip()
+	core.wait(sec_delay)
+	
 
 def OGnPMprobe(): 
 	win.flip()
@@ -276,6 +270,10 @@ for monitorBlock in range(2):
 ## M&M, 2 blocks
 for mnmBlock in range(2): 
 	for trial in range(2): ## Change to total number of trials
+		target(targetOri_df)
+		print win.color
+		delay()
+		print win.color
 		for probe in range(2): ## Will also range from 1 to 15 
 			OGnPMprobe()
 		targetProbe()
