@@ -154,13 +154,12 @@ def ogOnly(words_df):
 
 def target(targetOri_df):
 	win.color = color_white
-	win.flip()
+	win.flip()	
 	grating.pos = [0.0,0.0] 
 	grating.ori = targetOri_df.loc[trial, 'orientation'] ## Change everytime
 	grating.sf = 5.0 / 80.0
 	grating.contrast = 1.0
 	grating.draw()
-	win.color = color_white
 	win.flip() 
 
 	core.wait(sec_target)
@@ -179,7 +178,25 @@ def OGprobe():
 	pass
 
 def OGnPMprobe(): 
-	pass
+	win.flip()
+	win.color = color_gray
+	#text
+	text = visual.TextStim(
+		win=win, 
+		text=ogStims_df.loc[trial, 'stimuli'], 
+		color=color_black, 
+		height = 40.0)
+	text.draw()
+	#gratings
+	for i_grating in range(2): 
+		grating.ori = 20 ## need to change
+		grating.pos = [0,grating_ypos[i_grating]]
+		grating.draw()
+	win.flip()
+	#response
+	keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
+	print keys
+	responses.append([keys])
 
 def targetProbe(): 
 	win.flip()
