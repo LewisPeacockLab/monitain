@@ -87,11 +87,23 @@ sd_keyList = ['1', '2']
 
 columns = ['subj_id', 'block_num', 'trial'] ## Add more to this! 
 
+n_trials_base = 106
+n_trials_maintain = 198
+n_trials_monitor = 198
+n_trials_mm = 198
+
+n_runs = 2
+
+df_index_base = pd.MultiIndex.from_product([range(n_runs),range(n_trials_base)])
 ## SET UP ##
 
 data = []
 coded_data = []
 responses = []
+
+df = pd.DataFrame(columns=df_columns, index=, dtype=float)
+
+df['subj_id'] = subj
 
 # Need column for number of probes in monitoring and total trials
 
