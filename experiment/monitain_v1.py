@@ -49,6 +49,10 @@ stimCombine = [words_df, nonwords_df]
 ogStims_df = pd.concat(stimCombine, ignore_index=True)
 
 
+
+#Orientations
+
+
 ####################################
 ############ Parameters ############
 ####################################
@@ -98,17 +102,36 @@ n_trials_mm = 198
 
 n_runs = 2
 
+#Blocks
+##0 = baseline
+##1 = maintain
+##2 = maintain
+##3 = monitor
+##4 = monitor
+##5 = m&m
+##6 = m&m
+##7 = baseline
+
 df_index_base = pd.MultiIndex.from_product([range(n_runs),range(n_trials_base)], names=['block', 'trial'])
 df_base = pd.DataFrame(columns=columns, index=df_index_base, dtype=float)
+df_base = df_base.rename(index={1:7}) #baseline is blocks 0 and 7
 
 df_index_maintain = pd.MultiIndex.from_product([range(n_runs),range(n_trials_maintain)], names=['block', 'trial'])
-df_maintain = pd.DataFrame(columns=columns, index=df_index_maintain, dtype=float)
+df_maintain = df_maintain = pd.DataFrame(columns=columns, index=df_index_maintain, dtype=float)
+df_maintain = df_maintain.rename(index={1:2})
+df_maintain['lexicalStim'].update(ogStims_df['stimuli'])
+df_maintain['correctResp'].update(ogStims_df['type'])
+
 
 df_index_monitor = pd.MultiIndex.from_product([range(n_runs),range(n_trials_monitor)], names=['block', 'trial'])
 df_monitor = pd.DataFrame(columns=columns, index=df_index_monitor, dtype=float)
+df_monitor = df_monitor.rename(index={0:3}) #monitor is blocks 3 and 4
+df_monitor = df_monitor.rename(index={1:4})
 
 df_index_mm = pd.MultiIndex.from_product([range(n_runs),range(n_trials_mm)], names=['block', 'trial'])
 df_mm = pd.DataFrame(columns=columns, index=df_index_mm, dtype=float)
+df_mm = df_mm.rename(index={0:5}) #m&m is blocks 5 and 6
+df_mm = df_mm.rename(index={1:6})
 
 ## SET UP ##
 
