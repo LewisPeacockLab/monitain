@@ -85,7 +85,11 @@ sd_keyList = ['1', '2']
 #### for individual participant ####
 ####################################
 
-columns = ['subj_id', 'block_num', 'trial'] ## Add more to this! 
+columns = ['subj_id', 'block_num', 'trial', 
+	'ori_top', 'ori_mid', 'ori_bot', 
+	'word_nonword', 'lexicalStim', 
+	'correctResp', 'resp', 'acc', 
+	'rt'] ## Add more to this! 
 
 n_trials_base = 106
 n_trials_maintain = 198
@@ -94,7 +98,18 @@ n_trials_mm = 198
 
 n_runs = 2
 
-df_index_base = pd.MultiIndex.from_product([range(n_runs),range(n_trials_base)])
+df_index_base = pd.MultiIndex.from_product([range(n_runs),range(n_trials_base)], names=['block', 'trial'])
+df_base = pd.DataFrame(columns=columns, index=df_index_base, dtype=float)
+
+df_index_maintain = pd.MultiIndex.from_product([range(n_runs),range(n_trials_maintain)], names=['block', 'trial'])
+df_maintain = pd.DataFrame(columns=columns, index=df_index_maintain, dtype=float)
+
+df_index_monitor = pd.MultiIndex.from_product([range(n_runs),range(n_trials_monitor)], names=['block', 'trial'])
+df_monitor = pd.DataFrame(columns=columns, index=df_index_monitor, dtype=float)
+
+df_index_mm = pd.MultiIndex.from_product([range(n_runs),range(n_trials_mm)], names=['block', 'trial'])
+df_mm = pd.DataFrame(columns=columns, index=df_index_mm, dtype=float)
+
 ## SET UP ##
 
 data = []
