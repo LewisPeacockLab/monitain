@@ -102,6 +102,18 @@ n_trials_mm = 198
 
 n_runs = 2
 
+oriData = [10, 20, 30, 40, 50, 60, 70, 80, 100,
+	110, 120, 130, 140, 150, 160, 170] #Exclude 0/180 and 90 degrees
+
+
+trialsPerBlock_a = [1, 2, 5, 6, 
+	8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15]
+trialsPerBlock_b = [3, 4, 7, 
+	8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15]
+
+
+
+
 #Blocks
 ##0 = baseline
 ##1 = maintain
@@ -122,16 +134,24 @@ df_maintain = df_maintain.rename(index={1:2})
 df_maintain['lexicalStim'].update(ogStims_df['stimuli'])
 df_maintain['correctResp'].update(ogStims_df['type'])
 
+trials_maintain_a = random.sample(trialsPerBlock_a, len(trialsPerBlock_a))
+trials_maintain_b = random.sample(trialsPerBlock_b, len(trialsPerBlock_b))
 
 df_index_monitor = pd.MultiIndex.from_product([range(n_runs),range(n_trials_monitor)], names=['block', 'trial'])
 df_monitor = pd.DataFrame(columns=columns, index=df_index_monitor, dtype=float)
 df_monitor = df_monitor.rename(index={0:3}) #monitor is blocks 3 and 4
 df_monitor = df_monitor.rename(index={1:4})
 
+trials_monitor_a = random.sample(trialsPerBlock_a, len(trialsPerBlock_a))
+trials_monitor_b = random.sample(trialsPerBlock_b, len(trialsPerBlock_b))
+
 df_index_mm = pd.MultiIndex.from_product([range(n_runs),range(n_trials_mm)], names=['block', 'trial'])
 df_mm = pd.DataFrame(columns=columns, index=df_index_mm, dtype=float)
 df_mm = df_mm.rename(index={0:5}) #m&m is blocks 5 and 6
 df_mm = df_mm.rename(index={1:6})
+
+trials_mm_a = random.sample(trialsPerBlock_a, len(trialsPerBlock_a))
+trials_mm_b = random.sample(trialsPerBlock_b, len(trialsPerBlock_b))
 
 ## SET UP ##
 
@@ -139,9 +159,9 @@ data = []
 coded_data = []
 responses = []
 
-df = pd.DataFrame(columns=df_columns, index=, dtype=float)
+df_mm = pd.DataFrame(columns=df_columns, index=, dtype=float)
 
-df['subj_id'] = subj
+df_mm['subj_id'] = subj
 
 # Need column for number of probes in monitoring and total trials
 
