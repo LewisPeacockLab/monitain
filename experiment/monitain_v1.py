@@ -49,6 +49,10 @@ stimCombine = [words_df, nonwords_df]
 ogStims_df = pd.concat(stimCombine, ignore_index=True)
 
 
+
+#Orientations
+
+
 ####################################
 ############ Parameters ############
 ####################################
@@ -85,13 +89,79 @@ sd_keyList = ['1', '2']
 #### for individual participant ####
 ####################################
 
-columns = ['subj_id', 'block_num', 'trial'] ## Add more to this! 
+columns = ['subj_id', 'block_num', 'trial', 
+	'ori_top', 'ori_mid', 'ori_bot', 
+	'word_nonword', 'lexicalStim', 
+	'correctResp', 'resp', 'acc', 
+	'rt'] ## Add more to this! 
+
+n_trials_base = 106
+n_trials_maintain = 198
+n_trials_monitor = 198
+n_trials_mm = 198
+
+n_runs = 2
+
+oriData = [10, 20, 30, 40, 50, 60, 70, 80, 100,
+	110, 120, 130, 140, 150, 160, 170] #Exclude 0/180 and 90 degrees
+
+
+trialsPerBlock_a = [1, 2, 5, 6, 
+	8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15]
+trialsPerBlock_b = [3, 4, 7, 
+	8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15]
+
+
+
+
+#Blocks
+##0 = baseline
+##1 = maintain
+##2 = maintain
+##3 = monitor
+##4 = monitor
+##5 = m&m
+##6 = m&m
+##7 = baseline
+
+df_index_base = pd.MultiIndex.from_product([range(n_runs),range(n_trials_base)], names=['block', 'trial'])
+df_base = pd.DataFrame(columns=columns, index=df_index_base, dtype=float)
+df_base = df_base.rename(index={1:7}) #baseline is blocks 0 and 7
+
+df_index_maintain = pd.MultiIndex.from_product([range(n_runs),range(n_trials_maintain)], names=['block', 'trial'])
+df_maintain = df_maintain = pd.DataFrame(columns=columns, index=df_index_maintain, dtype=float)
+df_maintain = df_maintain.rename(index={1:2})
+df_maintain['lexicalStim'].update(ogStims_df['stimuli'])
+df_maintain['correctResp'].update(ogStims_df['type'])
+
+trials_maintain_a = random.sample(trialsPerBlock_a, len(trialsPerBlock_a))
+trials_maintain_b = random.sample(trialsPerBlock_b, len(trialsPerBlock_b))
+
+df_index_monitor = pd.MultiIndex.from_product([range(n_runs),range(n_trials_monitor)], names=['block', 'trial'])
+df_monitor = pd.DataFrame(columns=columns, index=df_index_monitor, dtype=float)
+df_monitor = df_monitor.rename(index={0:3}) #monitor is blocks 3 and 4
+df_monitor = df_monitor.rename(index={1:4})
+
+trials_monitor_a = random.sample(trialsPerBlock_a, len(trialsPerBlock_a))
+trials_monitor_b = random.sample(trialsPerBlock_b, len(trialsPerBlock_b))
+
+df_index_mm = pd.MultiIndex.from_product([range(n_runs),range(n_trials_mm)], names=['block', 'trial'])
+df_mm = pd.DataFrame(columns=columns, index=df_index_mm, dtype=float)
+df_mm = df_mm.rename(index={0:5}) #m&m is blocks 5 and 6
+df_mm = df_mm.rename(index={1:6})
+
+trials_mm_a = random.sample(trialsPerBlock_a, len(trialsPerBlock_a))
+trials_mm_b = random.sample(trialsPerBlock_b, len(trialsPerBlock_b))
 
 ## SET UP ##
 
 data = []
 coded_data = []
 responses = []
+
+df_mm = pd.DataFrame(columns=df_columns, index=, dtype=float)
+
+df_mm['subj_id'] = subj
 
 # Need column for number of probes in monitoring and total trials
 
@@ -154,32 +224,43 @@ def ogOnly(words_df):
 
 def target(targetOri_df):
 	win.color = color_white
-	win.flip()
+	win.flip()	
 	grating.pos = [0.0,0.0] 
 	grating.ori = targetOri_df.loc[trial, 'orientation'] ## Change everytime
 	grating.sf = 5.0 / 80.0
 	grating.contrast = 1.0
 	grating.draw()
-	win.color = color_white
 	win.flip() 
-
 	core.wait(sec_target)
-	
 
 
 def delay(): 
-	win.flip()
 	win.color = color_gray
 	win.flip()
-
-def probe(): 
-	pass
-
-def OGprobe(): 
-	pass
+	win.flip()
+	core.wait(sec_delay)
+	
 
 def OGnPMprobe(): 
-	pass
+	win.flip()
+	win.color = color_gray
+	#text
+	text = visual.TextStim(
+		win=win, 
+		text=ogStims_df.loc[trial, 'stimuli'], 
+		color=color_black, 
+		height = 40.0)
+	text.draw()
+	#gratings
+	for i_grating in range(2): 
+		grating.ori = 20 ## need to change
+		grating.pos = [0,grating_ypos[i_grating]]
+		grating.draw()
+	win.flip()
+	#response
+	keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
+	print keys
+	responses.append([keys])
 
 def targetProbe(): 
 	win.flip()
@@ -259,6 +340,10 @@ for monitorBlock in range(2):
 ## M&M, 2 blocks
 for mnmBlock in range(2): 
 	for trial in range(2): ## Change to total number of trials
+		target(targetOri_df)
+		print win.color
+		delay()
+		print win.color
 		for probe in range(2): ## Will also range from 1 to 15 
 			OGnPMprobe()
 		targetProbe()
