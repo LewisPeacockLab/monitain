@@ -124,12 +124,16 @@ UPPER_CATCH_TRIAL = 7
 N_BLOCKS = 8
 probe_count_list = [] 
 
-N_BLOCKS = 8
-
 trials = range(N_MIN_PROBES, N_MAX_PROBES+1)
 
 
-N_TOTAL_TRIALS = N_PROBES_PER_BLOCK * N_BLOCKS
+baselineTrials = 106
+maintainTrials = 20
+monitorTrials = 198
+mnmTrials = 20
+
+#N_TOTAL_TRIALS = N_PROBES_PER_BLOCK * N_BLOCKS
+N_TOTAL_TRIALS = (baselineTrials*2) + (maintainTrials*2) + (monitorTrials*2) + (mnmTrials*2)
 
 
 # Create dataframe
@@ -139,14 +143,59 @@ wordCond_cols = ['word{:d}_cond'.format(i+1) for i in range(N_MAX_PROBES) ]
 topTheta_cols = ['topTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
 botTheta_cols = ['botTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
 
-columns = ['targTheta', #angle for memory target
-	 'n_probes',  #num of probes in trial 
-	 'probeTheta_loc' #where target probe is on last probe
-	 ]
+columns = ['subj', #subject id 
+	'block', #block num 
+	'targTheta', #angle for memory target
+	'n_probes',  #num of probes in trial 
+	'probeTheta_loc', #where target probe is on last probe
+	'acc', #acc for target probe for trial
+
+	]
 
 df_columns = columns + word_cols + wordCond_cols + topTheta_cols + botTheta_cols
 df_index = range(N_TOTAL_TRIALS)
 df = pd.DataFrame(columns = df_columns, index = df_index)
+
+df['subj'] = subj_id
+
+# Break up blocks
+## 1 and 8 = Baseline, trials 0-105 and 582-687
+## 2 and 3 = Maintain, trials 106-125, 126-145
+## 4 and 5 = Monitor, trials 146-343, 344-541
+## 6 and 7 = M&M, trials 542-561, 562-581
+
+# Set block values
+df.iloc[0:106, df.columns.get_loc('block')] = 1
+df.iloc[106:126, df.columns.get_loc('block')] = 2
+df.iloc[126:146, df.columns.get_loc('block')] = 3
+df.iloc[146:344, df.columns.get_loc('block')] = 4
+df.iloc[344:542, df.columns.get_loc('block')] = 5
+df.iloc[542:562, df.columns.get_loc('block')] = 6
+df.iloc[562:582, df.columns.get_loc('block')] = 7
+df.iloc[582:688, df.columns.get_loc('block')] = 8
+
+
+for totalTrials in range(N_TOTAL_TRIALS): 
+	for b1 in range(baselineTrials): 
+		df['block'][totalTrials] = 1
+	for main1 in range(maintainTrials): 
+		df['block'][totalTrials] = 2
+	for main2 in range(maintainTrials): 
+		df['block'][totalTrials] = 3
+	for mon1 in range(monitorTrials): 
+		df['block'][totalTrials] = 4
+	for mon2 in range(monitorTrials): 
+		df['block'][totalTrials] = 5
+	for mnm1 in range(mnmTrials): 
+		df['block'][totalTrials] = 6
+	for mnm2 in range(mnmTrials): 
+		df['block'][totalTrials] = 7 
+	for b2 in range(baselineTrials): 
+		df['block'][totalTrials] = 8 
+
+
+for i in range(baselineTrials):
+	print i
 
 all_targetTheta_locs = np.repeat(['top', 'bot'], N_TOTAL_TRIALS/2)
 np.random.shuffle(all_targetTheta_locs)
@@ -187,7 +236,7 @@ np.random.choice(possible_thetas)
 # probes = range(N_MIN_PROBES, N_MAX_PROBES+1)
 # probe_range = np.repeat(trials,2)
 
-# N_CATCH_PER_BLOCK = N_PROBES_PER_BLOCK - probe_range.size
+N_CATCH_PER_BLOCK = N_PROBES_PER_BLOCK - probe_range.size
 
 
 # new_range = np.append(catch_range, probe_range)
@@ -195,9 +244,9 @@ np.random.choice(possible_thetas)
 
 
 
-for i in range(N_BLOCKS): 
-	np.random.shuffle(new_range)
-	probe_count_list.append(new_range)
+# for i in range(N_BLOCKS): 
+# 	np.random.shuffle(new_range)
+# 	probe_count_list.append(new_range)
 
 
 
