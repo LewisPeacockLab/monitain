@@ -523,6 +523,26 @@ def iti():
 oriData = [10, 20, 80, 110, 30, 50, 170, 150, 20, 120]
 targetOri_df = pd.DataFrame(oriData, columns = ['orientation'])
 
+for trial_i in range(N_TOTAL_TRIALS): 
+	if df.iloc[trial_i, df.columns.get_loc('block')] == 1: 
+		print 'baseline ',trial_i
+	elif df.iloc[trial_i, df.columns.get_loc('block')] == 2: 
+		print 'maintain1',trial_i
+	elif df.iloc[trial_i, df.columns.get_loc('block')] == 3: 
+		print 'maintain2',trial_i
+	elif df.iloc[trial_i, df.columns.get_loc('block')] == 4: 
+		print 'monitor1',trial_i
+	elif df.iloc[trial_i, df.columns.get_loc('block')] == 5: 
+		print 'monitor2',trial_i
+	elif df.iloc[trial_i, df.columns.get_loc('block')] == 6: 
+		print 'mnm1',trial_i
+	elif df.iloc[trial_i, df.columns.get_loc('block')] == 7: 
+		print 'mnm2',trial_i
+	elif df.iloc[trial_i, df.columns.get_loc('block')] == 8: 
+		print 'mnm3',trial_i
+	else: 
+		raise Warning('yikes')
+
 
 ## Baseline, 1 block 
 for trial in range(10): ## Change to length of baseline block once I have stims
