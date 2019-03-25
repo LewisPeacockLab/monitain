@@ -336,34 +336,34 @@ for i in range(N_TOTAL_TRIALS):
 ##6 = m&m
 ##7 = baseline
 
-df_index_base = pd.MultiIndex.from_product([range(n_runs),range(n_trials_base)], names=['block', 'trial'])
-df_base = pd.DataFrame(columns=columns, index=df_index_base, dtype=float)
-df_base = df_base.rename(index={1:7}) #baseline is blocks 0 and 7
+# df_index_base = pd.MultiIndex.from_product([range(n_runs),range(n_trials_base)], names=['block', 'trial'])
+# df_base = pd.DataFrame(columns=columns, index=df_index_base, dtype=float)
+# df_base = df_base.rename(index={1:7}) #baseline is blocks 0 and 7
 
-df_index_maintain = pd.MultiIndex.from_product([range(n_runs),range(n_trials_maintain)], names=['block', 'trial'])
-df_maintain = df_maintain = pd.DataFrame(columns=columns, index=df_index_maintain, dtype=float)
-df_maintain = df_maintain.rename(index={1:2})
-df_maintain['lexicalStim'].update(ogStims_df['stimuli'])
-df_maintain['correctResp'].update(ogStims_df['type'])
+# df_index_maintain = pd.MultiIndex.from_product([range(n_runs),range(n_trials_maintain)], names=['block', 'trial'])
+# df_maintain = df_maintain = pd.DataFrame(columns=columns, index=df_index_maintain, dtype=float)
+# df_maintain = df_maintain.rename(index={1:2})
+# df_maintain['lexicalStim'].update(ogStims_df['stimuli'])
+# df_maintain['correctResp'].update(ogStims_df['type'])
 
-trials_maintain_a = random.sample(trialsPerBlock_a, len(trialsPerBlock_a))
-trials_maintain_b = random.sample(trialsPerBlock_b, len(trialsPerBlock_b))
+# trials_maintain_a = random.sample(trialsPerBlock_a, len(trialsPerBlock_a))
+# trials_maintain_b = random.sample(trialsPerBlock_b, len(trialsPerBlock_b))
 
-df_index_monitor = pd.MultiIndex.from_product([range(n_runs),range(n_trials_monitor)], names=['block', 'trial'])
-df_monitor = pd.DataFrame(columns=columns, index=df_index_monitor, dtype=float)
-df_monitor = df_monitor.rename(index={0:3}) #monitor is blocks 3 and 4
-df_monitor = df_monitor.rename(index={1:4})
+# df_index_monitor = pd.MultiIndex.from_product([range(n_runs),range(n_trials_monitor)], names=['block', 'trial'])
+# df_monitor = pd.DataFrame(columns=columns, index=df_index_monitor, dtype=float)
+# df_monitor = df_monitor.rename(index={0:3}) #monitor is blocks 3 and 4
+# df_monitor = df_monitor.rename(index={1:4})
 
-trials_monitor_a = random.sample(trialsPerBlock_a, len(trialsPerBlock_a))
-trials_monitor_b = random.sample(trialsPerBlock_b, len(trialsPerBlock_b))
+# trials_monitor_a = random.sample(trialsPerBlock_a, len(trialsPerBlock_a))
+# trials_monitor_b = random.sample(trialsPerBlock_b, len(trialsPerBlock_b))
 
-df_index_mm = pd.MultiIndex.from_product([range(n_runs),range(n_trials_mm)], names=['block', 'trial'])
-df_mm = pd.DataFrame(columns=columns, index=df_index_mm, dtype=float)
-df_mm = df_mm.rename(index={0:5}) #m&m is blocks 5 and 6
-df_mm = df_mm.rename(index={1:6})
+# df_index_mm = pd.MultiIndex.from_product([range(n_runs),range(n_trials_mm)], names=['block', 'trial'])
+# df_mm = pd.DataFrame(columns=columns, index=df_index_mm, dtype=float)
+# df_mm = df_mm.rename(index={0:5}) #m&m is blocks 5 and 6
+# df_mm = df_mm.rename(index={1:6})
 
-trials_mm_a = random.sample(trialsPerBlock_a, len(trialsPerBlock_a))
-trials_mm_b = random.sample(trialsPerBlock_b, len(trialsPerBlock_b))
+# trials_mm_a = random.sample(trialsPerBlock_a, len(trialsPerBlock_a))
+# trials_mm_b = random.sample(trialsPerBlock_b, len(trialsPerBlock_b))
 
 ## SET UP ##
 
@@ -371,9 +371,9 @@ data = []
 coded_data = []
 responses = []
 
-df_mm = pd.DataFrame(columns=df_columns, index=, dtype=float)
+#df_mm = pd.DataFrame(columns=df_columns, index=, dtype=float)
 
-df_mm['subj_id'] = subj
+#df_mm['subj_id'] = subj
 
 # Need column for number of probes in monitoring and total trials
 
@@ -424,7 +424,7 @@ def ogOnly(words_df):
 	#win.flip()
 	text = visual.TextStim(
 		win=win, 
-		text=ogStims_df.loc[trial, 'stimuli'], 
+		text=ogStims_df.loc[trial_i, 'stimuli'], 
 		color=color_black, 
 		height = 40.0)
 	text.draw()
@@ -595,46 +595,48 @@ for trial_i in range(N_TOTAL_TRIALS):
 		raise Warning('yikes')
 
 
-## Baseline, 1 block 
-for trial in range(10): ## Change to length of baseline block once I have stims
-	ogOnly(ogStims_df)	
 
 
-## Maintain, 2 blocks
 
-for maintainBlock in range(2): 
-	for trial in range(2): ## Change to maintain block length
-		target(targetOri_df)
-		delay()
-		for maintain_probe in range(2): ## Change length
-			ogOnly(ogStims_df)
-		targetProbe()
-		iti()
-		print 'iti'
+# ## Baseline, 1 block 
+# for trial in range(10): ## Change to length of baseline block once I have stims
+# 	ogOnly(ogStims_df)	
 
-## Monitor, 2 blocks 
-for monitorBlock in range(2):	
-	for trial in range(2): ##Change to number of trials
-		for probe in range(2): ##Will range from 1 to 15
-			OGnPMprobe()
-		targetProbe()
-		iti()
+# ## Maintain, 2 blocks
 
-## M&M, 2 blocks
-for mnmBlock in range(2): 
-	for trial in range(2): ## Change to total number of trials
-		target(targetOri_df)
-		print win.color
-		delay()
-		print win.color
-		for probe in range(2): ## Will also range from 1 to 15 
-			OGnPMprobe()
-		targetProbe()
-		iti()
+# for maintainBlock in range(2): 
+# 	for trial in range(2): ## Change to maintain block length
+# 		target(targetOri_df)
+# 		delay()
+# 		for maintain_probe in range(2): ## Change length
+# 			ogOnly(ogStims_df)
+# 		targetProbe()
+# 		iti()
+# 		print 'iti'
 
-## Baseline, 1 block 
-for trial in range(10): ## Change to length of baseline block once I have stims
-	ogOnly(ogStims_df)	
+# ## Monitor, 2 blocks 
+# for monitorBlock in range(2):	
+# 	for trial in range(2): ##Change to number of trials
+# 		for probe in range(2): ##Will range from 1 to 15
+# 			OGnPMprobe()
+# 		targetProbe()
+# 		iti()
+
+# ## M&M, 2 blocks
+# for mnmBlock in range(2): 
+# 	for trial in range(2): ## Change to total number of trials
+# 		target(targetOri_df)
+# 		print win.color
+# 		delay()
+# 		print win.color
+# 		for probe in range(2): ## Will also range from 1 to 15 
+# 			OGnPMprobe()
+# 		targetProbe()
+# 		iti()
+
+# ## Baseline, 1 block 
+# for trial in range(10): ## Change to length of baseline block once I have stims
+# 	ogOnly(ogStims_df)	
 
 
 ## MAINTAIN ## 
