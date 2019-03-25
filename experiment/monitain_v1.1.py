@@ -2,9 +2,16 @@
 ##################################
 ######### monitain v1.0 ##########
 ######## Katie Hedgpeth ##########
-######## February 2019 ###########
+######## March 2019 ###########
 ##################################
 ##################################
+
+
+####### PRACTICE STUFFS
+subj = 101
+####### 
+
+
 
 
 import random
@@ -50,16 +57,12 @@ stimCombine = [words_df, nonwords_df]
 ogStims_df = pd.concat(stimCombine, ignore_index=True)
 
 
-
-#Orientations
-
-
 ####################################
 ############ Parameters ############
 ####################################
 
 ## Check to see if file exists
-data_path = "monitain_v1_" + str(subj_id)
+data_path = "monitain_v1_" + str(subj)
 data_path_exists = os.path.exists(data_path)
 
 filename = data_path + ".csv"
@@ -80,38 +83,6 @@ sec_iti = 1
 
 # Keys to hit 
 sd_keyList = ['1', '2']
-
-# Slack 
-############ NEED TO ADD 
-
-
-####################################
-########## Build dataframe #########
-#### for individual participant ####
-####################################
-
-# columns = ['subj_id', 'block_num', 'trial', 
-# 	'ori_top', 'ori_mid', 'ori_bot', 
-# 	'word_nonword', 'lexicalStim', 
-# 	'correctResp', 'resp', 'acc', 
-# 	'rt'] ## Add more to this! 
-
-# n_trials_base = 106
-# n_trials_maintain = 198
-# n_trials_monitor = 198
-# n_trials_mm = 198
-
-# n_runs = 2
-
-# oriData = [10, 20, 30, 40, 50, 60, 70, 80, 100,
-# 	110, 120, 130, 140, 150, 160, 170] #Exclude 0/180 and 90 degrees
-
-
-# trialsPerBlock_a = [1, 2, 5, 6, 
-# 	8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15]
-# trialsPerBlock_b = [3, 4, 7, 
-# 	8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15]
-
 
 # Set values
 N_MIN_PROBES = 8
@@ -156,7 +127,7 @@ df_columns = columns + word_cols + wordCond_cols + topTheta_cols + botTheta_cols
 df_index = range(N_TOTAL_TRIALS)
 df = pd.DataFrame(columns = df_columns, index = df_index)
 
-df['subj'] = subj_id
+df['subj'] = subj
 
 # Break up blocks
 ## 1 and 8 = Baseline, trials 0-105 and 582-687
@@ -173,7 +144,6 @@ df.iloc[344:542, df.columns.get_loc('block')] = 5
 df.iloc[542:562, df.columns.get_loc('block')] = 6
 df.iloc[562:582, df.columns.get_loc('block')] = 7
 df.iloc[582:688, df.columns.get_loc('block')] = 8
-
 
 for totalTrials in range(N_TOTAL_TRIALS): 
 	for b1 in range(baselineTrials): 
@@ -193,9 +163,6 @@ for totalTrials in range(N_TOTAL_TRIALS):
 	for b2 in range(baselineTrials): 
 		df['block'][totalTrials] = 8 
 
-
-for i in range(baselineTrials):
-	print i
 
 all_targetTheta_locs = np.repeat(['top', 'bot'], N_TOTAL_TRIALS/2)
 np.random.shuffle(all_targetTheta_locs)
@@ -218,8 +185,6 @@ df['targTheta'] = df.targTheta.apply(pickTheta)
 
 possible_thetas = np.linspace(0,180, 18, endpoint=False)
 
-#possible_thetas = possible_thetas[~np.isin(possible_thetas[0,90])]
-
 possible_thetas = [10, 20, 30, 40, 50, 60, 70, 80, 
 	100, 110, 120, 130, 140, 150, 160, 170]
 
@@ -227,36 +192,13 @@ np.random.choice(possible_thetas)
 
 
 
-
-# Is this just a repeat of below?
-# catch_range = range(LOWER_CATCH_TRIAL, UPPER_CATCH_TRIAL+ 1) # Possible catch trials
-
-# np.random.choice(catch_range) 
-
-# probes = range(N_MIN_PROBES, N_MAX_PROBES+1)
-# probe_range = np.repeat(trials,2)
-
-N_CATCH_PER_BLOCK = N_PROBES_PER_BLOCK - probe_range.size
-
-
-# new_range = np.append(catch_range, probe_range)
-
-
-
-
-# for i in range(N_BLOCKS): 
-# 	np.random.shuffle(new_range)
-# 	probe_count_list.append(new_range)
-
-
-
-
 catch_range = range(LOWER_CATCH_TRIAL, UPPER_CATCH_TRIAL+ 1)
 
-# np.random.choice(catch_range)
 
 probes = range(N_MIN_PROBES, N_MAX_PROBES+1)
 probe_range = np.repeat(trials,2)
+
+N_CATCH_PER_BLOCK = N_PROBES_PER_BLOCK - probe_range.size
 
 new_range = np.append(catch_range, probe_range)
 
@@ -269,7 +211,8 @@ for i in range(N_BLOCKS):
 	probe_count_list.append(probe_set)
 
 np.ravel(probe_count_list).size #should equal 160 for hnow
-df['n_probes'] = np.ravel(probe_count_list)
+#df['n_probes'] = np.ravel(probe_count_list)
+df.iloc[106:266, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list) ## need to change this so it's not just setting subset in middle
 
 fake_word_list = []
 fake_nonword_list = []
@@ -326,56 +269,6 @@ for i in range(N_TOTAL_TRIALS):
 		df.loc[i, thetaTop_col] = top_theta
 		df.loc[i, thetaTop_col] = bot_theta
 
-#Blocks
-##0 = baseline
-##1 = maintain
-##2 = maintain
-##3 = monitor
-##4 = monitor
-##5 = m&m
-##6 = m&m
-##7 = baseline
-
-df_index_base = pd.MultiIndex.from_product([range(n_runs),range(n_trials_base)], names=['block', 'trial'])
-df_base = pd.DataFrame(columns=columns, index=df_index_base, dtype=float)
-df_base = df_base.rename(index={1:7}) #baseline is blocks 0 and 7
-
-df_index_maintain = pd.MultiIndex.from_product([range(n_runs),range(n_trials_maintain)], names=['block', 'trial'])
-df_maintain = df_maintain = pd.DataFrame(columns=columns, index=df_index_maintain, dtype=float)
-df_maintain = df_maintain.rename(index={1:2})
-df_maintain['lexicalStim'].update(ogStims_df['stimuli'])
-df_maintain['correctResp'].update(ogStims_df['type'])
-
-trials_maintain_a = random.sample(trialsPerBlock_a, len(trialsPerBlock_a))
-trials_maintain_b = random.sample(trialsPerBlock_b, len(trialsPerBlock_b))
-
-df_index_monitor = pd.MultiIndex.from_product([range(n_runs),range(n_trials_monitor)], names=['block', 'trial'])
-df_monitor = pd.DataFrame(columns=columns, index=df_index_monitor, dtype=float)
-df_monitor = df_monitor.rename(index={0:3}) #monitor is blocks 3 and 4
-df_monitor = df_monitor.rename(index={1:4})
-
-trials_monitor_a = random.sample(trialsPerBlock_a, len(trialsPerBlock_a))
-trials_monitor_b = random.sample(trialsPerBlock_b, len(trialsPerBlock_b))
-
-df_index_mm = pd.MultiIndex.from_product([range(n_runs),range(n_trials_mm)], names=['block', 'trial'])
-df_mm = pd.DataFrame(columns=columns, index=df_index_mm, dtype=float)
-df_mm = df_mm.rename(index={0:5}) #m&m is blocks 5 and 6
-df_mm = df_mm.rename(index={1:6})
-
-trials_mm_a = random.sample(trialsPerBlock_a, len(trialsPerBlock_a))
-trials_mm_b = random.sample(trialsPerBlock_b, len(trialsPerBlock_b))
-
-## SET UP ##
-
-data = []
-coded_data = []
-responses = []
-
-df_mm = pd.DataFrame(columns=df_columns, index=, dtype=float)
-
-df_mm['subj_id'] = subj
-
-# Need column for number of probes in monitoring and total trials
 
 
 ####################################
@@ -411,7 +304,6 @@ text = visual.TextStim(
 	)
 
 
-
 ####################################
 ############## Events ##############
 ####################################
@@ -424,7 +316,7 @@ def ogOnly(words_df):
 	#win.flip()
 	text = visual.TextStim(
 		win=win, 
-		text=ogStims_df.loc[trial, 'stimuli'], 
+		text=ogStims_df.loc[trial_i, 'stimuli'], 
 		color=color_black, 
 		height = 40.0)
 	text.draw()
@@ -506,22 +398,10 @@ def iti():
 	win.flip()
 
 
-
 ####################################
 ############ Experiment ############
 ####################################
 
-## Baseline
-# textList = ["apple", "boat", "glorb", "laser", "jalp", "book", "ser", "paper", "lent", "olev"]
-
-# Make dataframe of words and nonwords
-# wordData = [['apple',1], ['boat', 1], ['glorb', 2], ['laser',1], ['jalp',2], 
-# 	['book',1], ['ser',2], ['paper',1], ['lenp',2], ['olev',2]]
-# # 1 = word, 2 = nonword
-# wordStims_df = pd.DataFrame(wordData, columns=['word', 'type'])
-
-oriData = [10, 20, 80, 110, 30, 50, 170, 150, 20, 120]
-targetOri_df = pd.DataFrame(oriData, columns = ['orientation'])
 
 for trial_i in range(N_TOTAL_TRIALS): 
 
@@ -593,298 +473,3 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	else: 
 		raise Warning('yikes')
-
-
-## Baseline, 1 block 
-for trial in range(10): ## Change to length of baseline block once I have stims
-	ogOnly(ogStims_df)	
-
-
-## Maintain, 2 blocks
-
-for maintainBlock in range(2): 
-	for trial in range(2): ## Change to maintain block length
-		target(targetOri_df)
-		delay()
-		for maintain_probe in range(2): ## Change length
-			ogOnly(ogStims_df)
-		targetProbe()
-		iti()
-		print 'iti'
-
-## Monitor, 2 blocks 
-for monitorBlock in range(2):	
-	for trial in range(2): ##Change to number of trials
-		for probe in range(2): ##Will range from 1 to 15
-			OGnPMprobe()
-		targetProbe()
-		iti()
-
-## M&M, 2 blocks
-for mnmBlock in range(2): 
-	for trial in range(2): ## Change to total number of trials
-		target(targetOri_df)
-		print win.color
-		delay()
-		print win.color
-		for probe in range(2): ## Will also range from 1 to 15 
-			OGnPMprobe()
-		targetProbe()
-		iti()
-
-## Baseline, 1 block 
-for trial in range(10): ## Change to length of baseline block once I have stims
-	ogOnly(ogStims_df)	
-
-
-## MAINTAIN ## 
-
-###Target
-
-
-
-
-
-grating.pos = [0.0,0.0]
-grating.ori = 45.0
-grating.sf = 5.0 / 80.0 #spatialFrequency = # of cycles / length in pixels 
-grating.contrast = 1.0
-
-grating.draw()
-
-win.flip()
-
-core.wait(sec_target)
-
-win.color=color_gray
-win.flip()
-keys = event.waitKeys(timeStamped=clock)
-#s key for same, d key for different
-
-print keys
-if keys[0][0] == 's':
-	print 'same'
-elif keys[0][0] == 'd': 
-	print 'diff'
-else: 
-	print 'yikes'
-win.close()
-
-###OG task
-
-# Start a loop for this
-
-textList = ["apple", "boat", "glorb", "laser", "jalp", "book", "ser", "paper", "lent", "olev"]
-
-for trial in range(10): 
-
-	text = visual.TextStim(
-		win=win, 
-		text=textList[trial], 
-		color=color_black, 
-		height = 40.0)
-	text.draw()
-	win.flip()
-	core.wait(sec_probe)
-	keys = event.waitKeys(timeStamped=clock)
-	print keys
-
-	responses.append([keys[0][0], keys[0][1]])
-
-win.flip()
-
-core.wait(sec_probe)
-
-# Second word just for show
-
-text.text = "boat"
-text.draw()
-win.flip()
-core.wait(sec_probe)
-
-# End loop
-
-###Target probe
-
-grating_hpos = [-150, 150]
-
-for i_grating in range(2): 
-	grating.pos = [0, grating_hpos[i_grating]]
-	grating.draw()
-
-text.text = "glorb"
-text.draw()
-
-win.flip()
-core.wait(sec_probe)
-
-
-###ITI with fixation cross 
-
-text.text = "+"
-text.draw()
-win.flip()
-core.wait(sec_iti)
-
-win.close()
-
-
-
-##############
-
-
-## MONITOR ##
-
-win = visual.Window(
-	size=[1024,576], #Small size of screen for testing it out
-	units="pix", 
-	fullscr=False, #set to True when running for real
-	color=color_gray)
-
-grating_ori = [45.0, 135.0]
-
-for i_grating in range(2): 
-	grating.pos = [0, grating_hpos[i_grating]]
-	grating.ori = grating_ori[i_grating]
-	grating.draw()
-	text.text = "jalp"
-	text.draw()
-win.flip()
-core.wait(sec_probe)
-
-
-grating_ori = [135.0, 15.0]
-
-for i_grating in range(2): 
-	grating.pos = [0, grating_hpos[i_grating]]
-	grating.ori = grating_ori[i_grating]
-	grating.draw()
-	text.text = "apple"
-	text.draw()
-win.flip()
-core.wait(sec_probe)
-
-
-grating_ori = [45.0, 15.0]
-
-for i_grating in range(2): 
-	grating.pos = [0, grating_hpos[i_grating]]
-	grating.ori = grating_ori[i_grating]
-	grating.draw()
-	text.text = "boat"
-	text.draw()
-win.flip()
-core.wait(sec_probe)
-
-
-grating_ori = [135.0, 135.0]
-
-for i_grating in range(2): 
-	grating.pos = [0, grating_hpos[i_grating]]
-	grating.ori = grating_ori[i_grating]
-	grating.draw()
-	text.text = "glorb"
-	text.draw()
-win.flip()
-core.wait(sec_probe)
-
-###ITI with fixation cross 
-
-text.text = "+"
-text.draw()
-win.flip()
-core.wait(sec_iti)
-
-win.close()
-
-#############
-
-
-## MAINTAIN AND MONITOR ##
-
-win = visual.Window(
-	size=[1024,576], #Small size of screen for testing it out
-	units="pix", 
-	fullscr=False, #set to True when running for real
-	color=color_white)
-
-## MAINTAIN ## 
-
-###Target
-
-grating = visual.GratingStim(
-	win=win,
-	units="pix", 
-	size=[150,150], #size of box with grating in pixels
-	mask = "circle"
-	) 
-
-grating.pos = [0.0,0.0]
-grating.ori = 45.0
-grating.sf = 5.0 / 80.0 #spatialFrequency = # of cycles / length in pixels 
-grating.contrast = 1.0
-
-grating.draw()
-
-win.flip()
-
-core.wait(sec_target)
-
-win.color=color_gray
-win.flip()
-
-grating_ori = [15.0, 135.0]
-
-for i_grating in range(2): 
-	grating.pos = [0, grating_hpos[i_grating]]
-	grating.ori = grating_ori[i_grating]
-	grating.draw()
-	text.text = "apple"
-	text.draw()
-win.flip()
-core.wait(sec_probe)
-
-
-grating_ori = [135.0, 15.0]
-
-for i_grating in range(2): 
-	grating.pos = [0, grating_hpos[i_grating]]
-	grating.ori = grating_ori[i_grating]
-	grating.draw()
-	text.text = "boat"
-	text.draw()
-win.flip()
-core.wait(sec_probe)
-
-
-grating_ori = [45.0, 15.0] #TARGET
-
-for i_grating in range(2): 
-	grating.pos = [0, grating_hpos[i_grating]]
-	grating.ori = grating_ori[i_grating]
-	grating.draw()
-	text.text = "glorb"
-	text.draw()
-win.flip()
-core.wait(sec_probe)
-
-
-###ITI with fixation cross 
-
-text.text = "+"
-text.draw()
-win.flip()
-core.wait(sec_iti)
-
-##########################
-
-
-###Waiting for a response to move on 
-keys = psychopy.event.waitKeys(keyList=["space"])
-
-
-win.close() #Close window
-
-##Save output 
-np.savetxt() 
-
