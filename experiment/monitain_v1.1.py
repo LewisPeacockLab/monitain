@@ -21,7 +21,7 @@ import os
 import sys
 import pprint 
 import argparse
-from psychopy import visual, event, core
+from psychopy import visual, event, core, iohub
 from itertools import product, compress
 
 
@@ -40,6 +40,9 @@ parser = argparse.ArgumentParser(description="Monitain experimental display")
 parser.add_argument('--subj', default='s999', type=str, help='sXXX format')
 parser.add_argument('--scrn', default='animal', type=str, choices=SCREENS.keys(), help = 'computer used for experiment')
 args = parser.parse_args()
+
+io = iohub.launchHubServer(); io.clearEvents('all')
+keyboard = io.devices.keyboard
 
 subj = args.subj
 scrn = args.scrn
@@ -326,12 +329,49 @@ text = visual.TextStim(
 	height=40.0
 	)
 
+####################################
+############## Set up ##############
+####################################
+
+def respPrep():
+	keyboard.clearEvents()
+	return core.getTime(), None
+
+def collectResp(): 
+	for kp in keyboard.getPresses(keys=sd_keyList):
+		return kp
+
 
 ####################################
 ############## Events ##############
 ####################################
 responses = []
 
+def keyboardResp(): 
+	keyboard.clearEvents()
+
+
+def getKeyboardResponse(validResponses, duration=0): 
+	event.clearEvents()
+
+	responded = False
+	done = False
+	rt = '*'
+	responseTimer = core.Clock()
+
+	while True: 
+		if not responded: 
+			responded = event.getKeys(keyList =validResponses, timeStamped=responseTimer)
+		if duration > 0: 
+			if responseTimer.getTime() > duration: 
+				break
+		else: 
+			if responded: 
+				break
+	if not responded: 
+		return ['*', '*']
+	else: 
+		return responded[0] 
 
 def ogOnly(words_df):  
 	win.flip()
@@ -344,8 +384,12 @@ def ogOnly(words_df):
 		height = 40.0)
 	text.draw()
 	win.flip()
-	keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
-	print keys
+	#keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
+	#keys = event.getKeys(keyList = sd_keyList, timeStamped=clock)
+	clock.reset()
+	while clock.getTime() < 2:
+		keys = event.getKeys(keyList = sd_keyList, timeStamped=clock)
+	#print keys
 	responses.append([keys])
 		#responses.append([keys[0][0], keys[0][1]])
 
