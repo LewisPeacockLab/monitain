@@ -119,8 +119,7 @@ columns = ['subj', #subject id
 	'targTheta', #angle for memory target
 	'n_probes',  #num of probes in trial 
 	'probeTheta_loc', #where target probe is on last probe
-	'acc', #acc for target probe for trial
-
+	'acc' #acc for target probe for trial
 	]
 
 df_columns = columns + word_cols + wordCond_cols + topTheta_cols + botTheta_cols
@@ -261,6 +260,9 @@ for i in range(N_TOTAL_TRIALS):
 
 		thetaTop_col = 'topTheta{:d}'.format(j+1)
 		thetaBot_col = 'botTheta{:d}'.format(j+1)
+
+		resp_probe = 'respProbe{:d}'.format(j+1)
+		rt_probe = 'rtProbe{:d}'.format(j+1) # need to get it to take rt
 
 		if j+1 != n_probes: 
 			top_theta = np.random.choice(possible_thetas_minusTarg)
