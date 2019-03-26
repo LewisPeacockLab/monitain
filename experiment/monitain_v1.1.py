@@ -100,7 +100,7 @@ trials = range(N_MIN_PROBES, N_MAX_PROBES+1)
 
 baselineTrials = 106
 maintainTrials = 20
-monitorTrials = 198
+monitorTrials = 20 
 mnmTrials = 20
 
 #N_TOTAL_TRIALS = N_PROBES_PER_BLOCK * N_BLOCKS
@@ -139,29 +139,12 @@ df['subj'] = subj
 df.iloc[0:106, df.columns.get_loc('block')] = 1
 df.iloc[106:126, df.columns.get_loc('block')] = 2
 df.iloc[126:146, df.columns.get_loc('block')] = 3
-df.iloc[146:344, df.columns.get_loc('block')] = 4
-df.iloc[344:542, df.columns.get_loc('block')] = 5
-df.iloc[542:562, df.columns.get_loc('block')] = 6
-df.iloc[562:582, df.columns.get_loc('block')] = 7
-df.iloc[582:688, df.columns.get_loc('block')] = 8
+df.iloc[146:166, df.columns.get_loc('block')] = 4
+df.iloc[166:186, df.columns.get_loc('block')] = 5
+df.iloc[186:206, df.columns.get_loc('block')] = 6
+df.iloc[206:226, df.columns.get_loc('block')] = 7
+df.iloc[226:332, df.columns.get_loc('block')] = 8
 
-for totalTrials in range(N_TOTAL_TRIALS): 
-	for b1 in range(baselineTrials): 
-		df['block'][totalTrials] = 1
-	for main1 in range(maintainTrials): 
-		df['block'][totalTrials] = 2
-	for main2 in range(maintainTrials): 
-		df['block'][totalTrials] = 3
-	for mon1 in range(monitorTrials): 
-		df['block'][totalTrials] = 4
-	for mon2 in range(monitorTrials): 
-		df['block'][totalTrials] = 5
-	for mnm1 in range(mnmTrials): 
-		df['block'][totalTrials] = 6
-	for mnm2 in range(mnmTrials): 
-		df['block'][totalTrials] = 7 
-	for b2 in range(baselineTrials): 
-		df['block'][totalTrials] = 8 
 
 
 all_targetTheta_locs = np.repeat(['top', 'bot'], N_TOTAL_TRIALS/2)
@@ -202,17 +185,55 @@ N_CATCH_PER_BLOCK = N_PROBES_PER_BLOCK - probe_range.size
 
 new_range = np.append(catch_range, probe_range)
 
+N_BLOCKS_MAINTAIN = 2
+N_BLOCKS_MON = 2
+N_BLOCKS_MnM = 2
 
-probe_count_list = []
-for i in range(N_BLOCKS): 
-	catch_subset = np.random.choice(catch_range, size = N_CATCH_PER_BLOCK)
-	probe_set = np.append(catch_subset, probe_range)
-	np.random.shuffle(probe_set)
-	probe_count_list.append(probe_set)
+#Baseline 1 probe num
+baseline_probe_range = np.repeat([1],106)
+df.iloc[0:106, df.columns.get_loc('n_probes')] = baseline_probe_range
 
-np.ravel(probe_count_list).size #should equal 160 for hnow
+#Maintain probe num 
+probe_count_list_main = []
+for i in range(N_BLOCKS_MAINTAIN): 
+	catch_subset_main = np.random.choice(catch_range, size = N_CATCH_PER_BLOCK)
+	probe_set_main = np.append(catch_subset_main, probe_range)
+	np.random.shuffle(probe_set_main)
+	probe_count_list_main.append(probe_set_main)
+
+np.ravel(probe_count_list_main).size 
 #df['n_probes'] = np.ravel(probe_count_list)
-df.iloc[106:266, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list) ## need to change this so it's not just setting subset in middle
+df.iloc[106:146, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_main) ## need to change this so it's not just setting subset in middle
+
+#Monitor probe num 
+probe_count_list_mon = []
+for i in range(N_BLOCKS_MON): 
+	catch_subset_mon = np.random.choice(catch_range, size = N_CATCH_PER_BLOCK)
+	probe_set_mon = np.append(catch_subset_mon, probe_range)
+	np.random.shuffle(probe_set_mon)
+	probe_count_list_mon.append(probe_set_mon)
+
+np.ravel(probe_count_list_mon).size #should equal 160 for hnow
+#df['n_probes'] = np.ravel(probe_count_list)
+df.iloc[146:186, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mon)
+
+#Maintain&monitor probe num 
+probe_count_list_mnm = []
+for i in range(N_BLOCKS_MnM): 
+	catch_subset_mnm = np.random.choice(catch_range, size = N_CATCH_PER_BLOCK)
+	probe_set_mnm = np.append(catch_subset_mnm, probe_range)
+	np.random.shuffle(probe_set_mnm)
+	probe_count_list_mnm.append(probe_set_mnm)
+
+np.ravel(probe_count_list_mnm).size #should equal 160 for hnow
+#df['n_probes'] = np.ravel(probe_count_list)
+df.iloc[186:226, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mnm)
+
+#Baseline 2 probe num
+df.iloc[226:332, df.columns.get_loc('n_probes')] = baseline_probe_range
+
+
+
 
 fake_word_list = []
 fake_nonword_list = []
