@@ -333,13 +333,15 @@ text = visual.TextStim(
 ############## Set up ##############
 ####################################
 
-def respPrep():
-	keyboard.clearEvents()
-	return core.getTime(), None
 
-def collectResp(): 
-	for kp in keyboard.getPresses(keys=sd_keyList):
-		return kp
+def collectResp(duration):
+	event.clearEvents()
+	clock.reset()
+	while clock.getTime() < duration: 
+		for key, rt in event.getKeys(keyList=sd_keyList,timeStamped=clock):
+			print key, rt
+
+
 
 
 ####################################
@@ -347,31 +349,6 @@ def collectResp():
 ####################################
 responses = []
 
-def keyboardResp(): 
-	keyboard.clearEvents()
-
-
-def getKeyboardResponse(validResponses, duration=0): 
-	event.clearEvents()
-
-	responded = False
-	done = False
-	rt = '*'
-	responseTimer = core.Clock()
-
-	while True: 
-		if not responded: 
-			responded = event.getKeys(keyList =validResponses, timeStamped=responseTimer)
-		if duration > 0: 
-			if responseTimer.getTime() > duration: 
-				break
-		else: 
-			if responded: 
-				break
-	if not responded: 
-		return ['*', '*']
-	else: 
-		return responded[0] 
 
 def ogOnly(words_df):  
 	win.flip()
@@ -386,9 +363,8 @@ def ogOnly(words_df):
 	win.flip()
 	#keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
 	#keys = event.getKeys(keyList = sd_keyList, timeStamped=clock)
-	clock.reset()
-	while clock.getTime() < 2:
-		keys = event.getKeys(keyList = sd_keyList, timeStamped=clock)
+	collectResp(2)
+		#keys = event.getKeys(keyList = sd_keyList, timeStamped=clock)
 	#print keys
 	responses.append([keys])
 		#responses.append([keys[0][0], keys[0][1]])
