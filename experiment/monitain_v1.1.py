@@ -77,6 +77,7 @@ if data_path_exists:
 color_white = [1,1,1]
 color_black = [-1,-1,-1]
 color_gray = [0,0,0]
+color_cyan = [0,1,1]
 
 # Timings
 sec_target = 2 
@@ -339,11 +340,24 @@ def collectResp(duration):
 	clock.reset()
 	while clock.getTime() < duration: 
 		for key, rt in event.getKeys(keyList=sd_keyList,timeStamped=clock):
-			print key, rt	
+			if key == '1' or '2': 
+				print 'yay'
+				text.color = color_cyan
+				text.draw()
+				win.flip()
+				
+
+			
 			return key, rt
+
+	
 	
 
 
+text = visual.TextStim(
+		win=win, 
+		color=color_black, 
+		height = 40.0)
 
 
 ####################################
@@ -356,16 +370,26 @@ def ogOnly(words_df):
 	win.flip()
 	win.color = color_gray
 	#win.flip()
-	text = visual.TextStim(
-		win=win, 
-		text=ogStims_df.loc[trial_i, 'stimuli'], 
-		color=color_black, 
-		height = 40.0)
+	text.text = ogStims_df.loc[trial_i, 'stimuli']
 	text.draw()
 	win.flip()
 	#keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
 	#keys = event.getKeys(keyList = sd_keyList, timeStamped=clock)
-	key, rt = collectResp(2)
+	#text_stim.text = trial_word
+	event.clearEvents()
+	clock.reset()
+	#key, rt = collectResp(2)
+	duration = 2
+	while clock.getTime() < duration: 
+		for key, rt in event.getKeys(keyList=sd_keyList,timeStamped=clock):
+			if key in sd_keyList: 
+				print 'yay'
+				text.color = color_cyan #flip text to blue if input taken
+				text.draw()
+				win.flip()
+		text.color = color_black #flip text back to black
+
+	
 	#print key
 		#keys = event.getKeys(keyList = sd_keyList, timeStamped=clock)
 	#print keys
