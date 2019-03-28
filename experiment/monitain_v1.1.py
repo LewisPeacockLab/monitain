@@ -339,7 +339,9 @@ def collectResp(duration):
 	clock.reset()
 	while clock.getTime() < duration: 
 		for key, rt in event.getKeys(keyList=sd_keyList,timeStamped=clock):
-			print key, rt
+			print key, rt	
+			return key, rt
+	
 
 
 
@@ -363,10 +365,11 @@ def ogOnly(words_df):
 	win.flip()
 	#keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
 	#keys = event.getKeys(keyList = sd_keyList, timeStamped=clock)
-	collectResp(2)
+	key, rt = collectResp(2)
+	#print key
 		#keys = event.getKeys(keyList = sd_keyList, timeStamped=clock)
 	#print keys
-	responses.append([keys])
+	responses.append([key, rt])
 		#responses.append([keys[0][0], keys[0][1]])
 
 def target(targetOri_df):
