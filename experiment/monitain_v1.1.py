@@ -427,11 +427,12 @@ def ogOnly(trial_i):
 		text.color = color_black #flip text back to black
 
 
-def target(targetOri_df):
+def target(trial_i):
 	win.color = color_white
 	win.flip()	
 	grating.pos = [0.0,0.0] 
-	grating.ori = targetOri_df.loc[trial, 'orientation'] ## Change everytime
+	grating.ori = df.iloc[trial_i, df.columns.get_loc('targTheta')] ## Change everytime
+	print grating.ori 
 	grating.sf = 5.0 / 80.0
 	grating.contrast = 1.0
 	grating.draw()
@@ -503,17 +504,17 @@ def iti():
 ############ Experiment ############
 ####################################
 
-
 for trial_i in range(N_TOTAL_TRIALS): 
 
 	if df.iloc[trial_i, df.columns.get_loc('block')] == 1: 
 		ogOnly(trial_i)
-		#print 'baseline ',trial_i
 
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 2: 
 		#print 'maintain1',trial_i
-		for trial in range(2): ## Change to maintain block length
-			target(targetOri_df)
+		target(trial_i)
+		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+		for trial in range(probeInTrial): ## Change to maintain block length
+			
 			delay()
 			for maintain_probe in range(2): ## Change length
 				ogOnly(ogStims_df)
@@ -569,8 +570,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 			iti()
 
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 8: 
-		#print 'baseline2',trial_i
-		ogOnly(ogStims_df)
+		ogOnly(trial_i)
 
 	else: 
 		raise Warning('yikes')
