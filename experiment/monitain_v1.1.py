@@ -23,6 +23,7 @@ import pprint
 import argparse
 from psychopy import visual, event, core, iohub
 from itertools import product, compress
+from sklearn.utils import shuffle
 
 
 ## Thank yoooouuu Remy
@@ -53,11 +54,13 @@ words_df = words_df.rename(columns={0:'stimuli'})
 words_df['type'] = 1
 
 nonwords_df = pd.read_table("nonwords.txt", header=-1)
-nonwords_df = nonwords_df = nonwords_df.rename(columns={0:'stimuli'})
+nonwords_df = nonwords_df.rename(columns={0:'stimuli'})
 nonwords_df['type'] = 2
 
 stimCombine = [words_df, nonwords_df]
-ogStims_df = pd.concat(stimCombine, ignore_index=True)
+ogStims_df = pd.concat(stimCombine, ignore_index=True) # change name later when bigger set 
+ogStims_df = shuffle(ogStims_df)
+ogStims_df = ogStims_df.reset_index(drop=True)
 
 
 ####################################
@@ -86,7 +89,7 @@ sec_probe = 2
 sec_iti = 1
 
 # Keys to hit 
-sd_keyList = ['1', '2']
+sd_keyList = ['1', '2'] #1 = word, 2 = nonword
 
 # Set values
 N_MIN_PROBES = 8
@@ -289,12 +292,19 @@ for i in range(N_TOTAL_TRIALS):
 			raise Warning('noooooooooooo')
 
 
+
+
 		#insert into df
 		df.loc[i, col_name] = rand_word
 		df.loc[i, col_name_cond] = cond
 
 		df.loc[i, thetaTop_col] = top_theta
 		df.loc[i, thetaTop_col] = bot_theta
+
+		df.loc[i, resp_probe] = np.nan
+		df.loc[i, rt_probe] = np.nan
+
+
 
 
 
@@ -366,11 +376,14 @@ text = visual.TextStim(
 responses = []
 
 
-def ogOnly(words_df):  
+def ogOnly(trial_i):  
 	win.flip()
 	win.color = color_gray
 	#win.flip()
-	text.text = ogStims_df.loc[trial_i, 'stimuli']
+	if df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(1))] == 'word': 
+		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(1))]
+	elif df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(1))] == 'nonword': 
+		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(1))]
 	text.draw()
 	win.flip()
 	#keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
@@ -378,23 +391,41 @@ def ogOnly(words_df):
 	#text_stim.text = trial_word
 	event.clearEvents()
 	clock.reset()
+	responded = False
 	#key, rt = collectResp(2)
 	duration = 2
 	while clock.getTime() < duration: 
-		for key, rt in event.getKeys(keyList=sd_keyList,timeStamped=clock):
-			if key in sd_keyList: 
-				print 'yay'
-				text.color = color_cyan #flip text to blue if input taken
-				text.draw()
-				win.flip()
+		if responded == False : 
+			for key, rt in event.getKeys(keyList=sd_keyList,timeStamped=clock):
+				df.iloc[trial_i, df.columns.get_loc('respProbe{:d}'.format(1))] = key
+				responded = True 
+				print key
+				print df.iloc[trial_i, df.columns.get_loc('word1_cond')]
+
+				if key in sd_keyList: 
+					text.color = color_cyan #flip text to blue if input taken
+					text.draw()
+					win.flip()
+			
+					if (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word1_cond')] == 'word'): #picked word, correct
+						df.iloc[trial_i, df.columns.get_loc('acc')] = 1
+						print 'correct'
+					elif (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word1_cond')] != 'word'): #picked word, incorrect
+						df.iloc[trial_i, df.columns.get_loc('acc')] = 0
+						print 'incorrect'
+					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word1_cond')] == 'nonword'): #picked nonword, correct
+						df.iloc[trial_i, df.columns.get_loc('acc')] = 1
+						print 'correct'
+					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word1_cond')] != 'nonword'): #picked nonword, incorrect
+						df.iloc[trial_i, df.columns.get_loc('acc')] = 0
+						print 'incorrect'
+				else: #picked nothing or a key that wasn't 1 or 2
+					df.iloc[trial_i, df.columns.get_loc('acc')] = 0
+					print 'other'
+
+				print ''
 		text.color = color_black #flip text back to black
 
-	
-	#print key
-		#keys = event.getKeys(keyList = sd_keyList, timeStamped=clock)
-	#print keys
-	responses.append([key, rt])
-		#responses.append([keys[0][0], keys[0][1]])
 
 def target(targetOri_df):
 	win.color = color_white
@@ -476,7 +507,7 @@ def iti():
 for trial_i in range(N_TOTAL_TRIALS): 
 
 	if df.iloc[trial_i, df.columns.get_loc('block')] == 1: 
-		ogOnly(ogStims_df)
+		ogOnly(trial_i)
 		#print 'baseline ',trial_i
 
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 2: 
