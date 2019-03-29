@@ -505,22 +505,20 @@ def iti():
 ####################################
 
 for trial_i in range(N_TOTAL_TRIALS): 
-
+	trial_i = 120
 	if df.iloc[trial_i, df.columns.get_loc('block')] == 1: 
 		ogOnly(trial_i)
 
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 2: 
 		#print 'maintain1',trial_i
 		target(trial_i)
+		delay()
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for trial in range(probeInTrial): ## Change to maintain block length
-			
-			delay()
-			for maintain_probe in range(2): ## Change length
-				ogOnly(ogStims_df)
-			targetProbe()
-			iti()
-			print 'iti'
+		for trial in range(probeInTrial): ## Change to maintain block length 
+			ogOnly(trial_i)
+		targetProbe()
+		iti()
+		print 'iti'
 
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 3: 
 		#print 'maintain2',trial_i
