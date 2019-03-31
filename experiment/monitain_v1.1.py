@@ -42,8 +42,8 @@ parser.add_argument('--subj', default='s999', type=str, help='sXXX format')
 parser.add_argument('--scrn', default='animal', type=str, choices=SCREENS.keys(), help = 'computer used for experiment')
 args = parser.parse_args()
 
-io = iohub.launchHubServer(); io.clearEvents('all')
-keyboard = io.devices.keyboard
+#io = iohub.launchHubServer(); io.clearEvents('all')
+#keyboard = io.devices.keyboard
 
 subj = args.subj
 scrn = args.scrn
@@ -369,6 +369,12 @@ text = visual.TextStim(
 		color=color_black, 
 		height = 40.0)
 
+def wordOrNonword(trial_i, probe_n): 
+	if df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'word': 
+		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
+	elif df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword': 
+		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
+
 
 ####################################
 ############## Events ##############
@@ -376,14 +382,11 @@ text = visual.TextStim(
 responses = []
 
 
-def ogOnly(trial_i):  
+def ogOnly(trial_i, probe_n):  
 	win.flip()
 	win.color = color_gray
 	#win.flip()
-	if df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(1))] == 'word': 
-		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(1))]
-	elif df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(1))] == 'nonword': 
-		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(1))]
+	wordOrNonword(trial_i, probe_n)
 	text.draw()
 	win.flip()
 	#keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
@@ -471,12 +474,7 @@ def OGnPMprobe():
 def targetProbe(): 
 	win.flip()
 	win.color = color_gray
-	#text
-	text = visual.TextStim(
-		win=win, 
-		text=ogStims_df.loc[trial, 'stimuli'], 
-		color=color_black, 
-		height = 40.0)
+	wordOrNonword(trial_i)
 	text.draw()
 	#gratings
 	for i_grating in range(2): 
@@ -507,18 +505,19 @@ def iti():
 for trial_i in range(N_TOTAL_TRIALS): 
 	trial_i = 120
 	if df.iloc[trial_i, df.columns.get_loc('block')] == 1: 
-		ogOnly(trial_i)
+		probe_n = 1
+		ogOnly(trial_i, probe_n)
 
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 2: 
-		#print 'maintain1',trial_i
 		target(trial_i)
 		delay()
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 		for trial in range(probeInTrial): ## Change to maintain block length 
-			ogOnly(trial_i)
+			probe_n = trial
+			ogOnly(trial_i, probe_n)
 		targetProbe()
+		# targetProbe_n = 1 for maintaoin 
 		iti()
-		print 'iti'
 
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 3: 
 		#print 'maintain2',trial_i
