@@ -416,7 +416,8 @@ def getResp(trial_i, probe_n):
 
 				print ''
 
-
+def resetTrial(): 
+	text.color = color_black
 
 ####################################
 ############## Events ##############
@@ -564,6 +565,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		targetProbe()
 		# targetProbe_n = 1 for maintaoin 
 		iti()
+		resetTrial()
 
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 3: 
 		#print 'maintain2',trial_i
