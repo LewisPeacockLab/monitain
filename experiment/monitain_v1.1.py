@@ -371,6 +371,13 @@ def wordOrNonword(trial_i, probe_n):
 	elif df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n+1))] == 'nonword': 
 		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n+1))]
 
+def gratings_two(): 
+	for i_grating in range(2): 
+
+		grating.ori = 20 ## need to change
+		grating.pos = [0,grating_ypos[i_grating]]
+		grating.draw()
+
 def clear(): 
 	event.clearEvents()
 	clock.reset()	
@@ -384,7 +391,7 @@ def getResp(trial_i, probe_n):
 				df.iloc[trial_i, df.columns.get_loc('respProbe{:d}'.format(1))] = key
 				responded = True 
 				print key
-				print df.iloc[trial_i, df.columns.get_loc('word1_cond')]
+				print df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n+1))]
 
 				if key in sd_keyList: 
 					text.color = color_cyan #flip text to blue if input taken
@@ -515,15 +522,9 @@ def targetProbe():
 	wordOrNonword(trial_i, probe_n)
 	text.draw()
 	#gratings
-	for i_grating in range(2): 
-
-		grating.ori = 20 ## need to change
-		grating.pos = [0,grating_ypos[i_grating]]
-		grating.draw()
+	gratings_two()
 
 	win.flip()
-
-	#response
 	clear()
 	getResp(trial_i, probe_n)
 	#keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
@@ -547,10 +548,12 @@ def iti():
 
 for trial_i in range(N_TOTAL_TRIALS): 
 	trial_i = 120
+	##BASELINE
 	if df.iloc[trial_i, df.columns.get_loc('block')] == 1: 
 		probe_n = 1
 		ogOnly(trial_i, probe_n)
 
+	##MAINTAIN
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 2: 
 		target(trial_i)
 		delay()
