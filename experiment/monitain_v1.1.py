@@ -360,42 +360,23 @@ def collectResp(duration):
 			
 			return key, rt
 
-	
-	
-
-
 text = visual.TextStim(
 		win=win, 
 		color=color_black, 
 		height = 40.0)
 
 def wordOrNonword(trial_i, probe_n): 
-	if df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'word': 
-		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
-	elif df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword': 
-		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
+	if df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n+1))] == 'word': 
+		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n+1))]
+	elif df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n+1))] == 'nonword': 
+		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n+1))]
 
-
-####################################
-############## Events ##############
-####################################
-responses = []
-
-
-def ogOnly(trial_i, probe_n):  
-	win.flip()
-	win.color = color_gray
-	#win.flip()
-	wordOrNonword(trial_i, probe_n)
-	text.draw()
-	win.flip()
-	#keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
-	#keys = event.getKeys(keyList = sd_keyList, timeStamped=clock)
-	#text_stim.text = trial_word
+def clear(): 
 	event.clearEvents()
-	clock.reset()
+	clock.reset()	
+
+def getResp(trial_i, probe_n): 
 	responded = False
-	#key, rt = collectResp(2)
 	duration = 2
 	while clock.getTime() < duration: 
 		if responded == False : 
@@ -410,16 +391,16 @@ def ogOnly(trial_i, probe_n):
 					text.draw()
 					win.flip()
 			
-					if (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word1_cond')] == 'word'): #picked word, correct
+					if (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n+1))] == 'word'): #picked word, correct
 						df.iloc[trial_i, df.columns.get_loc('acc')] = 1
 						print 'correct'
-					elif (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word1_cond')] != 'word'): #picked word, incorrect
+					elif (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n+1))] != 'word'): #picked word, incorrect
 						df.iloc[trial_i, df.columns.get_loc('acc')] = 0
 						print 'incorrect'
-					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word1_cond')] == 'nonword'): #picked nonword, correct
+					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n+1))] == 'nonword'): #picked nonword, correct
 						df.iloc[trial_i, df.columns.get_loc('acc')] = 1
 						print 'correct'
-					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word1_cond')] != 'nonword'): #picked nonword, incorrect
+					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n+1))] != 'nonword'): #picked nonword, incorrect
 						df.iloc[trial_i, df.columns.get_loc('acc')] = 0
 						print 'incorrect'
 				else: #picked nothing or a key that wasn't 1 or 2
@@ -427,7 +408,63 @@ def ogOnly(trial_i, probe_n):
 					print 'other'
 
 				print ''
-		text.color = color_black #flip text back to black
+
+
+
+####################################
+############## Events ##############
+####################################
+#responses = []
+
+
+def ogOnly(trial_i, probe_n):  
+	win.flip()
+	win.color = color_gray
+	#win.flip()
+	wordOrNonword(trial_i, probe_n)
+	text.draw()
+	win.flip()
+	#keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
+	#keys = event.getKeys(keyList = sd_keyList, timeStamped=clock)
+	#text_stim.text = trial_word
+	event.clearEvents()
+	clock.reset()
+	#responded = False
+	getResp(trial_i, probe_n)
+	text.color = color_black #flip text back to black
+	# #key, rt = collectResp(2)
+	# duration = 2
+	# while clock.getTime() < duration: 
+	# 	if responded == False : 
+	# 		for key, rt in event.getKeys(keyList=sd_keyList,timeStamped=clock):
+	# 			df.iloc[trial_i, df.columns.get_loc('respProbe{:d}'.format(1))] = key
+	# 			responded = True 
+	# 			print key
+	# 			print df.iloc[trial_i, df.columns.get_loc('word1_cond')]
+
+	# 			if key in sd_keyList: 
+	# 				text.color = color_cyan #flip text to blue if input taken
+	# 				text.draw()
+	# 				win.flip()
+			
+	# 				if (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word1_cond')] == 'word'): #picked word, correct
+	# 					df.iloc[trial_i, df.columns.get_loc('acc')] = 1
+	# 					print 'correct'
+	# 				elif (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word1_cond')] != 'word'): #picked word, incorrect
+	# 					df.iloc[trial_i, df.columns.get_loc('acc')] = 0
+	# 					print 'incorrect'
+	# 				elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word1_cond')] == 'nonword'): #picked nonword, correct
+	# 					df.iloc[trial_i, df.columns.get_loc('acc')] = 1
+	# 					print 'correct'
+	# 				elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word1_cond')] != 'nonword'): #picked nonword, incorrect
+	# 					df.iloc[trial_i, df.columns.get_loc('acc')] = 0
+	# 					print 'incorrect'
+	# 			else: #picked nothing or a key that wasn't 1 or 2
+	# 				df.iloc[trial_i, df.columns.get_loc('acc')] = 0
+	# 				print 'other'
+
+	# 			print ''
+		
 
 
 def target(trial_i):
@@ -472,20 +509,26 @@ def OGnPMprobe():
 	responses.append([keys])
 
 def targetProbe(): 
+	
 	win.flip()
 	win.color = color_gray
-	wordOrNonword(trial_i)
+	wordOrNonword(trial_i, probe_n)
 	text.draw()
 	#gratings
 	for i_grating in range(2): 
+
 		grating.ori = 20 ## need to change
 		grating.pos = [0,grating_ypos[i_grating]]
 		grating.draw()
+
 	win.flip()
+
 	#response
-	keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
-	print keys
-	responses.append([keys])
+	clear()
+	getResp(trial_i, probe_n)
+	#keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
+	#print keys
+	#responses.append([keys])
 
 def iti(): 
 	win.flip()
