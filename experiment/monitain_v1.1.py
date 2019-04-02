@@ -376,15 +376,20 @@ def gratings_two():
 		grating.ori = 20 ## need to change
 		grating.pos = [0,grating_ypos[i_grating]]
 		grating.draw()
-		grating.autoDraw = True 
+		grating.autoDraw = True
+		#grating.autoDraw = True 
 
 def clear(): 
 	event.clearEvents()
 	clock.reset()	
 
-def getResp(trial_i, probe_n): 
+def getResp(trial_i, probe_n, gratingDraw): 
 	responded = False
 	duration = 2
+	if gratingDraw == True: 
+		grating.autoDraw = True
+	else: 
+		grating.autoDraw = False
 	while clock.getTime() < duration: 
 		if responded == False : 
 			for key, rt in event.getKeys(keyList=sd_keyList,timeStamped=clock):
@@ -415,6 +420,7 @@ def getResp(trial_i, probe_n):
 					print 'other'
 
 				print ''
+	grating.autoDraw = False #change to false after done
 
 
 def resetTrial(): 
@@ -427,6 +433,7 @@ def resetTrial():
 
 
 def ogOnly(trial_i, probe_n):  
+	grating.autoDraw = False
 	win.flip()
 	win.color = color_gray
 	#win.flip()
@@ -435,7 +442,7 @@ def ogOnly(trial_i, probe_n):
 	win.flip()
 	event.clearEvents()
 	clock.reset()
-	getResp(trial_i, probe_n)
+	getResp(trial_i, probe_n, gratingDraw = False)
 	text.color = color_black #flip text back to black
 
 
@@ -491,10 +498,14 @@ def targetProbe():
 
 	win.flip()
 	clear()
-	getResp(trial_i, probe_n)
+	getResp(trial_i, probe_n, gratingDraw = True)
+	#grating.autoDraw=True
 	gratings_two()
+	#grating.autoDraw=True
 	#grating.draw()
-	win.flip()
+	#grating.autoDraw = False
+	#win.flip()
+	
 
 	#keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
 	#print keys
