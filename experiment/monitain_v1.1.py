@@ -376,8 +376,8 @@ def gratings_two():
 		grating.ori = 20 ## need to change
 		grating.pos = [0,grating_ypos[i_grating]]
 		grating.draw()
-		grating.autoDraw = True
 		#grating.autoDraw = True 
+
 
 def clear(): 
 	event.clearEvents()
@@ -501,6 +501,8 @@ def targetProbe():
 	getResp(trial_i, probe_n, gratingDraw = True)
 	#grating.autoDraw=True
 	gratings_two()
+	grating_top()
+	grating_bottom()
 	#grating.autoDraw=True
 	#grating.draw()
 	#grating.autoDraw = False
@@ -512,6 +514,7 @@ def targetProbe():
 	#responses.append([keys])
 
 def iti(): 
+	grating.autoDraw = False
 	win.flip()
 	text = visual.TextStim(
 		win=win, 
