@@ -323,11 +323,28 @@ win = visual.Window(
 	)
 
 # Grating set up 
-grating = visual.GratingStim(
+grating_top = visual.GratingStim(
 	win=win,
 	units="pix", 
 	size=[150,150], #size of box with grating in pixels
-	mask = "circle"
+	mask = "circle", 
+	pos = [0, -150]
+	) 
+
+grating_mid = visual.GratingStim(
+	win=win,
+	units="pix", 
+	size=[150,150], #size of box with grating in pixels
+	mask = "circle",
+	pos = [0,0]
+	) 
+
+grating_bot = visual.GratingStim(
+	win=win,
+	units="pix", 
+	size=[150,150], #size of box with grating in pixels
+	mask = "circle",
+	pos = [0,150]
 	) 
 
 grating_ypos = [-150, 150]  ## need to change
@@ -387,9 +404,11 @@ def getResp(trial_i, probe_n, gratingDraw):
 	responded = False
 	duration = 2
 	if gratingDraw == True: 
-		grating.autoDraw = True
+		grating_top.autoDraw = True
+		grating_bot.autoDraw = True
 	else: 
-		grating.autoDraw = False
+		grating_top.autoDraw = False
+		grating_bot.autoDraw = False
 	while clock.getTime() < duration: 
 		if responded == False : 
 			for key, rt in event.getKeys(keyList=sd_keyList,timeStamped=clock):
@@ -433,7 +452,7 @@ def resetTrial():
 
 
 def ogOnly(trial_i, probe_n):  
-	grating.autoDraw = False
+	#grating.autoDraw = False
 	win.flip()
 	win.color = color_gray
 	#win.flip()
@@ -449,12 +468,12 @@ def ogOnly(trial_i, probe_n):
 def target(trial_i):
 	win.color = color_white
 	win.flip()	
-	grating.pos = [0.0,0.0] 
-	grating.ori = df.iloc[trial_i, df.columns.get_loc('targTheta')] ## Change everytime
-	print grating.ori 
-	grating.sf = 5.0 / 80.0
-	grating.contrast = 1.0
-	grating.draw()
+	grating_mid.pos = [0.0,0.0] 
+	grating_mid.ori = df.iloc[trial_i, df.columns.get_loc('targTheta')] ## Change everytime
+	print grating_mid.ori 
+	grating_mid.sf = 5.0 / 80.0
+	grating_mid.contrast = 1.0
+	grating_mid.draw()
 	win.flip() 
 	core.wait(sec_target)
 
@@ -495,14 +514,16 @@ def targetProbe():
 	text.draw()
 	#gratings
 	gratings_two()
+	grating_top.draw()
+	grating_bot.draw()
 
 	win.flip()
 	clear()
 	getResp(trial_i, probe_n, gratingDraw = True)
 	#grating.autoDraw=True
-	gratings_two()
-	grating_top()
-	grating_bottom()
+	#gratings_two()
+	#grating_top()
+	#grating_bottom()
 	#grating.autoDraw=True
 	#grating.draw()
 	#grating.autoDraw = False
