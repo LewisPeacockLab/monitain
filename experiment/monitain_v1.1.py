@@ -565,11 +565,15 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 5: 
 		print 'monitor2',trial_i
-		for trial in range(2): ##Change to number of trials
-			for probe in range(2): ##Will range from 1 to 15
-				OGnPMprobe()
-			targetProbe()
-			iti()
+		target(trial_i)
+		delay()
+		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+		for probe_n in range(probeInTrial): ## not -1 because go through all probes as targetProbe
+			print 'probe',probe_n
+			targetProbe(trial_i, probe_n)
+		# targetProbe_n = 1 for maintaoin 
+		iti()
+		resetTrial()
 
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 6: 
 		print 'mnm1',trial_i
