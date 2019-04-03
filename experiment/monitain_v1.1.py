@@ -326,7 +326,7 @@ win = visual.Window(
 grating_top = visual.GratingStim(
 	win=win,
 	units="pix", 
-	size=[150,150], #size of box with grating in pixels
+	size=[150,150], 
 	mask = "circle", 
 	pos = [0, -150]
 	) 
@@ -342,7 +342,7 @@ grating_mid = visual.GratingStim(
 grating_bot = visual.GratingStim(
 	win=win,
 	units="pix", 
-	size=[150,150], #size of box with grating in pixels
+	size=[150,150], 
 	mask = "circle",
 	pos = [0,150]
 	) 
@@ -352,7 +352,6 @@ grating_ypos = [-150, 150]  ## need to change
 # Text set up 
 text = visual.TextStim(
 	win=win, 
-	#text=, 
 	color=color_black, 
 	height=40.0
 	)
