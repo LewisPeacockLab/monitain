@@ -361,40 +361,11 @@ text = visual.TextStim(
 ############## Set up ##############
 ####################################
 
-
-def collectResp(duration):
-	event.clearEvents()
-	clock.reset()
-	while clock.getTime() < duration: 
-		for key, rt in event.getKeys(keyList=sd_keyList,timeStamped=clock):
-			if key == '1' or '2': 
-				print 'yay'
-				text.color = color_cyan
-				text.draw()
-				win.flip()
-				
-
-			
-			return key, rt
-
-# text = visual.TextStim(
-# 		win=win, 
-# 		color=color_black, 
-# 		height = 40.0)
-
 def wordOrNonword(trial_i, probe_n): 
 	if df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n+1))] == 'word': 
 		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n+1))]
 	elif df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n+1))] == 'nonword': 
 		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n+1))]
-
-def gratings_two(): 
-	for i_grating in range(2): 
-		grating.ori = 20 ## need to change
-		grating.pos = [0,grating_ypos[i_grating]]
-		grating.draw()
-		#grating.autoDraw = True 
-
 
 def clear(): 
 	event.clearEvents()
@@ -403,12 +374,6 @@ def clear():
 def getResp(trial_i, probe_n, gratingDraw): 
 	responded = False
 	duration = 2
-	# if gratingDraw == True: 
-	# 	grating_top.autoDraw = True
-	# 	grating_bot.autoDraw = True
-	# else: 
-	# 	grating_top.autoDraw = False
-	# 	grating_bot.autoDraw = False
 	while clock.getTime() < duration: 
 		if gratingDraw == True: 
 			grating_top.autoDraw = True
@@ -522,7 +487,7 @@ def targetProbe():
 	wordOrNonword(trial_i, probe_n)
 	text.draw()
 	#gratings
-	gratings_two()
+	#gratings_two()
 	grating_top.draw()
 	grating_bot.draw()
 
@@ -531,7 +496,8 @@ def targetProbe():
 	getResp(trial_i, probe_n, gratingDraw = True)
 
 def iti(): 
-	grating.autoDraw = False
+	grating_top.autoDraw = False
+	grating_bot.autoDraw = False
 	win.flip()
 	text = visual.TextStim(
 		win=win, 
