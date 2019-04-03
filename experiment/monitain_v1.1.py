@@ -403,13 +403,19 @@ def clear():
 def getResp(trial_i, probe_n, gratingDraw): 
 	responded = False
 	duration = 2
-	if gratingDraw == True: 
-		grating_top.autoDraw = True
-		grating_bot.autoDraw = True
-	else: 
-		grating_top.autoDraw = False
-		grating_bot.autoDraw = False
+	# if gratingDraw == True: 
+	# 	grating_top.autoDraw = True
+	# 	grating_bot.autoDraw = True
+	# else: 
+	# 	grating_top.autoDraw = False
+	# 	grating_bot.autoDraw = False
 	while clock.getTime() < duration: 
+		if gratingDraw == True: 
+			grating_top.autoDraw = True
+			grating_bot.autoDraw = True
+		else: 
+			grating_top.autoDraw = False
+			grating_top.autoDraw = False
 		if responded == False : 
 			for key, rt in event.getKeys(keyList=sd_keyList,timeStamped=clock):
 				df.iloc[trial_i, df.columns.get_loc('respProbe{:d}'.format(1))] = key
@@ -439,7 +445,10 @@ def getResp(trial_i, probe_n, gratingDraw):
 					print 'other'
 
 				print ''
-	grating.autoDraw = False #change to false after done
+	else: 
+		grating_top.autoDraw = False
+		grating_bot.autoDraw = False
+	#grating.autoDraw = False #change to false after done
 
 
 def resetTrial(): 
@@ -520,19 +529,6 @@ def targetProbe():
 	win.flip()
 	clear()
 	getResp(trial_i, probe_n, gratingDraw = True)
-	#grating.autoDraw=True
-	#gratings_two()
-	#grating_top()
-	#grating_bottom()
-	#grating.autoDraw=True
-	#grating.draw()
-	#grating.autoDraw = False
-	#win.flip()
-	
-
-	#keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
-	#print keys
-	#responses.append([keys])
 
 def iti(): 
 	grating.autoDraw = False
@@ -542,8 +538,11 @@ def iti():
 		text="+", 
 		color=color_black, 
 		height = 40.0)
-	text.draw()
-	win.flip()
+	clear()
+	duration = 0.5
+	while clock.getTime() < duration: 
+		text.draw()
+		win.flip()
 
 
 ####################################
