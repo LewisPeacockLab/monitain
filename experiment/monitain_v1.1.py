@@ -443,18 +443,13 @@ def resetTrial():
 
 def ogOnly(trial_i, probe_n): 
 	print 'og probe', probe_n
-	#grating.autoDraw = False
 	win.flip()
 	win.color = color_gray
-	#win.flip()
 	wordOrNonword(trial_i, probe_n)
 	text.draw()
-	win.flip()
-	event.clearEvents()
-	clock.reset()
+	clear()
 	getResp(trial_i, probe_n, gratingDraw = False)
 	resetTrial()
-
 
 def target(trial_i):
 	win.color = color_white
@@ -468,13 +463,11 @@ def target(trial_i):
 	win.flip() 
 	core.wait(sec_target)
 
-
 def delay(): 
 	win.color = color_gray
 	win.flip()
 	win.flip()
-	core.wait(sec_delay)
-	
+	core.wait(sec_delay)	
 
 def OGnPMprobe(trial_i, probe_n): 
 	win.flip()
@@ -488,20 +481,18 @@ def OGnPMprobe(trial_i, probe_n):
 	getResp(trial_i, probe_n, gratingDraw = True)
 	resetTrial()
 
-
 def targetProbe(trial_i, probe_n): 
-	#print trial_i
-	print 'probe',probe_n
+	print 'target probe',probe_n
 	win.flip()
 	win.color = color_gray
 	wordOrNonword(trial_i, probe_n)
 	text.draw()
 	grating_top.draw()
 	grating_bot.draw()
-
 	win.flip()
 	clear()
 	getResp(trial_i, probe_n, gratingDraw = True)
+	resetTrial()
 
 def iti(): 
 	grating_top.autoDraw = False
@@ -525,7 +516,7 @@ def iti():
 
 for trial_i in range(N_TOTAL_TRIALS): 
 
-	trial_i = 120
+	trial_i = 150
 	##BASELINE
 	if df.iloc[trial_i, df.columns.get_loc('block')] == 1: 
 		print 'baseline 1'
@@ -551,10 +542,10 @@ for trial_i in range(N_TOTAL_TRIALS):
 		target(trial_i)
 		delay()
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for trial in range(probeInTrial-1): ## Change to maintain block length 
-			probe_n = trial
+		for probe_n in range(probeInTrial-1): ## Change to maintain block length 
+			print 'probe',probe_n
 			ogOnly(trial_i, probe_n)
-		targetProbe()
+		targetProbe(trial_i, probeInTrial-1) #probeInTrial is always 1 extra because starts at 1
 		# targetProbe_n = 1 for maintaoin 
 		iti()
 		resetTrial()
@@ -564,20 +555,13 @@ for trial_i in range(N_TOTAL_TRIALS):
 		target(trial_i)
 		delay()
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for trial in range(probeInTrial-1): ## Change to maintain block length 
-			probe_n = trial
-			OGnPMprobe(trial_i, probe_n)
-		targetProbe()
+		for probe_n in range(probeInTrial): ## not -1 because go through all probes as targetProbe
+			print 'probe',probe_n
+			targetProbe(trial_i, probe_n)
 		# targetProbe_n = 1 for maintaoin 
 		iti()
 		resetTrial()
 
-
-		for trial in range(2): ##Change to number of trials
-			for probe in range(2): ##Will range from 1 to 15
-				OGnPMprobe()
-			targetProbe()
-			iti()
 
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 5: 
 		print 'monitor2',trial_i
