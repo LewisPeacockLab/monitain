@@ -81,6 +81,8 @@ color_white = [1,1,1]
 color_black = [-1,-1,-1]
 color_gray = [0,0,0]
 color_cyan = [0,1,1]
+color_green = [0,1,0]
+color_red = [1,0,0]
 
 # Timings
 sec_target = 2 
@@ -115,8 +117,8 @@ N_TOTAL_TRIALS = (baselineTrials*2) + (maintainTrials*2) + (monitorTrials*2) + (
 
 
 # Create dataframe
-word_cols = ['word{:d}'.format(i+1) for i in range(N_MAX_PROBES) ]
-wordCond_cols = ['word{:d}_cond'.format(i+1) for i in range(N_MAX_PROBES) ]
+word_cols = ['word{:d}'.format(i) for i in range(N_MAX_PROBES) ]
+wordCond_cols = ['word{:d}_cond'.format(i) for i in range(N_MAX_PROBES) ]
 
 topTheta_cols = ['topTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
 botTheta_cols = ['botTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
@@ -258,18 +260,19 @@ for i in range(N_TOTAL_TRIALS):
 	possible_thetas_minusTarg = list(compress(possible_thetas, (possible_thetas != memTarg)))
 
 	for j in range(n_probes): 
-
+	
 		cond = np.random.choice(['word', 'nonword'])
 		
 
-		col_name = 'word{:d}'.format(j+1)
-		col_name_cond = 'word{:d}_cond'.format(j+1)
+		col_name = 'word{:d}'.format(j)
+		col_name_cond = 'word{:d}_cond'.format(j)
 
-		thetaTop_col = 'topTheta{:d}'.format(j+1)
-		thetaBot_col = 'botTheta{:d}'.format(j+1)
+		thetaTop_col = 'topTheta{:d}'.format(j)
+		thetaBot_col = 'botTheta{:d}'.format(j)
 
-		resp_probe = 'respProbe{:d}'.format(j+1)
-		rt_probe = 'rtProbe{:d}'.format(j+1) # need to get it to take rt
+		resp_probe = 'respProbe{:d}'.format(j)
+		rt_probe = 'rtProbe{:d}'.format(j) # need to get it to take rt
+		acc_probe = 'probe{:d}_acc'.format(j)
 
 		if j+1 != n_probes: 
 			top_theta = np.random.choice(possible_thetas_minusTarg)
@@ -303,6 +306,7 @@ for i in range(N_TOTAL_TRIALS):
 
 		df.loc[i, resp_probe] = np.nan
 		df.loc[i, rt_probe] = np.nan
+		df.loc[i, acc_probe] = np.nan
 
 
 
@@ -361,10 +365,10 @@ text = visual.TextStim(
 ####################################
 
 def wordOrNonword(trial_i, probe_n): 
-	if df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n+1))] == 'word': 
-		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n+1))]
-	elif df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n+1))] == 'nonword': 
-		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n+1))]
+	if df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'word': 
+		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
+	elif df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword': 
+		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
 
 def clear(): 
 	event.clearEvents()
@@ -382,30 +386,43 @@ def getResp(trial_i, probe_n, gratingDraw):
 			grating_top.autoDraw = False
 		if responded == False : 
 			for key, rt in event.getKeys(keyList=sd_keyList,timeStamped=clock):
-				df.iloc[trial_i, df.columns.get_loc('respProbe{:d}'.format(1))] = key
+				df.iloc[trial_i, df.columns.get_loc('respProbe{:d}'.format(probe_n))] = key
+				df.iloc[trial_i, df.columns.get_loc('rtProbe{:d}'.format(probe_n))] = rt
 				responded = True 
 				print key
-				print df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n+1))]
+				print df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))]
 
 				if key in sd_keyList: 
 					text.color = color_cyan #flip text to blue if input taken
 					text.draw()
 					win.flip()
 			
-					if (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n+1))] == 'word'): #picked word, correct
-						df.iloc[trial_i, df.columns.get_loc('acc')] = 1
+					if (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'word'): #picked word, correct
+						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
+						text.color = color_green
+						text.draw()
+						win.flip()
 						print 'correct'
-					elif (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n+1))] != 'word'): #picked word, incorrect
-						df.iloc[trial_i, df.columns.get_loc('acc')] = 0
+					elif (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'word'): #picked word, incorrect
+						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
+						text.color = color_red
+						text.draw()
+						win.flip()
 						print 'incorrect'
-					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n+1))] == 'nonword'): #picked nonword, correct
-						df.iloc[trial_i, df.columns.get_loc('acc')] = 1
+					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword'): #picked nonword, correct
+						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
+						text.color = color_green
+						text.draw()
+						win.flip()
 						print 'correct'
-					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n+1))] != 'nonword'): #picked nonword, incorrect
-						df.iloc[trial_i, df.columns.get_loc('acc')] = 0
+					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'nonword'): #picked nonword, incorrect
+						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
+						text.color = color_red
+						text.draw()
+						win.flip()
 						print 'incorrect'
 				else: #picked nothing or a key that wasn't 1 or 2
-					df.iloc[trial_i, df.columns.get_loc('acc')] = 0
+					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 					print 'other'
 
 				print ''
@@ -424,7 +441,8 @@ def resetTrial():
 #responses = []
 
 
-def ogOnly(trial_i, probe_n):  
+def ogOnly(trial_i, probe_n): 
+	print 'og probe', probe_n
 	#grating.autoDraw = False
 	win.flip()
 	win.color = color_gray
@@ -435,7 +453,7 @@ def ogOnly(trial_i, probe_n):
 	event.clearEvents()
 	clock.reset()
 	getResp(trial_i, probe_n, gratingDraw = False)
-	text.color = color_black #flip text back to black
+	resetTrial()
 
 
 def target(trial_i):
@@ -458,35 +476,26 @@ def delay():
 	core.wait(sec_delay)
 	
 
-def OGnPMprobe(): 
-	win.flip()
-	win.color = color_gray
-	#text
-	text = visual.TextStim(
-		win=win, 
-		text=ogStims_df.loc[trial, 'stimuli'], 
-		color=color_black, 
-		height = 40.0)
-	text.draw()
-	#gratings
-	for i_grating in range(2): 
-		grating.ori = 20 ## need to change
-		grating.pos = [0,grating_ypos[i_grating]]
-		grating.draw()
-	win.flip()
-	#response
-	keys = event.waitKeys(maxWait=sec_probe, keyList = sd_keyList, timeStamped=clock)
-	print keys
-	responses.append([keys])
-
-def targetProbe(): 
-	
+def OGnPMprobe(trial_i, probe_n): 
 	win.flip()
 	win.color = color_gray
 	wordOrNonword(trial_i, probe_n)
 	text.draw()
-	#gratings
-	#gratings_two()
+	grating_top.draw()
+	grating_bot.draw()
+	win.flip()
+	clear()
+	getResp(trial_i, probe_n, gratingDraw = True)
+	resetTrial()
+
+
+def targetProbe(trial_i, probe_n): 
+	#print trial_i
+	print 'probe',probe_n
+	win.flip()
+	win.color = color_gray
+	wordOrNonword(trial_i, probe_n)
+	text.draw()
 	grating_top.draw()
 	grating_bot.draw()
 
@@ -515,14 +524,30 @@ def iti():
 ####################################
 
 for trial_i in range(N_TOTAL_TRIALS): 
+
 	trial_i = 120
 	##BASELINE
 	if df.iloc[trial_i, df.columns.get_loc('block')] == 1: 
+		print 'baseline 1'
 		probe_n = 1
 		ogOnly(trial_i, probe_n)
 
 	##MAINTAIN
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 2: 
+		#print 'maintain1',trial_i
+		target(trial_i)
+		delay()
+		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+		for probe_n in range(probeInTrial-1): ## Change to maintain block length 
+			print 'probe',probe_n
+			ogOnly(trial_i, probe_n)
+		targetProbe(trial_i, probeInTrial-1) #probeInTrial is always 1 extra because starts at 1
+		# targetProbe_n = 1 for maintaoin 
+		iti()
+		resetTrial()
+
+	elif df.iloc[trial_i, df.columns.get_loc('block')] == 3: 
+		print 'maintain2',trial_i
 		target(trial_i)
 		delay()
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
@@ -534,19 +559,20 @@ for trial_i in range(N_TOTAL_TRIALS):
 		iti()
 		resetTrial()
 
-	elif df.iloc[trial_i, df.columns.get_loc('block')] == 3: 
-		#print 'maintain2',trial_i
-		for trial in range(2): ## Change to maintain block length
-			target(targetOri_df)
-			delay()
-			for maintain_probe in range(2): ## Change length
-				ogOnly(ogStims_df)
-			targetProbe()
-			iti()
-			print 'iti'
-
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 4: 
-		#print 'monitor1',trial_i
+		print 'monitor1',trial_i 
+		target(trial_i)
+		delay()
+		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+		for trial in range(probeInTrial-1): ## Change to maintain block length 
+			probe_n = trial
+			OGnPMprobe(trial_i, probe_n)
+		targetProbe()
+		# targetProbe_n = 1 for maintaoin 
+		iti()
+		resetTrial()
+
+
 		for trial in range(2): ##Change to number of trials
 			for probe in range(2): ##Will range from 1 to 15
 				OGnPMprobe()
@@ -554,7 +580,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 			iti()
 
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 5: 
-		#print 'monitor2',trial_i
+		print 'monitor2',trial_i
 		for trial in range(2): ##Change to number of trials
 			for probe in range(2): ##Will range from 1 to 15
 				OGnPMprobe()
@@ -562,7 +588,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 			iti()
 
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 6: 
-		#print 'mnm1',trial_i
+		print 'mnm1',trial_i
 		for trial in range(2): ## Change to total number of trials
 			target(targetOri_df)
 			print win.color
