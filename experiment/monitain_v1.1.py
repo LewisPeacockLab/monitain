@@ -261,7 +261,7 @@ for i in range(N_TOTAL_TRIALS):
 
 
 	for j in range(n_probes): 
-		
+
 		print 'n_probe', j
 		# Assign words #
 		cond = np.random.choice(['word', 'nonword'])
@@ -278,19 +278,16 @@ for i in range(N_TOTAL_TRIALS):
 
 		df.loc[i, col_name] = rand_word
 		df.loc[i, col_name_cond] = cond
-		print 'rand_word',rand_word
-		print 'cond',cond
-		print ''
+		#print 'rand_word',rand_word
+		#print 'cond',cond
+		#print ''
 
 
 		# Assign thetas #
 		thetaTop_col = 'topTheta{:d}'.format(j)
 		thetaBot_col = 'botTheta{:d}'.format(j)
 
-		resp_probe = 'respProbe{:d}'.format(j)
-		rt_probe = 'rtProbe{:d}'.format(j) # need to get it to take rt
-		acc_probe = 'probe{:d}_acc'.format(j)
-
+		print j, 'j'
 		if j+1 != n_probes: 
 			top_theta = np.random.choice(possible_thetas_minusTarg)
 			bot_theta = np.random.choice(possible_thetas_minusTarg)
@@ -302,18 +299,21 @@ for i in range(N_TOTAL_TRIALS):
 				top_theta = np.random.choice(possible_thetas_minusTarg)
 				bot_theta = memTarg
 		else: 
-			raise Warning('Nooooooo')
+			raise Warning('Nooooooo')	
 
-		
-
-
-
-
-		#insert into df
-		
+		#print 'top_theta', top_theta
+		#print 'bot_theta', bot_theta	
 
 		df.loc[i, thetaTop_col] = top_theta
-		df.loc[i, thetaTop_col] = bot_theta
+		df.loc[i, thetaBot_col] = bot_theta
+		print 'thetaBot_col', thetaBot_col
+		print 'bot_theta', bot_theta
+
+
+		# Set up resp, rt, acc columns #
+		resp_probe = 'respProbe{:d}'.format(j)
+		rt_probe = 'rtProbe{:d}'.format(j) # need to get it to take rt
+		acc_probe = 'probe{:d}_acc'.format(j)
 
 		df.loc[i, resp_probe] = np.nan
 		df.loc[i, rt_probe] = np.nan
@@ -337,29 +337,39 @@ win = visual.Window(
 	#color=color
 	)
 
+grating_size = [150, 150]
+grating_sf = 5.0 / 80.0
+grating_contrast = 1.0
+
 # Grating set up 
 grating_top = visual.GratingStim(
 	win=win,
+	mask = "circle",
 	units="pix", 
-	size=[150,150], 
-	mask = "circle", 
-	pos = [0, -150]
+	pos = [0, -150],
+	size=grating_size, 
+	sf = 5.0 / 80.0,
+	contrast = grating_contrast
 	) 
 
 grating_mid = visual.GratingStim(
 	win=win,
-	units="pix", 
-	size=[150,150], #size of box with grating in pixels
 	mask = "circle",
-	pos = [0,0]
+	units="pix", 
+	pos = [0, 0],
+	size=grating_size, 
+	sf = grating_sf,
+	contrast = grating_contrast
 	) 
 
 grating_bot = visual.GratingStim(
 	win=win,
-	units="pix", 
-	size=[150,150], 
 	mask = "circle",
-	pos = [0,150]
+	units="pix", 
+	pos = [0,150],
+	size=grating_size, 
+	sf = grating_sf,
+	contrast = grating_contrast
 	) 
 
 grating_ypos = [-150, 150]  ## need to change
@@ -380,6 +390,12 @@ def wordOrNonword(trial_i, probe_n):
 		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
 	elif df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword': 
 		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
+
+def twoGratings(trial_i, probe_n): 
+	grating_top.ori = df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))]
+	grating_top.draw()
+	grating_bot.ori = df.iloc[trial_i, df.columns.get_loc('botTheta{:d}'.format(probe_n))]
+	grating_bot.draw()
 
 def clear(): 
 	event.clearEvents()
@@ -469,8 +485,8 @@ def target(trial_i):
 	grating_mid.pos = [0.0,0.0] 
 	grating_mid.ori = df.iloc[trial_i, df.columns.get_loc('targTheta')] ## Change everytime
 	print grating_mid.ori 
-	grating_mid.sf = 5.0 / 80.0
-	grating_mid.contrast = 1.0
+	#grating_mid.sf = 5.0 / 80.0
+	#grating_mid.contrast = 1.0
 	grating_mid.draw()
 	win.flip() 
 	core.wait(sec_target)
@@ -499,8 +515,7 @@ def targetProbe(trial_i, probe_n):
 	win.color = color_gray
 	wordOrNonword(trial_i, probe_n)
 	text.draw()
-	grating_top.draw()
-	grating_bot.draw()
+	twoGratings(trial_i, probe_n)
 	win.flip()
 	clear()
 	getResp(trial_i, probe_n, gratingDraw = True)
