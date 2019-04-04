@@ -259,14 +259,31 @@ for i in range(N_TOTAL_TRIALS):
 	#possible_thetas_minusTarg = possible_thetas[possible_thetas!=memTarg]
 	possible_thetas_minusTarg = list(compress(possible_thetas, (possible_thetas != memTarg)))
 
+
 	for j in range(n_probes): 
-	
+		
+		print 'n_probe', j
+		# Assign words #
 		cond = np.random.choice(['word', 'nonword'])
 		
-
 		col_name = 'word{:d}'.format(j)
 		col_name_cond = 'word{:d}_cond'.format(j)
 
+		if cond == 'word':
+			rand_word = fake_word_list.pop(0)
+		elif cond == 'nonword':
+			rand_word = fake_nonword_list.pop(0)
+		else: 
+			raise Warning('noooooooooooo')
+
+		df.loc[i, col_name] = rand_word
+		df.loc[i, col_name_cond] = cond
+		print 'rand_word',rand_word
+		print 'cond',cond
+		print ''
+
+
+		# Assign thetas #
 		thetaTop_col = 'topTheta{:d}'.format(j)
 		thetaBot_col = 'botTheta{:d}'.format(j)
 
@@ -287,19 +304,13 @@ for i in range(N_TOTAL_TRIALS):
 		else: 
 			raise Warning('Nooooooo')
 
-		if cond == 'word':
-			rand_word = fake_word_list.pop(0)
-		elif cond == 'nonword':
-			rand_word = fake_nonword_list.pop(0)
-		else: 
-			raise Warning('noooooooooooo')
+		
 
 
 
 
 		#insert into df
-		df.loc[i, col_name] = rand_word
-		df.loc[i, col_name_cond] = cond
+		
 
 		df.loc[i, thetaTop_col] = top_theta
 		df.loc[i, thetaTop_col] = bot_theta
@@ -517,7 +528,7 @@ def iti():
 
 for trial_i in range(N_TOTAL_TRIALS): 
 
-	trial_i = 130
+	trial_i = 150
 	##BASELINE
 	if df.iloc[trial_i, df.columns.get_loc('block')] == 1: 
 		print 'baseline 1'
