@@ -531,7 +531,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	#trial_i = 120 #maintain, block 2
 	#trial_i = 150 #monitor
-	#trial_i = 200 #m&m, block 6
+	trial_i = 200 #m&m, block 6
 	
 	##BASELINE
 	if df.iloc[trial_i, df.columns.get_loc('block')] == 1: 
