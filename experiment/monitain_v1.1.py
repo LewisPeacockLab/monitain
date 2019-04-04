@@ -8,10 +8,8 @@
 
 
 ####### PRACTICE STUFFS
-subj = 101
+#subj = 101
 ####### 
-
-
 
 
 import random
@@ -262,7 +260,6 @@ for i in range(N_TOTAL_TRIALS):
 
 	for j in range(n_probes): 
 
-		print 'n_probe', j
 		# Assign words #
 		cond = np.random.choice(['word', 'nonword'])
 		
@@ -278,16 +275,12 @@ for i in range(N_TOTAL_TRIALS):
 
 		df.loc[i, col_name] = rand_word
 		df.loc[i, col_name_cond] = cond
-		#print 'rand_word',rand_word
-		#print 'cond',cond
-		#print ''
 
 
 		# Assign thetas #
 		thetaTop_col = 'topTheta{:d}'.format(j)
 		thetaBot_col = 'botTheta{:d}'.format(j)
 
-		print j, 'j'
 		if j+1 != n_probes: 
 			top_theta = np.random.choice(possible_thetas_minusTarg)
 			bot_theta = np.random.choice(possible_thetas_minusTarg)
@@ -301,14 +294,8 @@ for i in range(N_TOTAL_TRIALS):
 		else: 
 			raise Warning('Nooooooo')	
 
-		#print 'top_theta', top_theta
-		#print 'bot_theta', bot_theta	
-
 		df.loc[i, thetaTop_col] = top_theta
 		df.loc[i, thetaBot_col] = bot_theta
-		print 'thetaBot_col', thetaBot_col
-		print 'bot_theta', bot_theta
-
 
 		# Set up resp, rt, acc columns #
 		resp_probe = 'respProbe{:d}'.format(j)
@@ -334,7 +321,6 @@ win = visual.Window(
 	size=[1024,576], #Small size of screen for testing it out
 	units="pix", 
 	fullscr=False, #set to True when running for real
-	#color=color
 	)
 
 grating_size = [150, 150]
