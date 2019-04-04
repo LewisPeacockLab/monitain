@@ -529,12 +529,16 @@ def iti():
 
 for trial_i in range(N_TOTAL_TRIALS): 
 
-	trial_i = 150
+	#trial_i = 120 #maintain, block 2
+	#trial_i = 150 #monitor
+	#trial_i = 200 #m&m, block 6
+	
 	##BASELINE
 	if df.iloc[trial_i, df.columns.get_loc('block')] == 1: 
 		print 'baseline 1'
-		probe_n = 1
+		probe_n = 0
 		ogOnly(trial_i, probe_n)
+		resetTrial()
 
 	##MAINTAIN
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 2: 
@@ -563,21 +567,26 @@ for trial_i in range(N_TOTAL_TRIALS):
 		iti()
 		resetTrial()
 
+	## MONITOR
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 4: 
 		print 'monitor1',trial_i 
-		target(trial_i)
-		delay()
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 		for probe_n in range(probeInTrial): ## not -1 because go through all probes as targetProbe
 			print 'probe',probe_n
 			targetProbe(trial_i, probe_n)
 		# targetProbe_n = 1 for maintaoin 
-		iti()
-		resetTrial()
-
 
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 5: 
 		print 'monitor2',trial_i
+		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+		for probe_n in range(probeInTrial): ## not -1 because go through all probes as targetProbe
+			print 'probe',probe_n
+			targetProbe(trial_i, probe_n)
+		# targetProbe_n = 1 for maintaoin 
+
+	## MAINTAIN & MONITOR
+	elif df.iloc[trial_i, df.columns.get_loc('block')] == 6: 
+		print 'mnm1',trial_i
 		target(trial_i)
 		delay()
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
@@ -588,28 +597,23 @@ for trial_i in range(N_TOTAL_TRIALS):
 		iti()
 		resetTrial()
 
-	elif df.iloc[trial_i, df.columns.get_loc('block')] == 6: 
-		print 'mnm1',trial_i
-		for trial in range(2): ## Change to total number of trials
-			target(targetOri_df)
-			print win.color
-			delay()
-			print win.color
-			for probe in range(2): ## Will also range from 1 to 15 
-				OGnPMprobe()
-			targetProbe()
-			iti()
-
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 7: 
-		#print 'mnm2',trial_i
-		for trial in range(2): ##Change to number of trials
-			for probe in range(2): ##Will range from 1 to 15
-				OGnPMprobe()
-			targetProbe()
-			iti()
+		print 'mnm2',trial_i
+		target(trial_i)
+		delay()
+		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+		for probe_n in range(probeInTrial): ## not -1 because go through all probes as targetProbe
+			print 'probe',probe_n
+			targetProbe(trial_i, probe_n)
+		# targetProbe_n = 1 for maintaoin 
+		iti()
+		resetTrial()
 
+	# BASELINE
 	elif df.iloc[trial_i, df.columns.get_loc('block')] == 8: 
-		ogOnly(trial_i)
+		print 'baseline 2'
+		probe_n = 0
+		ogOnly(trial_i, probe_n)
 
 	else: 
 		raise Warning('yikes')
