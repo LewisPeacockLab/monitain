@@ -447,6 +447,7 @@ def ogOnly(trial_i, probe_n):
 	win.color = color_gray
 	wordOrNonword(trial_i, probe_n)
 	text.draw()
+	win.flip()
 	clear()
 	getResp(trial_i, probe_n, gratingDraw = False)
 	resetTrial()
@@ -516,7 +517,7 @@ def iti():
 
 for trial_i in range(N_TOTAL_TRIALS): 
 
-	trial_i = 150
+	trial_i = 120
 	##BASELINE
 	if df.iloc[trial_i, df.columns.get_loc('block')] == 1: 
 		print 'baseline 1'
