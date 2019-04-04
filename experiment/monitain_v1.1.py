@@ -517,7 +517,7 @@ def iti():
 
 for trial_i in range(N_TOTAL_TRIALS): 
 
-	trial_i = 120
+	trial_i = 130
 	##BASELINE
 	if df.iloc[trial_i, df.columns.get_loc('block')] == 1: 
 		print 'baseline 1'
