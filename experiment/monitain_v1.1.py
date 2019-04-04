@@ -89,7 +89,9 @@ sec_probe = 2
 sec_iti = 1
 
 # Keys to hit 
-sd_keyList = ['1', '2'] #1 = word, 2 = nonword
+keyList_word = ['1', '2'] #1 = word, 2 = nonword
+keyList_target = ['3']
+keyList_nontarget = ['4']
 
 # Set values
 N_MIN_PROBES = 8
@@ -126,6 +128,7 @@ columns = ['subj', #subject id
 	'targTheta', #angle for memory target
 	'n_probes',  #num of probes in trial 
 	'probeTheta_loc', #where target probe is on last probe
+	'targOrNoTarg', #is target present on final probe?
 	'acc' #acc for target probe for trial
 	]
 
@@ -142,8 +145,8 @@ df['subj'] = subj
 ## 6 and 7 = M&M, trials 542-561, 562-581
 
 # Set block values
-df.iloc[0:106, df.columns.get_loc('block')] = 1
-df.iloc[106:126, df.columns.get_loc('block')] = 2
+df.iloc[0:106, df.columns.get_loc('block')] = 1 #blocks 1&8 are length 106
+df.iloc[106:126, df.columns.get_loc('block')] = 2 #blocks 2-7 are length 20
 df.iloc[126:146, df.columns.get_loc('block')] = 3
 df.iloc[146:166, df.columns.get_loc('block')] = 4
 df.iloc[166:186, df.columns.get_loc('block')] = 5
@@ -152,6 +155,15 @@ df.iloc[206:226, df.columns.get_loc('block')] = 7
 df.iloc[226:332, df.columns.get_loc('block')] = 8
 
 
+blockBase_len = len(df.iloc[0:106, df.columns.get_loc('block')])
+blockOther_len = len(df.iloc[106:126, df.columns.get_loc('block')])
+
+targProb_base = np.repeat([0,1], blockBase_len/2)
+for block_other in range(6): 
+	np.random.shuffle(targProb_base)
+	df.iloc[(106 + block_other*20):(126 + block_other*20), df.columns.get_loc('targOrNoTarg')] = targProb_base
+
+targProb_other = np.repeat([0,1], blockOther_len/2)
 
 all_targetTheta_locs = np.repeat(['top', 'bot'], N_TOTAL_TRIALS/2)
 np.random.shuffle(all_targetTheta_locs)
@@ -387,7 +399,7 @@ def clear():
 	event.clearEvents()
 	clock.reset()	
 
-def getResp(trial_i, probe_n, gratingDraw): 
+def getResp(trial_i, probe_n, gratingDraw, targPro): 
 	responded = False
 	duration = sec_probe
 	while clock.getTime() < duration: 
@@ -398,14 +410,14 @@ def getResp(trial_i, probe_n, gratingDraw):
 			grating_top.autoDraw = False
 			grating_top.autoDraw = False
 		if responded == False : 
-			for key, rt in event.getKeys(keyList=sd_keyList,timeStamped=clock):
+			for key, rt in event.getKeys(keyList=keyList_word,timeStamped=clock):
 				df.iloc[trial_i, df.columns.get_loc('respProbe{:d}'.format(probe_n))] = key
 				df.iloc[trial_i, df.columns.get_loc('rtProbe{:d}'.format(probe_n))] = rt
 				responded = True 
 				print key
 				print df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))]
 
-				if key in sd_keyList: 
+				if (key in keyList_word) and (targPro = False): 
 					text.color = color_cyan #flip text to blue if input taken
 					text.draw()
 					win.flip()
@@ -434,6 +446,36 @@ def getResp(trial_i, probe_n, gratingDraw):
 						text.draw()
 						win.flip()
 						print 'incorrect'
+				elif (key in (keyList_target or keyList_nontarget)) and (targPro = True): 
+					grating_top.color = color_cyan
+					grating_bot.color = color_cyan 
+					grating.draw()
+					win.flip()
+					if (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'word'): #picked word, correct
+						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
+						text.color = color_green
+						text.draw()
+						win.flip()
+						print 'correct'
+					elif (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'word'): #picked word, incorrect
+						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
+						text.color = color_red
+						text.draw()
+						win.flip()
+						print 'incorrect'
+					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword'): #picked nonword, correct
+						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
+						text.color = color_green
+						text.draw()
+						win.flip()
+						print 'correct'
+					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'nonword'): #picked nonword, incorrect
+						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
+						text.color = color_red
+						text.draw()
+						win.flip()
+						print 'incorrect'
+
 				else: #picked nothing or a key that wasn't 1 or 2
 					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 					print 'other'
@@ -462,7 +504,7 @@ def ogOnly(trial_i, probe_n):
 	text.draw()
 	win.flip()
 	clear()
-	getResp(trial_i, probe_n, gratingDraw = False)
+	getResp(trial_i, probe_n, gratingDraw = False, targPro = False)
 	resetTrial()
 
 def target(trial_i):
@@ -492,7 +534,7 @@ def OGnPMprobe(trial_i, probe_n):
 	grating_bot.draw()
 	win.flip()
 	clear()
-	getResp(trial_i, probe_n, gratingDraw = True)
+	getResp(trial_i, probe_n, gratingDraw = True, targPro = False)
 	resetTrial()
 
 def targetProbe(trial_i, probe_n): 
@@ -504,7 +546,7 @@ def targetProbe(trial_i, probe_n):
 	twoGratings(trial_i, probe_n)
 	win.flip()
 	clear()
-	getResp(trial_i, probe_n, gratingDraw = True)
+	getResp(trial_i, probe_n, gratingDraw = True, targPro = True)
 	resetTrial()
 
 def iti(): 
