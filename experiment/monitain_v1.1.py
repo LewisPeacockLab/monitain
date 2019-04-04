@@ -159,11 +159,18 @@ blockBase_len = len(df.iloc[0:106, df.columns.get_loc('block')])
 blockOther_len = len(df.iloc[106:126, df.columns.get_loc('block')])
 
 targProb_base = np.repeat([0,1], blockBase_len/2)
-for block_other in range(6): 
+for block_base in range(2): 
 	np.random.shuffle(targProb_base)
-	df.iloc[(106 + block_other*20):(126 + block_other*20), df.columns.get_loc('targOrNoTarg')] = targProb_base
+	if block_base == 0:
+		df.iloc[0:106, df.columns.get_loc('targOrNoTarg')] = targProb_base
+	elif block_base == 1: 
+		df.iloc[226:332, df.columns.get_loc('targOrNoTarg')] = targProb_base
 
 targProb_other = np.repeat([0,1], blockOther_len/2)
+for block_other in range(6): 
+	np.random.shuffle(targProb_other)
+	df.iloc[(106 + block_other*20):(126 + block_other*20), df.columns.get_loc('targOrNoTarg')] = targProb_other
+
 
 all_targetTheta_locs = np.repeat(['top', 'bot'], N_TOTAL_TRIALS/2)
 np.random.shuffle(all_targetTheta_locs)
