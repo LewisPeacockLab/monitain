@@ -389,7 +389,7 @@ def clear():
 
 def getResp(trial_i, probe_n, gratingDraw): 
 	responded = False
-	duration = 2
+	duration = sec_probe
 	while clock.getTime() < duration: 
 		if gratingDraw == True: 
 			grating_top.autoDraw = True
@@ -517,7 +517,7 @@ def iti():
 		color=color_black, 
 		height = 40.0)
 	clear()
-	duration = 0.5
+	duration = sec_iti
 	while clock.getTime() < duration: 
 		text.draw()
 		win.flip()
@@ -529,9 +529,9 @@ def iti():
 
 for trial_i in range(N_TOTAL_TRIALS): 
 
-	#trial_i = 120 #maintain, block 2
+	trial_i = 120 #maintain, block 2
 	#trial_i = 150 #monitor
-	trial_i = 200 #m&m, block 6
+	#trial_i = 200 #m&m, block 6
 	
 	##BASELINE
 	if df.iloc[trial_i, df.columns.get_loc('block')] == 1: 
