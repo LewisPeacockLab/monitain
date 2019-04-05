@@ -155,22 +155,22 @@ df.iloc[206:226, df.columns.get_loc('block')] = 7
 df.iloc[226:332, df.columns.get_loc('block')] = 8
 
 
-blockBase_len = len(df.iloc[0:106, df.columns.get_loc('block')])
 blockOther_len = len(df.iloc[106:126, df.columns.get_loc('block')])
 
-targProb_base = np.repeat([0,1], blockBase_len/2)
-for block_base in range(2): 
-	np.random.shuffle(targProb_base)
-	if block_base == 0:
-		df.iloc[0:106, df.columns.get_loc('targOrNoTarg')] = targProb_base
-	elif block_base == 1: 
-		df.iloc[226:332, df.columns.get_loc('targOrNoTarg')] = targProb_base
-
+# Set target present for half of maintain, not present for other half of maintain
 targProb_other = np.repeat([0,1], blockOther_len/2)
-for block_other in range(6): 
+for block_other in range(2): 
 	np.random.shuffle(targProb_other)
-	df.iloc[(106 + block_other*20):(126 + block_other*20), df.columns.get_loc('targOrNoTarg')] = targProb_other
+	if block_other == 0: #block 2
+		df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targProb_other
+	elif block_other == 1: #block 3
+		df.iloc[126:146, df.columns.get_loc('targOrNoTarg')] = targProb_other
 
+df.iloc[0:106, df.columns.get_loc('targOrNoTarg')] = np.nan
+df.iloc[146:332, df.columns.get_loc('targOrNoTarg')] = np.nan
+
+# Double check that half are ones and half are zeros
+# pd.value_counts(df['targOrNoTarg'].values, sort=False) 
 
 all_targetTheta_locs = np.repeat(['top', 'bot'], N_TOTAL_TRIALS/2)
 np.random.shuffle(all_targetTheta_locs)
@@ -304,6 +304,11 @@ for i in range(N_TOTAL_TRIALS):
 			top_theta = np.random.choice(possible_thetas_minusTarg)
 			bot_theta = np.random.choice(possible_thetas_minusTarg)
 		elif j+1 == n_probes: 
+			if df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')] == 0: #target not present
+				top_theta = np.random.choice(possible_thetas_minusTarg)
+				bot_theta = np.random.choice(possible_thetas_minusTarg)
+
+
 			if probe_loc == 'top': 
 				top_theta = memTarg
 				bot_theta = np.random.choice(possible_thetas_minusTarg)
@@ -424,7 +429,7 @@ def getResp(trial_i, probe_n, gratingDraw, targPro):
 				print key
 				print df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))]
 
-				if (key in keyList_word) and (targPro = False): 
+				if (key in keyList_word) and (targPro == False): 
 					text.color = color_cyan #flip text to blue if input taken
 					text.draw()
 					win.flip()
@@ -453,34 +458,38 @@ def getResp(trial_i, probe_n, gratingDraw, targPro):
 						text.draw()
 						win.flip()
 						print 'incorrect'
-				elif (key in (keyList_target or keyList_nontarget)) and (targPro = True): 
+				elif (key in (keyList_target or keyList_nontarget)) and (targPro == True): 
 					grating_top.color = color_cyan
 					grating_bot.color = color_cyan 
 					grating.draw()
 					win.flip()
-					if (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'word'): #picked word, correct
+					if (key == '3') and (df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')] == '1'): #picked target, correct
 						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
-						text.color = color_green
-						text.draw()
-						win.flip()
+						print 'correct, target present'
+						#text.color = color_green
+						#text.draw()
+						#win.flip()
 						print 'correct'
-					elif (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'word'): #picked word, incorrect
+					elif (key == '3') and (df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')] == '0'): #picked target, incorrect
 						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
-						text.color = color_red
-						text.draw()
-						win.flip()
+						print 'incorrect, target not present'
+						#text.color = color_red
+						#text.draw()
+						#win.flip()
 						print 'incorrect'
-					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword'): #picked nonword, correct
+					elif (key == '4') and (df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')] == '0'): #picked no target, correct
 						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
-						text.color = color_green
-						text.draw()
-						win.flip()
+						print 'correct, target not present'
+						#text.color = color_green
+						#text.draw()
+						#win.flip()
 						print 'correct'
-					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'nonword'): #picked nonword, incorrect
+					elif (key == '4') and (df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')] == '1'): #picked no target, incorrect
 						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
-						text.color = color_red
-						text.draw()
-						win.flip()
+						print 'incorrect, target present'
+						#text.color = color_red
+						#text.draw()
+						#win.flip()
 						print 'incorrect'
 
 				else: #picked nothing or a key that wasn't 1 or 2
