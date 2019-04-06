@@ -154,9 +154,12 @@ df.iloc[186:206, df.columns.get_loc('block')] = 6
 df.iloc[206:226, df.columns.get_loc('block')] = 7
 df.iloc[226:332, df.columns.get_loc('block')] = 8
 
+df.iloc[0:106, df.columns.get_loc('targOrNoTarg')] = np.nan
+df.iloc[146:332, df.columns.get_loc('targOrNoTarg')] = np.nan
 
 blockOther_len = len(df.iloc[106:126, df.columns.get_loc('block')])
 
+## MAINTAIN 
 # Set target present for half of maintain, not present for other half of maintain
 targProb_other = np.repeat([0,1], blockOther_len/2)
 for block_other in range(2): 
@@ -166,11 +169,12 @@ for block_other in range(2):
 	elif block_other == 1: #block 3
 		df.iloc[126:146, df.columns.get_loc('targOrNoTarg')] = targProb_other
 
-df.iloc[0:106, df.columns.get_loc('targOrNoTarg')] = np.nan
-df.iloc[146:332, df.columns.get_loc('targOrNoTarg')] = np.nan
-
 # Double check that half are ones and half are zeros
 # pd.value_counts(df['targOrNoTarg'].values, sort=False) 
+
+## MONITOR
+
+
 
 all_targetTheta_locs = np.repeat(['top', 'bot'], N_TOTAL_TRIALS/2)
 np.random.shuffle(all_targetTheta_locs)
@@ -273,6 +277,7 @@ for i in range(N_TOTAL_TRIALS):
 	n_probes = df.loc[i, 'n_probes']
 	probe_loc = df.loc[i, 'probeTheta_loc']
 	memTarg = df.loc[i, 'targTheta']
+	currentBlock = df.loc[i, 'block']
 	#possible_thetas_minusTarg = possible_thetas[possible_thetas!=memTarg]
 	possible_thetas_minusTarg = list(compress(possible_thetas, (possible_thetas != memTarg)))
 
@@ -300,20 +305,38 @@ for i in range(N_TOTAL_TRIALS):
 		thetaTop_col = 'topTheta{:d}'.format(j)
 		thetaBot_col = 'botTheta{:d}'.format(j)
 
+		targOrNah = df.iloc[i, df.columns.get_loc('targOrNoTarg')]
+
 		if j+1 != n_probes: 
 			top_theta = np.random.choice(possible_thetas_minusTarg)
 			bot_theta = np.random.choice(possible_thetas_minusTarg)
 		elif j+1 == n_probes: 
-			if df.iloc[i, df.columns.get_loc('targOrNoTarg')] == 0: #target not present
+			if targOrNah == 0: #target not present for MAINTAIN
 				top_theta = np.random.choice(possible_thetas_minusTarg)
 				bot_theta = np.random.choice(possible_thetas_minusTarg)
-			elif df.iloc[i, df.columns.get_loc('targOrNoTarg')] == 1: #target present
+			elif targOrNah == 1: #target present for MAINTAIN
 				if probe_loc == 'top': 
 					top_theta = memTarg
 					bot_theta = np.random.choice(possible_thetas_minusTarg)
 				elif probe_loc == 'bot': 
 					top_theta = np.random.choice(possible_thetas_minusTarg)
 					bot_theta = memTarg
+			else: #targOrNah = np.nan
+				if (currentBlock == 4) or (currentBlock == 5): #monitor 
+					top_theta = memTarg #looking for watch so top or bot probe doesn't matter
+					bot_theta = memTarg
+				elif (currentBlock == 6) or (currentBlock == 7): #m&m 
+					if probe_loc == 'top': 
+						top_theta = memTarg
+						bot_theta = np.random.choice(possible_thetas_minusTarg)
+					elif probe_loc == 'bot': 
+						top_theta = np.random.choice(possible_thetas_minusTarg)
+						bot_theta = memTarg
+				elif (currentBlock == 1) or (currentBlock == 8): #baseline
+						top_theta = np.nan
+						bot_theta = np.nan
+				else: 
+					raise Warning('uh oh')
 		else: 
 			raise Warning('Nooooooo')	
 
@@ -631,8 +654,8 @@ def iti():
 
 for trial_i in range(N_TOTAL_TRIALS): 
 
-	trial_i = 120 #maintain, block 2
-	#trial_i = 150 #monitor
+	#trial_i = 120 #maintain, block 2
+	trial_i = 150 #monitor
 	#trial_i = 200 #m&m, block 6
 	
 	##BASELINE
