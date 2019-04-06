@@ -307,14 +307,13 @@ for i in range(N_TOTAL_TRIALS):
 			if df.iloc[i, df.columns.get_loc('targOrNoTarg')] == 0: #target not present
 				top_theta = np.random.choice(possible_thetas_minusTarg)
 				bot_theta = np.random.choice(possible_thetas_minusTarg)
-
-
-			if probe_loc == 'top': 
-				top_theta = memTarg
-				bot_theta = np.random.choice(possible_thetas_minusTarg)
-			elif probe_loc == 'bot': 
-				top_theta = np.random.choice(possible_thetas_minusTarg)
-				bot_theta = memTarg
+			elif df.iloc[i, df.columns.get_loc('targOrNoTarg')] == 1: #target present
+				if probe_loc == 'top': 
+					top_theta = memTarg
+					bot_theta = np.random.choice(possible_thetas_minusTarg)
+				elif probe_loc == 'bot': 
+					top_theta = np.random.choice(possible_thetas_minusTarg)
+					bot_theta = memTarg
 		else: 
 			raise Warning('Nooooooo')	
 
