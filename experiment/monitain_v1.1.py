@@ -445,7 +445,7 @@ def clear():
 def getResp(trial_i, probe_n, gratingDraw): 
 	responded = False
 	duration = sec_probe
-	accPos = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
+	#accPos = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
 
 	while clock.getTime() < duration: 
 		if gratingDraw == True: 
@@ -468,25 +468,25 @@ def getResp(trial_i, probe_n, gratingDraw):
 					win.flip()
 			
 					if (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'word'): #picked word, correct
-						accPos = 1
+						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
 						text.color = color_green
 						text.draw()
 						win.flip()
 						print 'correct'
 					elif (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'word'): #picked word, incorrect
-						accPos = 0
+						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 						text.color = color_red
 						text.draw()
 						win.flip()
 						print 'incorrect'
 					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword'): #picked nonword, correct
-						accPos = 1
+						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
 						text.color = color_green
 						text.draw()
 						win.flip()
 						print 'correct'
 					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'nonword'): #picked nonword, incorrect
-						accPos = 0
+						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 						text.color = color_red
 						text.draw()
 						win.flip()
@@ -494,7 +494,7 @@ def getResp(trial_i, probe_n, gratingDraw):
 				
 
 				else: #picked nothing or a key that wasn't 1 or 2
-					accPos = 0
+					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 					print 'other'
 
 				print ''
@@ -502,6 +502,9 @@ def getResp(trial_i, probe_n, gratingDraw):
 		grating_top.autoDraw = False
 		grating_bot.autoDraw = False
 		lastProbe = False
+
+	#print 'accPos', accPos, 'probe_n', probe_n
+	#print ''
 	#grating.autoDraw = False #change to false after done
 
 
@@ -525,7 +528,7 @@ def getResp_targ(trial_i, probe_n, gratingDraw):
 				#print df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))]
 
 				targNoTarg = df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]
-				accPos = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
+				#accPos = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
 		
 				if key in (keyList_target+keyList_nontarget): 
 					print key
@@ -536,28 +539,28 @@ def getResp_targ(trial_i, probe_n, gratingDraw):
 					twoGratings(trial_i, probe_n)
 					win.flip()
 					if (key == '3') and (targNoTarg == 1): #picked target, correct
-						accPos = 1
+						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
 						print 'correct, target present'
 						#text.color = color_green
 						#text.draw()
 						#win.flip()
 						print 'correct'
 					elif (key == '3') and (targNoTarg == 0): #picked target, incorrect
-						accPos = 0
+						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 						print 'incorrect, target not present'
 						#text.color = color_red
 						#text.draw()
 						#win.flip()
 						print 'incorrect'
 					elif (key == '4') and (targNoTarg == 0): #picked no target, correct
-						accPos = 1
+						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
 						print 'correct, target not present'
 						#text.color = color_green
 						#text.draw()
 						#win.flip()
 						print 'correct'
 					elif (key == '4') and (targNoTarg == 1): #picked no target, incorrect
-						accPos = 0
+						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 						print 'incorrect, target present'
 						#text.color = color_red
 						#text.draw()
@@ -567,13 +570,14 @@ def getResp_targ(trial_i, probe_n, gratingDraw):
 						print 'yikes'
 
 				else: #picked nothing or a key that wasn't 1 or 2
-					accPos = 0
+					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 					print 'other'
 
 				print ''
 	else: 
 		grating_top.autoDraw = False
 		grating_bot.autoDraw = False
+
 	#grating.autoDraw = False #change to false after done
 
 
@@ -629,7 +633,7 @@ def OGnPMprobe(trial_i, probe_n):
 	getResp(trial_i, probe_n, gratingDraw = True)
 	resetTrial()
 
-def targetProbe(trial_i, probe_n, block, lastProbe): 
+def targetProbe(trial_i, probe_n, lastProbe): 
 	print 'target probe',probe_n
 	win.flip()
 	win.color = color_gray
@@ -642,6 +646,7 @@ def targetProbe(trial_i, probe_n, block, lastProbe):
 		getResp_targ(trial_i, probe_n, gratingDraw = True)
 	elif lastProbe == False: 
 		getResp(trial_i, probe_n, gratingDraw = True)
+	lastProbe = False
 	resetTrial()
 
 
@@ -667,7 +672,7 @@ def iti():
 
 for trial_i in range(N_TOTAL_TRIALS): 
 
-	#trial_i = 120 #maintain, block 2
+	trial_i = 120 #maintain, block 2
 	#trial_i = 150 #monitor
 	#trial_i = 200 #m&m, block 6
 
@@ -689,6 +694,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		for probe_n in range(probeInTrial-1): ## Change to maintain block length 
 			print 'probe',probe_n
 			ogOnly(trial_i, probe_n)
+		#lastProbe = True
 		targetProbe(trial_i, probeInTrial-1, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
 		# targetProbe_n = 1 for maintaoin 
 		iti()
@@ -720,7 +726,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 	elif block == 5: 
 		print 'monitor2',trial_i
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for probe_n in range(probeInTrial): ## not -1 because go through all probes as targetProbe
+		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
 			print 'probe',probe_n
 			targetProbe(trial_i, probe_n, lastProbe = False)
 		targetProbe(trial_i, probeInTrial-1, lastProbe = True)
@@ -732,9 +738,10 @@ for trial_i in range(N_TOTAL_TRIALS):
 		target(trial_i)
 		delay()
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for probe_n in range(probeInTrial): ## not -1 because go through all probes as targetProbe
+		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
 			print 'probe',probe_n
-			targetProbe(trial_i, probe_n)
+			targetProbe(trial_i, probe_n, lastProbe = False)
+		targetProbe(trial_i, probe_n, lastProbe = True)
 		# targetProbe_n = 1 for maintaoin 
 		iti()
 		resetTrial()
@@ -744,9 +751,10 @@ for trial_i in range(N_TOTAL_TRIALS):
 		target(trial_i)
 		delay()
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for probe_n in range(probeInTrial): ## not -1 because go through all probes as targetProbe
+		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
 			print 'probe',probe_n
-			targetProbe(trial_i, probe_n)
+			targetProbe(trial_i, probe_n, lastProbe = False)
+		targetProbe(trial_i, probe_n, lastProbe = True)
 		# targetProbe_n = 1 for maintaoin 
 		iti()
 		resetTrial()
