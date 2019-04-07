@@ -672,8 +672,8 @@ def iti():
 
 for trial_i in range(N_TOTAL_TRIALS): 
 
-	trial_i = 120 #maintain, block 2
-	#trial_i = 150 #monitor
+	#trial_i = 120 #maintain, block 2
+	trial_i = 151 #monitor
 	#trial_i = 200 #m&m, block 6
 
 	block = df.iloc[trial_i, df.columns.get_loc('block')]
@@ -696,7 +696,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 			ogOnly(trial_i, probe_n)
 		#lastProbe = True
 		targetProbe(trial_i, probeInTrial-1, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
-		# targetProbe_n = 1 for maintaoin 
+		# targetProbe_n = 1 for maintain 
 		iti()
 		resetTrial()
 
@@ -709,7 +709,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 			print 'probe',probe_n
 			ogOnly(trial_i, probe_n)
 		targetProbe(trial_i, probeInTrial-1, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
-		# targetProbe_n = 1 for maintaoin 
+		# targetProbe_n = 1 for maintain 
 		iti()
 		resetTrial()
 
@@ -718,19 +718,19 @@ for trial_i in range(N_TOTAL_TRIALS):
 		print 'monitor1',trial_i 
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-			print 'probe',probe_n
+			print 'probe', probe_n
 			targetProbe(trial_i, probe_n, lastProbe = False)
 		targetProbe(trial_i, probeInTrial-1, lastProbe = True)
-		# targetProbe_n = 1 for maintaoin 
+		# targetProbe_n = 1 for maintain 
 
 	elif block == 5: 
 		print 'monitor2',trial_i
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-			print 'probe',probe_n
+			print 'probe', probe_n
 			targetProbe(trial_i, probe_n, lastProbe = False)
 		targetProbe(trial_i, probeInTrial-1, lastProbe = True)
-		# targetProbe_n = 1 for maintaoin 
+		# targetProbe_n = 1 for maintain 
 
 	## MAINTAIN & MONITOR
 	elif block == 6: 
@@ -742,7 +742,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 			print 'probe',probe_n
 			targetProbe(trial_i, probe_n, lastProbe = False)
 		targetProbe(trial_i, probe_n, lastProbe = True)
-		# targetProbe_n = 1 for maintaoin 
+		# targetProbe_n = 1 for maintain 
 		iti()
 		resetTrial()
 
@@ -755,7 +755,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 			print 'probe',probe_n
 			targetProbe(trial_i, probe_n, lastProbe = False)
 		targetProbe(trial_i, probe_n, lastProbe = True)
-		# targetProbe_n = 1 for maintaoin 
+		# targetProbe_n = 1 for maintain 
 		iti()
 		resetTrial()
 
