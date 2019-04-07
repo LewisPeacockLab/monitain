@@ -47,18 +47,22 @@ subj = args.subj
 scrn = args.scrn
 
 # Put .txt files into dataframes
-words_df = pd.read_table("words.txt", header=-1)
+words_df = pd.read_table("words.csv", header=-1)
 words_df = words_df.rename(columns={0:'stimuli'})
 words_df['type'] = 1
 
-nonwords_df = pd.read_table("nonwords.txt", header=-1)
+words_df = shuffle(words_df)
+
+nonwords_df = pd.read_table("nonwords.csv", header=-1)
 nonwords_df = nonwords_df.rename(columns={0:'stimuli'})
 nonwords_df['type'] = 2
 
-stimCombine = [words_df, nonwords_df]
-ogStims_df = pd.concat(stimCombine, ignore_index=True) # change name later when bigger set 
-ogStims_df = shuffle(ogStims_df)
-ogStims_df = ogStims_df.reset_index(drop=True)
+nonwords_df = shuffle(nonwords_df)
+
+#stimCombine = [words_df, nonwords_df]
+#ogStims_df = pd.concat(stimCombine, ignore_index=True) # change name later when bigger set 
+#ogStims_df = shuffle(ogStims_df)
+#ogStims_df = ogStims_df.reset_index(drop=True)
 
 
 ####################################
@@ -273,6 +277,9 @@ fake_nonword_list = [ 'dawg{:d}'.format(i+1) for i in range(5000)]
 fake_list = np.vstack([fake_word_list, fake_nonword_list])
 np.random.shuffle(fake_list)
 
+word_list = list(words_df['stimuli'])
+nonword_list = list(nonwords_df['stimuli'])
+
 for i in range(N_TOTAL_TRIALS): 
 	n_probes = df.loc[i, 'n_probes']
 	probe_loc = df.loc[i, 'probeTheta_loc']
@@ -291,9 +298,9 @@ for i in range(N_TOTAL_TRIALS):
 		col_name_cond = 'word{:d}_cond'.format(j)
 
 		if cond == 'word':
-			rand_word = fake_word_list.pop(0)
+			rand_word = word_list.pop(0)
 		elif cond == 'nonword':
-			rand_word = fake_nonword_list.pop(0)
+			rand_word = nonword_list.pop(0)
 		else: 
 			raise Warning('noooooooooooo')
 
@@ -519,9 +526,8 @@ def getResp_targ(trial_i, probe_n, gratingDraw):
 
 				targNoTarg = df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]
 				accPos = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
-				elif key in keyList_word: 
-
-				elif key in (keyList_target+keyList_nontarget): 
+		
+				if key in (keyList_target+keyList_nontarget): 
 					print key
 					print df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]
 					text.draw()
@@ -662,7 +668,7 @@ def iti():
 for trial_i in range(N_TOTAL_TRIALS): 
 
 	#trial_i = 120 #maintain, block 2
-	trial_i = 150 #monitor
+	#trial_i = 150 #monitor
 	#trial_i = 200 #m&m, block 6
 
 	block = df.iloc[trial_i, df.columns.get_loc('block')]
