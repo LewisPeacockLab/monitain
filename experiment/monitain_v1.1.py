@@ -19,25 +19,27 @@ import os
 import sys
 import pprint 
 import argparse
-from psychopy import visual, event, core, iohub
+from psychopy import visual, event, core, iohub, monitors
 from itertools import product, compress
 from sklearn.utils import shuffle
 
 
 ## Thank yoooouuu Remy
 SCREENS = {
-    'animal':      dict(distance_cm= 60,width_cm=47.3,pixel_dims=[1920,1080]),
-    'beauregard':  dict(distance_cm= 60,width_cm=47.3,pixel_dims=[1920,1080]),
-    'camilla':     dict(distance_cm= 60,width_cm=47.3,pixel_dims=[1920,1080]),
-    'scooter':     dict(distance_cm= 67,width_cm=28.5,pixel_dims=[1440, 900]),
-    'snuffy':      dict(distance_cm= 67,width_cm=59.3,pixel_dims=[2560,1440]),
-    'swedishchef': dict(distance_cm= 67,width_cm=33.0,pixel_dims=[1440, 900]),
-    'alice':       dict(distance_cm= 67,width_cm=28.5,pixel_dims=[1440, 900]),
+    'animal':          dict(distance_cm= 60,width_cm=47.3,pixel_dims=[1920,1080]),
+    'beauregard':      dict(distance_cm= 60,width_cm=47.3,pixel_dims=[1920,1080]),
+    'camilla':         dict(distance_cm= 60,width_cm=47.3,pixel_dims=[1920,1080]),
+    'scooter':         dict(distance_cm= 67,width_cm=28.5,pixel_dims=[1440,900]),
+    'misspiggy_main':  dict(distance_cm= 67,width_cm=68.58,pixel_dims=[2560,1440]),
+    'misspiggy_side':  dict(distance_cm= 67,width_cm=50.8,pixel_dims=[1680,1050]),
+    'swedishchef':     dict(distance_cm= 67,width_cm=33.0,pixel_dims=[1440,900]),
+    'alice':           dict(distance_cm= 67,width_cm=28.5,pixel_dims=[1440,900]),
 }
+#distance_cm is anticipated distance participant is from screen
 
 parser = argparse.ArgumentParser(description="Monitain experimental display")
 parser.add_argument('--subj', default='s999', type=str, help='sXXX format')
-parser.add_argument('--scrn', default='animal', type=str, choices=SCREENS.keys(), help = 'computer used for experiment')
+parser.add_argument('--scrn', default='misspiggy_side', type=str, choices=SCREENS.keys(), help = 'computer used for experiment')
 args = parser.parse_args()
 
 #io = iohub.launchHubServer(); io.clearEvents('all')
@@ -369,11 +371,17 @@ for i in range(N_TOTAL_TRIALS):
 
 clock = core.Clock()
 
+mon = monitors.Monitor('testMonitor')
+mon.setWidth(SCREENS[scrn]['width_cm'])
+mon.setSizePix(SCREENS[scrn]['pixel_dims'])
+
 # Window set up
 win = visual.Window(
-	size=[1024,576], #Small size of screen for testing it out
+	monitor=mon,
+	#screen = 0,
+	#size=[1024,576], #Small size of screen for testing it out
 	units="pix", 
-	fullscr=False, #set to True when running for real
+	fullscr=True, #set to True when running for real
 	)
 
 grating_size = [150, 150]
