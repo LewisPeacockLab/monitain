@@ -360,6 +360,7 @@ win = visual.Window(
 	fullscr=False, #set to True when running for real
 	)
 
+# Shared grating parameters
 grating_size = [150, 150]
 grating_sf = 5.0 / 80.0
 grating_contrast = 1.0
@@ -401,8 +402,11 @@ grating_ypos = [-150, 150]  ## need to change
 text = visual.TextStim(
 	win=win, 
 	color=color_black, 
-	height=40.0
+	height=40.0, 
+	font = 'Calibri'
 	)
+
+
 
 ####################################
 ############## Set up ##############
@@ -414,6 +418,7 @@ def wordOrNonword(trial_i, probe_n):
 	elif df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword': 
 		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
 
+
 def twoGratings(trial_i, probe_n): 
 	grating_top.ori = df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))]
 	print 'gratingTop', grating_top.ori
@@ -422,9 +427,11 @@ def twoGratings(trial_i, probe_n):
 	print 'gratingBot', grating_bot.ori
 	grating_bot.draw()
 
+
 def clear(): 
 	event.clearEvents()
 	clock.reset()	
+
 
 def getResp(trial_i, probe_n, gratingDraw): 
 	responded = False
@@ -589,16 +596,17 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 
 def resetTrial(): 
 	text.color = color_black
+	text.size = 40.0
 	grating_top.color = color_white
 	grating_mid.color = color_white
 	grating_bot.color = color_white
+
 
 def breakMessage(block):
 	breakText = "This is the end of block {:d}. \
 	\nPlease hold down the space bar to move onto the next block.".format(block-1)
 
 	text.text = breakText
-	text.font = 'Calibri'
 	text.height=40.0
 	text.draw()
 	win.flip()
@@ -612,6 +620,7 @@ def breakMessage(block):
 			break 
 
 	win.flip()
+
 
 
 ####################################
@@ -630,6 +639,7 @@ def ogOnly(trial_i, probe_n):
 	getResp(trial_i, probe_n, gratingDraw = False)
 	resetTrial()
 
+
 def target(trial_i):
 	win.color = color_white
 	win.flip()	
@@ -641,6 +651,7 @@ def target(trial_i):
 	grating_mid.draw()
 	win.flip() 
 	core.wait(sec_target)
+
 
 def delay(): 
 	win.color = color_gray
@@ -659,6 +670,7 @@ def OGnPMprobe(trial_i, probe_n):
 	clear()
 	getResp(trial_i, probe_n, gratingDraw = True)
 	resetTrial()
+
 
 def targetProbe(trial_i, probe_n, block, lastProbe): 
 	print 'target probe',probe_n
@@ -693,6 +705,7 @@ def iti():
 		win.flip()
 
 
+
 ####################################
 ############ Experiment ############
 ####################################
@@ -700,11 +713,6 @@ def iti():
 for trial_i in range(N_TOTAL_TRIALS): 
 
 	block_starts = [106, 126, 146, 166, 186, 206, 226]
-
-	#trial_i = 120 #maintain, block 2
-	#trial_i = 15 #monitor
-	#trial_i = 200 #m&m, block 6
-	#trial_i = 300 #baseline, block 8
 
 	block = df.iloc[trial_i, df.columns.get_loc('block')]
 	
@@ -730,9 +738,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		for probe_n in range(probeInTrial-1): ## Change to maintain block length 
 			print 'probe',probe_n
 			ogOnly(trial_i, probe_n)
-		#lastProbe = True
 		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
-		# targetProbe_n = 1 for maintain 
 		iti()
 		resetTrial()
 
@@ -745,7 +751,6 @@ for trial_i in range(N_TOTAL_TRIALS):
 			print 'probe',probe_n
 			ogOnly(trial_i, probe_n)
 		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
-		# targetProbe_n = 1 for maintain 
 		iti()
 		resetTrial()
 
@@ -757,7 +762,6 @@ for trial_i in range(N_TOTAL_TRIALS):
 			print 'probe', probe_n
 			targetProbe(trial_i, probe_n, block, lastProbe = False)
 		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
-		# targetProbe_n = 1 for maintain 
 
 	elif block == 5: 
 		print 'monitor2',trial_i
@@ -766,7 +770,6 @@ for trial_i in range(N_TOTAL_TRIALS):
 			print 'probe', probe_n
 			targetProbe(trial_i, probe_n, block, lastProbe = False)
 		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
-		# targetProbe_n = 1 for maintain 
 
 	## MAINTAIN & MONITOR
 	elif block == 6: 
@@ -778,7 +781,6 @@ for trial_i in range(N_TOTAL_TRIALS):
 			print 'probe', probe_n
 			targetProbe(trial_i, probe_n, block, lastProbe = False)
 		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
-		# targetProbe_n = 1 for maintain 
 		iti()
 		resetTrial()
 
@@ -791,7 +793,6 @@ for trial_i in range(N_TOTAL_TRIALS):
 			print 'probe', probe_n
 			targetProbe(trial_i, probe_n, block, lastProbe = False)
 		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
-		# targetProbe_n = 1 for maintain 
 		iti()
 		resetTrial()
 
