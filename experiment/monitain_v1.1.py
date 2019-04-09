@@ -37,7 +37,7 @@ SCREENS = {
 
 parser = argparse.ArgumentParser(description="Monitain experimental display")
 parser.add_argument('--subj', default='s999', type=str, help='sXXX format')
-parser.add_argument('--scrn', default='misspiggy_side', type=str, choices=SCREENS.keys(), help = 'computer used for experiment')
+parser.add_argument('--scrn', default='misspiggy_main', type=str, choices=SCREENS.keys(), help = 'computer used for experiment')
 
 args = parser.parse_args()
 
@@ -376,7 +376,7 @@ win = visual.Window(
 	monitor=mon,
 	#size=[1024,576], #Small size of screen for testing it out
 	units="pix", 
-	fullscr=False, #set to True when running for real
+	fullscr=True, #set to True when running for real
 	)
 
 # Shared grating parameters
@@ -440,10 +440,10 @@ def wordOrNonword(trial_i, probe_n):
 
 def twoGratings(trial_i, probe_n): 
 	grating_top.ori = df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))]
-	#print 'gratingTop', grating_top.ori
+	print 'gratingTop', grating_top.ori
 	grating_top.draw()
 	grating_bot.ori = df.iloc[trial_i, df.columns.get_loc('botTheta{:d}'.format(probe_n))]
-	#print 'gratingBot', grating_bot.ori
+	print 'gratingBot', grating_bot.ori
 	grating_bot.draw()
 
 
@@ -678,7 +678,7 @@ def target(trial_i):
 	win.flip()	
 	grating_mid.pos = [0.0,0.0] 
 	grating_mid.ori = df.iloc[trial_i, df.columns.get_loc('targTheta')] ## Change everytime
-	#print grating_mid.ori 
+	print grating_mid.ori 
 	#grating_mid.sf = 5.0 / 80.0
 	#grating_mid.contrast = 1.0
 	grating_mid.draw()
@@ -752,8 +752,6 @@ for trial_i in range(N_TOTAL_TRIALS):
 	block_starts = [106, 126, 146, 166, 186, 206, 226]
 
 	block = df.iloc[trial_i, df.columns.get_loc('block')]
-	
-	
 
 	if trial_i in block_starts: 
 		# Break before moving on 
@@ -771,7 +769,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		ogOnly(trial_i, probe_n)
 		resetTrial()
 
-	##MAINTAIN
+	#MAINTAIN
 	elif block == 2: 
 		#print 'maintain1',trial_i
 		target(trial_i)
@@ -796,7 +794,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		iti()
 		resetTrial()
 
-	## MONITOR
+	# MONITOR
 	elif block == 4: 
 		print 'monitor1',trial_i 
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
