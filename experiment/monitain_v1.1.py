@@ -2,14 +2,10 @@
 ##################################
 ######### monitain v1.0 ##########
 ######## Katie Hedgpeth ##########
-######## March 2019 ###########
+######## April 2019 ###########
 ##################################
 ##################################
 
-
-####### PRACTICE STUFFS
-#subj = 101
-####### 
 
 
 import random
@@ -67,6 +63,7 @@ nonwords_df = shuffle(nonwords_df)
 #ogStims_df = ogStims_df.reset_index(drop=True)
 
 
+
 ####################################
 ############ Parameters ############
 ####################################
@@ -112,19 +109,18 @@ probe_count_list = []
 
 trials = range(N_MIN_PROBES, N_MAX_PROBES+1)
 
-
+# Block lengths
 baselineTrials = 106
 maintainTrials = 20
 monitorTrials = 20 
 mnmTrials = 20
 
-#N_TOTAL_TRIALS = N_PROBES_PER_BLOCK * N_BLOCKS
 N_TOTAL_TRIALS = (baselineTrials*2) + (maintainTrials*2) + (monitorTrials*2) + (mnmTrials*2)
 
 
 # Create dataframe
-word_cols = ['word{:d}'.format(i) for i in range(N_MAX_PROBES) ]
-wordCond_cols = ['word{:d}_cond'.format(i) for i in range(N_MAX_PROBES) ]
+word_cols = ['word{:d}'.format(i) for i in range(N_MAX_PROBES)]
+wordCond_cols = ['word{:d}_cond'.format(i) for i in range(N_MAX_PROBES)]
 
 topTheta_cols = ['topTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
 botTheta_cols = ['botTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
@@ -178,13 +174,10 @@ for block_other in range(2):
 # Double check that half are ones and half are zeros
 # pd.value_counts(df['targOrNoTarg'].values, sort=False) 
 
-## MONITOR
-
-
-
+# Will the top or bottom be probed?
 all_targetTheta_locs = np.repeat(['top', 'bot'], N_TOTAL_TRIALS/2)
 np.random.shuffle(all_targetTheta_locs)
-df['probeTheta_loc'] = all_targetTheta_locs # Will the top or bottom be probed?
+df['probeTheta_loc'] = all_targetTheta_locs 
 
 possible_thetas = np.linspace(0,180, 18, endpoint=False) # Possible orientations presented
 
@@ -199,6 +192,7 @@ np.random.choice(possible_thetas)
 def pickTheta(x): 
 	return np.random.choice(possible_thetas)
 
+
 df['targTheta'] = df.targTheta.apply(pickTheta)
 
 possible_thetas = np.linspace(0,180, 18, endpoint=False)
@@ -208,10 +202,7 @@ possible_thetas = [10, 20, 30, 40, 50, 60, 70, 80,
 
 np.random.choice(possible_thetas)
 
-
-
 catch_range = range(LOWER_CATCH_TRIAL, UPPER_CATCH_TRIAL+ 1)
-
 
 probes = range(N_MIN_PROBES, N_MAX_PROBES+1)
 probe_range = np.repeat(trials,2)
@@ -267,18 +258,7 @@ df.iloc[186:226, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mnm
 #Baseline 2 probe num
 df.iloc[226:332, df.columns.get_loc('n_probes')] = baseline_probe_range
 
-
-
-
-fake_word_list = []
-fake_nonword_list = []
-#fake_word_list = np.repeat(['cat'], 1000)
-fake_word_list = [ 'cat{:d}'.format(i+1) for i in range(5000)]
-fake_nonword_list = [ 'dawg{:d}'.format(i+1) for i in range(5000)]
-
-fake_list = np.vstack([fake_word_list, fake_nonword_list])
-np.random.shuffle(fake_list)
-
+# Add word and nonword stims to dataframe
 word_list = list(words_df['stimuli'])
 nonword_list = list(nonwords_df['stimuli'])
 
@@ -289,7 +269,6 @@ for i in range(N_TOTAL_TRIALS):
 	currentBlock = df.loc[i, 'block']
 	#possible_thetas_minusTarg = possible_thetas[possible_thetas!=memTarg]
 	possible_thetas_minusTarg = list(compress(possible_thetas, (possible_thetas != memTarg)))
-
 
 	for j in range(n_probes): 
 
@@ -308,7 +287,6 @@ for i in range(N_TOTAL_TRIALS):
 
 		df.loc[i, col_name] = rand_word
 		df.loc[i, col_name_cond] = cond
-
 
 		# Assign thetas #
 		thetaTop_col = 'topTheta{:d}'.format(j)
@@ -360,8 +338,6 @@ for i in range(N_TOTAL_TRIALS):
 		df.loc[i, resp_probe] = np.nan
 		df.loc[i, rt_probe] = np.nan
 		df.loc[i, acc_probe] = np.nan
-
-
 
 
 
@@ -618,10 +594,12 @@ def resetTrial():
 	grating_bot.color = color_white
 
 def breakMessage(block):
-	breakText = "This is the end of block {:d} \
-	\n Please hold down the space bar to move onto the next block.".format(block-1)
+	breakText = "This is the end of block {:d}. \
+	\nPlease hold down the space bar to move onto the next block.".format(block-1)
 
 	text.text = breakText
+	text.font = 'Calibri'
+	text.height=40.0
 	text.draw()
 	win.flip()
 
