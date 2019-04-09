@@ -477,25 +477,25 @@ def getResp(trial_i, probe_n, gratingDraw):
 			
 					if (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'word'): #picked word, correct
 						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
-						text.color = color_green
+						#text.color = color_green
 						text.draw()
 						win.flip()
 						print 'correct'
 					elif (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'word'): #picked word, incorrect
 						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
-						text.color = color_red
+						#text.color = color_red
 						text.draw()
 						win.flip()
 						print 'incorrect'
 					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword'): #picked nonword, correct
 						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
-						text.color = color_green
+						#text.color = color_green
 						text.draw()
 						win.flip()
 						print 'correct'
 					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'nonword'): #picked nonword, incorrect
 						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
-						text.color = color_red
+						#text.color = color_red
 						text.draw()
 						win.flip()
 						print 'incorrect'
@@ -558,31 +558,31 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 						if (((block == 2) or (block == 3)) and (targNoTarg == 1)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7)): 
 							#picked target, correct
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
-							print 'correct, target present'
+							#print 'correct, target present'
 							#text.color = color_green
 							#text.draw()
 							#win.flip()
-							print 'correct'
+							#print 'correct'
 
 					elif (key == '3'): 
 						if (((block == 2) or (block == 3)) and (targNoTarg == 0)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7)): #picked target, correct
 							#picked target, incorrect
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
-							print 'incorrect, target not present'
+							#print 'incorrect, target not present'
 							#text.color = color_red
 							#text.draw()
 							#win.flip()
-							print 'incorrect'
+							#print 'incorrect'
 						
 					elif (key == '4'): 
 						if (((block == 2) or (block == 3)) and (targNoTarg == 0)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7)):
 							#picked no target, correct
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
-							print 'correct, target not present'
+							#print 'correct, target not present'
 							#text.color = color_green
 							#text.draw()
 							#win.flip()
-							print 'correct'
+							#print 'correct'
 					elif (key == '4'): 
 						if (((block == 2) or (block == 3)) and (targNoTarg == 1)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7)):
 							#picked no target, incorrect
@@ -591,16 +591,16 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 							#text.color = color_red
 							#text.draw()
 							#win.flip()
-							print 'incorrect'
+							#print 'incorrect'
 					else: 
 						print 'yikes'
-						print 'key', key
-						print 'targNoTarg'
+						#print 'key', key
+						#print 'targNoTarg'
 
 				else: #picked nothing or a key that wasn't 1 or 2
 					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
-					print key
-					print 'other'
+					#print key
+					#print 'other'
 
 
 				print ''
@@ -610,7 +610,6 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 
 	#grating.autoDraw = False #change to false after done
 
-	print keysPossible 
 
 def resetTrial(): 
 	text.color = color_black
@@ -732,7 +731,10 @@ for trial_i in range(N_TOTAL_TRIALS):
 	block = df.iloc[trial_i, df.columns.get_loc('block')]
 	
 	if trial_i in block_starts: 
+		# Break before moving on 
 		breakMessage(block)
+		# Save output at the end
+		df.to_csv(filename)
 
 	##BASELINE
 	if block == 1: 
@@ -823,3 +825,8 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	else: 
 		raise Warning('yikes, part 2')
+
+
+
+# Save output at the end
+df.to_csv(filename)
