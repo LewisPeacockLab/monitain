@@ -38,6 +38,7 @@ SCREENS = {
 parser = argparse.ArgumentParser(description="Monitain experimental display")
 parser.add_argument('--subj', default='s999', type=str, help='sXXX format')
 parser.add_argument('--scrn', default='misspiggy_side', type=str, choices=SCREENS.keys(), help = 'computer used for experiment')
+
 args = parser.parse_args()
 
 #io = iohub.launchHubServer(); io.clearEvents('all')
@@ -45,6 +46,9 @@ args = parser.parse_args()
 
 subj = args.subj
 scrn = args.scrn
+
+global debug 
+debug = subj in ['debug']
 
 # Put .txt files into dataframes
 words_df = pd.read_table("words.csv", header=-1)
@@ -96,10 +100,16 @@ color_green = [0,1,0]
 color_red = [1,0,0]
 
 # Timings
-sec_target = 2 
-sec_delay = 1 
-sec_probe = 2 
-sec_iti = 1
+event_times = OrderedDict([
+	('sec_target',	2), 
+	('sec_delay',	1),  
+	('sec_probe',	2),  
+	('sec_iti', 	1)])
+
+# Debugging mode
+if debug == True: 
+	event_times = OrderedDict([	(event, secs/50.) for event, secs in event_times.iteritems() ])
+
 
 # Keys to hit 
 keyList_word = ['1', '2'] #1 = word, 2 = nonword
@@ -364,7 +374,6 @@ mon.setSizePix(SCREENS[scrn]['pixel_dims'])
 # Window set up
 win = visual.Window(
 	monitor=mon,
-	#screen = 0,
 	#size=[1024,576], #Small size of screen for testing it out
 	units="pix", 
 	fullscr=False, #set to True when running for real
@@ -431,21 +440,26 @@ def wordOrNonword(trial_i, probe_n):
 
 def twoGratings(trial_i, probe_n): 
 	grating_top.ori = df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))]
-	print 'gratingTop', grating_top.ori
+	#print 'gratingTop', grating_top.ori
 	grating_top.draw()
 	grating_bot.ori = df.iloc[trial_i, df.columns.get_loc('botTheta{:d}'.format(probe_n))]
-	print 'gratingBot', grating_bot.ori
+	#print 'gratingBot', grating_bot.ori
 	grating_bot.draw()
 
 
 def clear(): 
-	event.clearEvents()
-	clock.reset()	
+	clock.reset()
+	if debug == False: 
+		event.clearEvents()	
 
 
 def getResp(trial_i, probe_n, gratingDraw): 
 	responded = False
-	duration = sec_probe
+	duration = event_times['sec_probe']
+
+	#Skip responses if debugging
+	if debug == True: 
+		responded = True
 	#accPos = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
 
 	while clock.getTime() < duration: 
@@ -460,8 +474,8 @@ def getResp(trial_i, probe_n, gratingDraw):
 				df.iloc[trial_i, df.columns.get_loc('respProbe{:d}'.format(probe_n))] = key
 				df.iloc[trial_i, df.columns.get_loc('rtProbe{:d}'.format(probe_n))] = rt
 				responded = True 
-				print key
-				print df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))]
+				#print key
+				#print df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))]
 
 				if key in keyList_word: 
 					text.color = color_cyan #flip text to blue if input taken
@@ -473,25 +487,25 @@ def getResp(trial_i, probe_n, gratingDraw):
 						#text.color = color_green
 						text.draw()
 						win.flip()
-						print 'correct'
+						#print 'correct'
 					elif (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'word'): #picked word, incorrect
 						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 						#text.color = color_red
 						text.draw()
 						win.flip()
-						print 'incorrect'
+						#print 'incorrect'
 					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword'): #picked nonword, correct
 						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
 						#text.color = color_green
 						text.draw()
 						win.flip()
-						print 'correct'
+						#print 'correct'
 					elif (key == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'nonword'): #picked nonword, incorrect
 						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 						#text.color = color_red
 						text.draw()
 						win.flip()
-						print 'incorrect'
+						#print 'incorrect'
 				
 
 			else: #picked nothing or a key that wasn't 1 or 2
@@ -511,7 +525,10 @@ def getResp(trial_i, probe_n, gratingDraw):
 
 def getResp_targ(trial_i, probe_n, block, gratingDraw): 	
 	responded = False
-	duration = sec_probe
+	duration = event_times['sec_probe']
+
+	if debug == True: 
+		responded = True
 
 	while clock.getTime() < duration: 
 		if gratingDraw == True: 
@@ -540,8 +557,8 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 				#accPos = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
 		
 				if key in keysPossible: 
-					print key
-					print df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]
+					#print key
+					#print df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]
 					text.draw()
 					grating_top.color = color_cyan
 					grating_bot.color = color_cyan
@@ -580,7 +597,7 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 						if (((block == 2) or (block == 3)) and (targNoTarg == 1)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7)):
 							#picked no target, incorrect
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
-							print 'incorrect, target present'
+							#print 'incorrect, target present'
 							#text.color = color_red
 							#text.draw()
 							#win.flip()
@@ -594,9 +611,6 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 					#print key
 					#print 'other'
-
-
-				print ''
 	else: 
 		grating_top.autoDraw = False
 		grating_bot.autoDraw = False
@@ -623,11 +637,14 @@ def breakMessage(block):
 
 	pressContinue = False
 	while pressContinue == False: 
-		keyPress = event.waitKeys()
+		if debug == False:
+			keyPress = event.waitKeys()
 
-		if keyPress == ['space']: 
-			pressContinue = True
-			break 
+			if keyPress == ['space']: 
+				pressContinue = True
+				break 
+		else: 
+			break
 
 	win.flip()
 
@@ -645,7 +662,7 @@ def slackMessage(block, slack_msg): #thank you again, Remy
  
 
 def ogOnly(trial_i, probe_n): 
-	print 'og probe', probe_n
+	#print 'og probe', probe_n
 	win.flip()
 	win.color = color_gray
 	wordOrNonword(trial_i, probe_n)
@@ -661,19 +678,19 @@ def target(trial_i):
 	win.flip()	
 	grating_mid.pos = [0.0,0.0] 
 	grating_mid.ori = df.iloc[trial_i, df.columns.get_loc('targTheta')] ## Change everytime
-	print grating_mid.ori 
+	#print grating_mid.ori 
 	#grating_mid.sf = 5.0 / 80.0
 	#grating_mid.contrast = 1.0
 	grating_mid.draw()
 	win.flip() 
-	core.wait(sec_target)
+	core.wait(event_times['sec_target'])
 
 
 def delay(): 
 	win.color = color_gray
 	win.flip()
 	win.flip()
-	core.wait(sec_delay)	
+	core.wait(event_times['sec_delay'])	
 
 def OGnPMprobe(trial_i, probe_n): 
 	win.flip()
@@ -689,7 +706,7 @@ def OGnPMprobe(trial_i, probe_n):
 
 
 def targetProbe(trial_i, probe_n, block, lastProbe): 
-	print 'target probe',probe_n
+	#print 'target probe',probe_n
 	win.flip()
 	win.color = color_gray
 	wordOrNonword(trial_i, probe_n)
@@ -715,7 +732,7 @@ def iti():
 		color=color_black, 
 		height = 40.0)
 	clear()
-	duration = sec_iti
+	duration = event_times['sec_iti']
 	while clock.getTime() < duration: 
 		text.draw()
 		win.flip()
@@ -726,12 +743,18 @@ def iti():
 ############ Experiment ############
 ####################################
 
+# Let Slack know experiment is starting
+slack_msg = 'Starting experiment'
+slackMessage(1, slack_msg)
+
 for trial_i in range(N_TOTAL_TRIALS): 
 
 	block_starts = [106, 126, 146, 166, 186, 206, 226]
 
 	block = df.iloc[trial_i, df.columns.get_loc('block')]
 	
+	
+
 	if trial_i in block_starts: 
 		# Break before moving on 
 		breakMessage(block)
@@ -743,19 +766,19 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	##BASELINE
 	if block == 1: 
-		print 'baseline 1'
+		print 'baseline1', trial_i
 		probe_n = 0
 		ogOnly(trial_i, probe_n)
 		resetTrial()
 
 	##MAINTAIN
 	elif block == 2: 
-		print 'maintain1',trial_i
+		#print 'maintain1',trial_i
 		target(trial_i)
 		delay()
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 		for probe_n in range(probeInTrial-1): ## Change to maintain block length 
-			print 'probe',probe_n
+			#print 'probe',probe_n
 			ogOnly(trial_i, probe_n)
 		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
 		iti()
@@ -767,7 +790,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		delay()
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 		for probe_n in range(probeInTrial-1): ## Change to maintain block length 
-			print 'probe',probe_n
+			#print 'probe',probe_n
 			ogOnly(trial_i, probe_n)
 		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
 		iti()
@@ -778,7 +801,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		print 'monitor1',trial_i 
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-			print 'probe', probe_n
+			#print 'probe', probe_n
 			targetProbe(trial_i, probe_n, block, lastProbe = False)
 		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
 
@@ -786,7 +809,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		print 'monitor2',trial_i
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-			print 'probe', probe_n
+			#print 'probe', probe_n
 			targetProbe(trial_i, probe_n, block, lastProbe = False)
 		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
 
@@ -797,7 +820,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		delay()
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-			print 'probe', probe_n
+			#print 'probe', probe_n
 			targetProbe(trial_i, probe_n, block, lastProbe = False)
 		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
 		iti()
@@ -809,7 +832,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		delay()
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-			print 'probe', probe_n
+			#print 'probe', probe_n
 			targetProbe(trial_i, probe_n, block, lastProbe = False)
 		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
 		iti()
@@ -817,14 +840,17 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	# BASELINE
 	elif block == 8: 
-		print 'baseline 2'
+		print 'baseline 2', trial_i
 		probe_n = 0
 		ogOnly(trial_i, probe_n)
 
 	else: 
 		raise Warning('yikes, part 2')
 
-
+slack_msg = 'Experiment finished'
+slackMessage(block, slack_msg)
 
 # Save output at the end
 df.to_csv(filename)
+
+win.close()
