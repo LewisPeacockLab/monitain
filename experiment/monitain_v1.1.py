@@ -381,7 +381,7 @@ win = visual.Window(
 	#screen = 0,
 	#size=[1024,576], #Small size of screen for testing it out
 	units="pix", 
-	fullscr=True, #set to True when running for real
+	fullscr=False, #set to True when running for real
 	)
 
 grating_size = [150, 150]
@@ -618,10 +618,29 @@ def resetTrial():
 	grating_mid.color = color_white
 	grating_bot.color = color_white
 
+def breakMessage(block):
+	breakText = "This is the end of block {:d} \
+	\n Please hold down the space bar to move onto the next block.".format(block-1)
+
+	text.text = breakText
+	text.draw()
+	win.flip()
+
+	pressContinue = False
+	while pressContinue == False: 
+		keyPress = event.waitKeys()
+
+		if keyPress == ['space']: 
+			pressContinue = True
+			break 
+
+	win.flip()
+
+
 ####################################
 ############## Events ##############
 ####################################
-
+ 
 
 def ogOnly(trial_i, probe_n): 
 	print 'og probe', probe_n
@@ -703,13 +722,18 @@ def iti():
 
 for trial_i in range(N_TOTAL_TRIALS): 
 
+	block_starts = [106, 126, 146, 166, 186, 206, 226]
+
 	#trial_i = 120 #maintain, block 2
 	#trial_i = 15 #monitor
-	trial_i = 200 #m&m, block 6
+	#trial_i = 200 #m&m, block 6
 	#trial_i = 300 #baseline, block 8
 
 	block = df.iloc[trial_i, df.columns.get_loc('block')]
 	
+	if trial_i in block_starts: 
+		breakMessage(block)
+
 	##BASELINE
 	if block == 1: 
 		print 'baseline 1'
