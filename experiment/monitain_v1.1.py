@@ -15,9 +15,11 @@ import os
 import sys
 import pprint 
 import argparse
+import requests
 from psychopy import visual, event, core, iohub, monitors
 from itertools import product, compress
 from sklearn.utils import shuffle
+from collections import OrderedDict
 
 
 ## Thank yoooouuu Remy
@@ -76,6 +78,14 @@ filename = data_path + ".csv"
 
 if data_path_exists: 
 	sys.exit("Filename " + data_path + "already exists!")
+
+## Set up Slack notificaitons
+SLACK = dict(
+	channel = '#katieshooks', 
+	botname = '{:s}'.format(subj), 
+	emoji = ':person_climbing:', 
+	url = 'https://hooks.slack.com/services/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'
+	)
 
 # Colors
 color_white = [1,1,1]
@@ -621,6 +631,12 @@ def breakMessage(block):
 
 	win.flip()
 
+def slackMessage(block, slack_msg): #thank you again, Remy
+	if SLACK: 
+		payload = dict(text=slack_msg, channel = SLACK['channel'], username=SLACK['botname'], icon_emoji=SLACK['emoji'])
+		try: requests.post(json=payload, url=SLACK['url'])
+		except ConnectionError: print('Slack messaging failed, no internet')
+
 
 
 ####################################
@@ -721,6 +737,9 @@ for trial_i in range(N_TOTAL_TRIALS):
 		breakMessage(block)
 		# Save output at the end
 		df.to_csv(filename)
+
+		slack_msg = 'Starting block {:d}'.format(block)
+		slackMessage(block, slack_msg)
 
 	##BASELINE
 	if block == 1: 
