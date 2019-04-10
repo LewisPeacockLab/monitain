@@ -2,11 +2,12 @@
 ##################################
 ######### monitain v1.0 ##########
 ######## Katie Hedgpeth ##########
-######## April 2019 ###########
+########## April 2019 ############
 ##################################
 ##################################
 
-
+### Error? Try this
+#pip install opencv-python
 
 import random
 import numpy as np 
@@ -16,6 +17,7 @@ import sys
 import pprint 
 import argparse
 import requests
+import cv2
 from psychopy import visual, event, core, iohub, monitors
 from itertools import product, compress
 from sklearn.utils import shuffle
@@ -376,7 +378,14 @@ win = visual.Window(
 	monitor=mon,
 	#size=[1024,576], #Small size of screen for testing it out
 	units="pix", 
-	fullscr=True, #set to True when running for real
+	fullscr=False, #set to True when running for real
+	)
+
+# Images for instructions
+
+instructImage = visual.ImageStim(
+	win = win, 
+	size = win.size 
 	)
 
 # Shared grating parameters
@@ -386,7 +395,7 @@ grating_contrast = 1.0
 
 # Grating set up 
 grating_top = visual.GratingStim(
-	win=win,
+	win = win,
 	mask = "circle",
 	units="pix", 
 	pos = [0, 150],
@@ -396,7 +405,7 @@ grating_top = visual.GratingStim(
 	) 
 
 grating_mid = visual.GratingStim(
-	win=win,
+	win = win,
 	mask = "circle",
 	units="pix", 
 	pos = [0, 0],
@@ -406,7 +415,7 @@ grating_mid = visual.GratingStim(
 	) 
 
 grating_bot = visual.GratingStim(
-	win=win,
+	win = win,
 	mask = "circle",
 	units="pix", 
 	pos = [0,-150],
@@ -648,6 +657,20 @@ def breakMessage(block):
 
 	win.flip()
 
+
+def instructionSlides(block_starts): 
+	if block_starts == 106: 
+		for slide in range(1): ##change later based on slides
+			instructImage.image = 'instructionSlides/instructionSlides.00{:d}.jpeg'.format(slide)
+			instructImage.draw()
+			win.flip()
+			while 1: 
+				for key in event.getKeys(): 
+					if key == 'space': 
+						win.flip()
+						break 
+		
+
 def slackMessage(block, slack_msg): #thank you again, Remy
 	if SLACK: 
 		payload = dict(text=slack_msg, channel = SLACK['channel'], username=SLACK['botname'], icon_emoji=SLACK['emoji'])
@@ -758,6 +781,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		breakMessage(block)
 		# Save output at the end
 		df.to_csv(filename)
+		instructionSlides(block_starts)
 
 		slack_msg = 'Starting block {:d}'.format(block)
 		slackMessage(block, slack_msg)
