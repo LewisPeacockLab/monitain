@@ -815,15 +815,15 @@ for trial_i in range(N_TOTAL_TRIALS):
 		slack_msg = 'Starting block {:d}'.format(block)
 		slackMessage(block, slack_msg)
 
-	# ##BASELINE
-	# if block == 1: 
-	# 	print 'baseline1', trial_i
-	# 	probe_n = 0
-	# 	ogOnly(trial_i, probe_n)
-	# 	resetTrial()
+	##BASELINE
+	if block == 1: 
+		print 'baseline1', trial_i
+	 	probe_n = 0
+	 	ogOnly(trial_i, probe_n)
+	 	resetTrial()
 
 	#MAINTAIN
-	if block == 2: 
+	elif block == 2: 
 		#print 'maintain1',trial_i
 		target(trial_i)
 		delay()
@@ -895,8 +895,8 @@ for trial_i in range(N_TOTAL_TRIALS):
 		probe_n = 0
 		ogOnly(trial_i, probe_n)
 
-	#else: 
-	#	raise Warning('yikes, part 2')
+	else: 
+		raise Warning('yikes, part 2')
 
 # End of expt instruction slides
 for end_slide in range(1,6): ##change later based on slides
