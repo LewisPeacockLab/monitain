@@ -461,6 +461,13 @@ def clear():
 	if debug == False: 
 		event.clearEvents()	
 
+def pressSpace(): 
+	while 1: 
+		for key in event.getKeys(): 
+			if key == 'space': 
+				win.flip()
+				break
+
 
 def getResp(trial_i, probe_n, gratingDraw): 
 	responded = False
@@ -657,18 +664,27 @@ def breakMessage(block):
 
 	win.flip()
 
+def presentSlides(slide): 
+	instructImage.image = 'exptInstruct/exptInstruct.{:d}.jpeg'.format(slide)
+	instructImage.draw()
+	win.flip()
+	pressSpace()
+
 
 def instructionSlides(block_starts): 
-	if block_starts == 106: 
-		for slide in range(1): ##change later based on slides
-			instructImage.image = 'instructionSlides/instructionSlides.00{:d}.jpeg'.format(slide)
-			instructImage.draw()
-			win.flip()
-			while 1: 
-				for key in event.getKeys(): 
-					if key == 'space': 
-						win.flip()
-						break 
+	if block_starts == block_starts[0]: #before maintaining
+		for slide in range(6,12): ##change later based on slides
+			presentSlides(slide)
+	elif block_starts == block_starts[2]: #before monitoring
+		for slide in range(12,15): ##change later based on slides
+			presentSlides(slide)
+	elif block_starts == block_starts[4]: #before mnm
+		for slide in range(15,20): ##change later based on slides
+			presentSlides(slide)
+	elif block_starts == block_starts[6]: #before baseline
+		for slide in range(20,21): ##change later based on slides
+			presentSlides(slide)
+
 		
 
 def slackMessage(block, slack_msg): #thank you again, Remy
@@ -770,6 +786,10 @@ def iti():
 slack_msg = 'Starting experiment'
 slackMessage(1, slack_msg)
 
+# Starting instruction slides
+for start_slide in range(1,6): ##change later based on slides
+	presentSlides(start_slide)
+
 for trial_i in range(N_TOTAL_TRIALS): 
 
 	block_starts = [106, 126, 146, 166, 186, 206, 226]
@@ -868,6 +888,10 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	else: 
 		raise Warning('yikes, part 2')
+
+# End of expt instruction slides
+for end_slide in range(1,6): ##change later based on slides
+	presentSlides(end_slide)
 
 slack_msg = 'Experiment finished'
 slackMessage(block, slack_msg)
