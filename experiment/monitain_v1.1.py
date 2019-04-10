@@ -378,14 +378,16 @@ win = visual.Window(
 	monitor=mon,
 	#size=[1024,576], #Small size of screen for testing it out
 	units="pix", 
-	fullscr=False, #set to True when running for real
+	fullscr=True, #set to True when running for real
 	)
 
 # Images for instructions
 
+windowSize = win.size
+
 instructImage = visual.ImageStim(
 	win = win, 
-	size = win.size 
+	size = win.size/2 
 	)
 
 # Shared grating parameters
@@ -463,11 +465,13 @@ def clear():
 
 def pressSpace(): 
 	while 1: 
-		for key in event.getKeys(): 
+		for key in event.getKeys(): 			
 			if key == 'space': 
+				win.color = color_black
 				win.flip()
-				break
-
+				#win.flip()
+				return 
+			
 
 def getResp(trial_i, probe_n, gratingDraw): 
 	responded = False
@@ -665,7 +669,7 @@ def breakMessage(block):
 	win.flip()
 
 def presentSlides(slide): 
-	instructImage.image = 'exptInstruct/exptInstruct.{:d}.jpeg'.format(slide)
+	instructImage.image = 'exptInstruct/exptInstruct.{:d}.png'.format(slide)
 	instructImage.draw()
 	win.flip()
 	pressSpace()
@@ -749,6 +753,8 @@ def targetProbe(trial_i, probe_n, block, lastProbe):
 	win.flip()
 	win.color = color_gray
 	wordOrNonword(trial_i, probe_n)
+	if (block == 2) or (block == 3): 
+		text.text = ''	
 	text.draw()
 	twoGratings(trial_i, probe_n)
 	win.flip()
@@ -787,8 +793,11 @@ slack_msg = 'Starting experiment'
 slackMessage(1, slack_msg)
 
 # Starting instruction slides
+win.color = color_black
+win.flip()
 for start_slide in range(1,6): ##change later based on slides
 	presentSlides(start_slide)
+
 
 for trial_i in range(N_TOTAL_TRIALS): 
 
@@ -806,15 +815,15 @@ for trial_i in range(N_TOTAL_TRIALS):
 		slack_msg = 'Starting block {:d}'.format(block)
 		slackMessage(block, slack_msg)
 
-	##BASELINE
-	if block == 1: 
-		print 'baseline1', trial_i
-		probe_n = 0
-		ogOnly(trial_i, probe_n)
-		resetTrial()
+	# ##BASELINE
+	# if block == 1: 
+	# 	print 'baseline1', trial_i
+	# 	probe_n = 0
+	# 	ogOnly(trial_i, probe_n)
+	# 	resetTrial()
 
 	#MAINTAIN
-	elif block == 2: 
+	if block == 2: 
 		#print 'maintain1',trial_i
 		target(trial_i)
 		delay()
@@ -886,8 +895,8 @@ for trial_i in range(N_TOTAL_TRIALS):
 		probe_n = 0
 		ogOnly(trial_i, probe_n)
 
-	else: 
-		raise Warning('yikes, part 2')
+	#else: 
+	#	raise Warning('yikes, part 2')
 
 # End of expt instruction slides
 for end_slide in range(1,6): ##change later based on slides
