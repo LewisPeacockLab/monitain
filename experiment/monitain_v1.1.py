@@ -464,6 +464,8 @@ def clear():
 		event.clearEvents()	
 
 def pressSpace(): 
+	if debug == True: 
+		return 
 	while 1: 
 		for key in event.getKeys(): 			
 			if key == 'space': 
