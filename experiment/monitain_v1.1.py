@@ -378,7 +378,7 @@ win = visual.Window(
 	monitor=mon,
 	#size=[1024,576], #Small size of screen for testing it out
 	units="pix", 
-	fullscr=True, #set to True when running for real
+	fullscr=False, #set to True when running for real
 	)
 
 # Images for instructions
@@ -677,17 +677,17 @@ def presentSlides(slide):
 	pressSpace()
 
 
-def instructionSlides(block_starts): 
-	if block_starts == block_starts[0]: #before maintaining
+def instructionSlides(trial_i): 
+	if trial_i == block_starts[0]: #before maintaining
 		for slide in range(6,12): ##change later based on slides
 			presentSlides(slide)
-	elif block_starts == block_starts[2]: #before monitoring
+	elif trial_i == block_starts[2]: #before monitoring
 		for slide in range(12,15): ##change later based on slides
 			presentSlides(slide)
-	elif block_starts == block_starts[4]: #before mnm
+	elif trial_i == block_starts[4]: #before mnm
 		for slide in range(15,20): ##change later based on slides
 			presentSlides(slide)
-	elif block_starts == block_starts[6]: #before baseline
+	elif trial_i == block_starts[6]: #before baseline
 		for slide in range(20,21): ##change later based on slides
 			presentSlides(slide)
 
@@ -812,51 +812,53 @@ for trial_i in range(N_TOTAL_TRIALS):
 		breakMessage(block)
 		# Save output at the end
 		df.to_csv(filename)
-		instructionSlides(block_starts)
+		instructionSlides(trial_i)
 
 		slack_msg = 'Starting block {:d}'.format(block)
 		slackMessage(block, slack_msg)
 
-	##BASELINE
-	if block == 1: 
-		print 'baseline1', trial_i
-	 	probe_n = 0
-	 	ogOnly(trial_i, probe_n)
-	 	resetTrial()
+	# ##BASELINE
+	# if block == 1: 
+	# 	print 'baseline1', trial_i
+	#  	probe_n = 0
+	#  	ogOnly(trial_i, probe_n)
+	#  	resetTrial()
 
-	#MAINTAIN
-	elif block == 2: 
-		#print 'maintain1',trial_i
-		target(trial_i)
-		delay()
-		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for probe_n in range(probeInTrial-1): ## Change to maintain block length 
-			#print 'probe',probe_n
-			ogOnly(trial_i, probe_n)
-		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
-		iti()
-		resetTrial()
+	# #MAINTAIN
+	# elif block == 2: 
+	# 	#print 'maintain1',trial_i
+	# 	target(trial_i)
+	# 	delay()
+	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+	# 	for probe_n in range(probeInTrial-1): ## Change to maintain block length 
+	# 		#print 'probe',probe_n
+	# 		ogOnly(trial_i, probe_n)
+	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
+	# 	iti()
+	# 	resetTrial()
 
-	elif block == 3: 
-		print 'maintain2',trial_i
-		target(trial_i)
-		delay()
-		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for probe_n in range(probeInTrial-1): ## Change to maintain block length 
-			#print 'probe',probe_n
-			ogOnly(trial_i, probe_n)
-		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
-		iti()
-		resetTrial()
+	# elif block == 3: 
+	# 	print 'maintain2',trial_i
+	# 	target(trial_i)
+	# 	delay()
+	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+	# 	for probe_n in range(probeInTrial-1): ## Change to maintain block length 
+	# 		#print 'probe',probe_n
+	# 		ogOnly(trial_i, probe_n)
+	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
+	# 	iti()
+	# 	resetTrial()
 
 	# MONITOR
-	elif block == 4: 
+	if block == 4: 
 		print 'monitor1',trial_i 
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
 			#print 'probe', probe_n
 			targetProbe(trial_i, probe_n, block, lastProbe = False)
 		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
+		iti()
+		resetTrial()
 
 	elif block == 5: 
 		print 'monitor2',trial_i
@@ -865,6 +867,8 @@ for trial_i in range(N_TOTAL_TRIALS):
 			#print 'probe', probe_n
 			targetProbe(trial_i, probe_n, block, lastProbe = False)
 		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
+		iti()
+		resetTrial()
 
 	## MAINTAIN & MONITOR
 	elif block == 6: 
@@ -897,8 +901,8 @@ for trial_i in range(N_TOTAL_TRIALS):
 		probe_n = 0
 		ogOnly(trial_i, probe_n)
 
-	else: 
-		raise Warning('yikes, part 2')
+	#else: 
+	#	raise Warning('yikes, part 2')
 
 # End of expt instruction slides
 for end_slide in range(1,6): ##change later based on slides
