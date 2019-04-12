@@ -17,7 +17,7 @@ import sys
 import pprint 
 import argparse
 import requests
-import cv2
+#import cv2
 from psychopy import visual, event, core, iohub, monitors
 from itertools import product, compress
 from sklearn.utils import shuffle
@@ -382,7 +382,7 @@ win = visual.Window(
 	monitor=mon,
 	#size=[1024,576], #Small size of screen for testing it out
 	units="pix", 
-	fullscr=False, #set to True when running for real
+	fullscr=True, #set to True when running for real
 	)
 
 # Images for instructions
