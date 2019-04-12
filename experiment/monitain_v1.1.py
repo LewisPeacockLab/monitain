@@ -535,7 +535,8 @@ def getResp(trial_i, probe_n, block, gratingDraw):
 					grating_top.color = color_red
 					grating_bot.color = color_red
 					twoGratings(trial_i, probe_n)
-					print block
+					text.draw()
+					win.flip()
 
 				
 
@@ -587,14 +588,13 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 				responded = True 
 				print key
 				#print df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))]
-
 				targNoTarg = df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]
 				#accPos = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
 		
 				if key in keysPossible: 
 					print key
 					print df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]
-					#text.draw()
+					text.draw()
 					#grating_top.color = color_cyan
 					#grating_bot.color = color_cyan
 					#twoGratings(trial_i, probe_n)
@@ -607,14 +607,12 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 							grating_top.color = color_green
 							grating_bot.color = color_green
 							twoGratings(trial_i, probe_n)
-							win.flip()
-							
+							win.flip()						
 							#print 'correct, target present'
 							#text.color = color_green
 							#text.draw()
 							#win.flip()
 							#print 'correct'
-
 						elif ((((block == 2) or (block == 3)) and (targNoTarg == 0)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))): #picked target, correct
 							#picked target, incorrect
 							print 'key 3, incorrect'
@@ -622,17 +620,13 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 							grating_top.color = color_red
 							grating_bot.color = color_red
 							twoGratings(trial_i, probe_n)
-							win.flip()
-							
+							win.flip()							
 							#print 'incorrect, target not present'
 							#text.color = color_red
 							#text.draw()
 							#win.flip()
 							#print 'incorrect'							
-
-
-						
-						
+		
 					elif (key == '4'): 
 						if ((((block == 2) or (block == 3)) and (targNoTarg == 0)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))):
 							#picked no target, correct
@@ -648,7 +642,6 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 							#text.draw()
 							#win.flip()
 							#print 'correct'
-
 						elif ((((block == 2) or (block == 3)) and (targNoTarg == 1)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))):
 							#picked no target, incorrect
 							print('key 4, incorrect')
@@ -872,30 +865,30 @@ for trial_i in range(N_TOTAL_TRIALS):
 	#  	ogOnly(trial_i, probe_n)
 	#  	resetTrial()
 
-	#MAINTAIN
-	if block == 2: 
-		print 'maintain1',trial_i
-		target(trial_i)
-		delay()
-		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for probe_n in range(probeInTrial-1): ## Change to maintain block length 
-			#print 'probe',probe_n
-			ogOnly(trial_i, probe_n)
-		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
-		iti()
-		resetTrial()
+	# #MAINTAIN
+	# if block == 2: 
+	# 	print 'maintain1',trial_i
+	# 	target(trial_i)
+	# 	delay()
+	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+	# 	for probe_n in range(probeInTrial-1): ## Change to maintain block length 
+	# 		#print 'probe',probe_n
+	# 		ogOnly(trial_i, probe_n)
+	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
+	# 	iti()
+	# 	resetTrial()
 
-	elif block == 3: 
-		print 'maintain2',trial_i
-		target(trial_i)
-		delay()
-		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for probe_n in range(probeInTrial-1): ## Change to maintain block length 
-			#print 'probe',probe_n
-			ogOnly(trial_i, probe_n)
-		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
-		iti()
-		resetTrial()
+	# elif block == 3: 
+	# 	print 'maintain2',trial_i
+	# 	target(trial_i)
+	# 	delay()
+	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+	# 	for probe_n in range(probeInTrial-1): ## Change to maintain block length 
+	# 		#print 'probe',probe_n
+	# 		ogOnly(trial_i, probe_n)
+	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
+	# 	iti()
+	# 	resetTrial()
 
 	# MONITOR
 	if block == 4: 
