@@ -319,6 +319,10 @@ for i in range(N_TOTAL_TRIALS):
 		if j+1 != n_probes: 
 			top_theta = np.random.choice(possible_thetas_minusTarg)
 			bot_theta = np.random.choice(possible_thetas_minusTarg)
+			if (currentBlock == 4) or (currentBlock == 5): 
+				if top_theta == bot_theta: 
+					newBotTheta_minusTop = list(compress(possible_thetas_minusTarg, (possible_thetas_minusTarg != top_theta)))
+					bot_theta = np.random.choice(newBotTheta_minusTop)
 		elif j+1 == n_probes: 
 			if targOrNah == 0: #target not present for MAINTAIN
 				top_theta = np.random.choice(possible_thetas_minusTarg)
