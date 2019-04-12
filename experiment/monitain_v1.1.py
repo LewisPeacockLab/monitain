@@ -85,7 +85,8 @@ filename = data_path + ".csv"
 if data_path_exists: 
 	sys.exit("Filename " + data_path + "already exists!")
 
-full_filename = '(LewPeaLab)/BEHAVIOR/monitain/v1/' + filename
+#full_filename = '(LewPeaLab)/BEHAVIOR/monitain/v1/' + filename
+full_filename = filename
 
 ## Set up Slack notificaitons
 SLACK = dict(
