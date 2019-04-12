@@ -85,7 +85,7 @@ filename = data_path + ".csv"
 if data_path_exists: 
 	sys.exit("Filename " + data_path + "already exists!")
 
-filename = "Dropbox\ \(LewPeaLab\)/BEHAVIOR/monitain/v1/" + filename
+full_filename = '(LewPeaLab)/BEHAVIOR/monitain/v1/' + filename
 
 ## Set up Slack notificaitons
 SLACK = dict(
@@ -865,7 +865,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		# Break before moving on 
 		breakMessage(block)
 		# Save output at the end
-		df.to_csv(filename)
+		df.to_csv(full_filename)
 		instructionSlides(trial_i)
 
 		slack_msg = 'Starting block {:d}'.format(block)
@@ -965,6 +965,6 @@ slack_msg = 'Experiment finished'
 slackMessage(block, slack_msg)
 
 # Save output at the end
-df.to_csv(filename)
+df.to_csv(full_filename)
 
 win.close()
