@@ -85,6 +85,8 @@ filename = data_path + ".csv"
 if data_path_exists: 
 	sys.exit("Filename " + data_path + "already exists!")
 
+filename = "Dropbox\ \(LewPeaLab\)/BEHAVIOR/monitain/v1/" + filename
+
 ## Set up Slack notificaitons
 SLACK = dict(
 	channel = '#katieshooks', 
