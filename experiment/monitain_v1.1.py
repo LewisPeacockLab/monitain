@@ -491,8 +491,9 @@ def getResp(trial_i, probe_n, block, gratingDraw):
 		else: 
 			grating_top.autoDraw = False
 			grating_top.autoDraw = False
+
 		if responded == False : 
-			for key, rt in event.getKeys(keyList=keyList_word + keyList_target,timeStamped=clock):
+			for key, rt in event.getKeys(timeStamped=clock):
 				df.iloc[trial_i, df.columns.get_loc('respProbe{:d}'.format(probe_n))] = key
 				df.iloc[trial_i, df.columns.get_loc('rtProbe{:d}'.format(probe_n))] = rt
 				responded = True 
@@ -501,8 +502,8 @@ def getResp(trial_i, probe_n, block, gratingDraw):
 
 				if key in keyList_word: 
 					#text.color = color_cyan #flip text to blue if input taken
-					text.draw()
-					win.flip()
+					#text.draw()
+					#win.flip()
 			
 					if (key == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'word'): #picked word, correct
 						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
@@ -529,7 +530,7 @@ def getResp(trial_i, probe_n, block, gratingDraw):
 						win.flip()
 						#print 'incorrect'
 
-				elif (key == '3') and ((block != 2) or (block != 3)): 
+				elif (key == '3') and ((block != 2) and (block != 3)): 
 					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 					grating_top.color = color_red
 					grating_bot.color = color_red
@@ -562,6 +563,8 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 	if debug == True: 
 		responded = True
 
+	print responded
+
 	while clock.getTime() < duration: 
 		if gratingDraw == True: 
 			grating_top.autoDraw = True
@@ -578,78 +581,89 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 			print 'not good here'
 
 		if responded == False : 
-			for key, rt in event.getKeys(keyList=keyList_word + keyList_target + keyList_nontarget, timeStamped=clock):
+			for key, rt in event.getKeys(timeStamped=clock):
 				df.iloc[trial_i, df.columns.get_loc('respProbe{:d}'.format(probe_n))] = key
 				df.iloc[trial_i, df.columns.get_loc('rtProbe{:d}'.format(probe_n))] = rt
 				responded = True 
-				#print key
+				print key
 				#print df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))]
 
 				targNoTarg = df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]
 				#accPos = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
 		
 				if key in keysPossible: 
-					#print key
-					#print df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]
+					print key
+					print df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]
 					#text.draw()
 					#grating_top.color = color_cyan
 					#grating_bot.color = color_cyan
 					#twoGratings(trial_i, probe_n)
 					#win.flip()
 					if (key == '3'): 
-						if (((block == 2) or (block == 3)) and (targNoTarg == 1)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7)): 
+						if ((((block == 2) or (block == 3)) and (targNoTarg == 1)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))): 
 							#picked target, correct
+							print 'key 3, correct'
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
 							grating_top.color = color_green
 							grating_bot.color = color_green
 							twoGratings(trial_i, probe_n)
 							win.flip()
+							
 							#print 'correct, target present'
 							#text.color = color_green
 							#text.draw()
 							#win.flip()
 							#print 'correct'
 
-					elif (key == '3'): 
-						if (((block == 2) or (block == 3)) and (targNoTarg == 0)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7)): #picked target, correct
+						elif ((((block == 2) or (block == 3)) and (targNoTarg == 0)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))): #picked target, correct
 							#picked target, incorrect
+							print 'key 3, incorrect'
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 							grating_top.color = color_red
 							grating_bot.color = color_red
 							twoGratings(trial_i, probe_n)
 							win.flip()
+							
 							#print 'incorrect, target not present'
 							#text.color = color_red
 							#text.draw()
 							#win.flip()
-							#print 'incorrect'
+							#print 'incorrect'							
+
+
+						
 						
 					elif (key == '4'): 
-						if (((block == 2) or (block == 3)) and (targNoTarg == 0)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7)):
+						if ((((block == 2) or (block == 3)) and (targNoTarg == 0)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))):
 							#picked no target, correct
+							print('key 4, correct')
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
 							grating_top.color = color_green
 							grating_bot.color = color_green
 							twoGratings(trial_i, probe_n)
 							win.flip()
+							
 							#print 'correct, target not present'
 							#text.color = color_green
 							#text.draw()
 							#win.flip()
 							#print 'correct'
-					elif (key == '4'): 
-						if (((block == 2) or (block == 3)) and (targNoTarg == 1)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7)):
+
+						elif ((((block == 2) or (block == 3)) and (targNoTarg == 1)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))):
 							#picked no target, incorrect
+							print('key 4, incorrect')
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 							grating_top.color = color_red
 							grating_bot.color = color_red
 							twoGratings(trial_i, probe_n)
 							win.flip()
+							
 							#print 'incorrect, target present'
 							#text.color = color_red
 							#text.draw()
 							#win.flip()
-							#print 'incorrect'
+							#print 'incorrect'	
+						
 					else: 
 						print 'yikes'
 						#print 'key', key
@@ -860,7 +874,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	#MAINTAIN
 	if block == 2: 
-		#print 'maintain1',trial_i
+		print 'maintain1',trial_i
 		target(trial_i)
 		delay()
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
