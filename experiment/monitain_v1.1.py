@@ -704,17 +704,44 @@ def presentSlides(slide):
 
 def instructionSlides(trial_i): 
 	if trial_i == block_starts[0]: #before maintaining
-		for slide in range(6,12): ##change later based on slides
+		for slide in range(6,11): ##change later based on slides
 			presentSlides(slide)
+		win.color = color_gray
+		win.flip()
+		text.text = "Press space to begin"
+		text.draw()
+		win.flip()
+		pressSpace()
+		
 	elif trial_i == block_starts[2]: #before monitoring
-		for slide in range(12,15): ##change later based on slides
+		for slide in range(11,14): ##change later based on slides
 			presentSlides(slide)
+		win.color = color_gray
+		win.flip()
+		text.text = "Press space to begin"
+		text.draw()
+		win.flip()
+		pressSpace()
+
 	elif trial_i == block_starts[4]: #before mnm
-		for slide in range(15,20): ##change later based on slides
+		for slide in range(14,19): ##change later based on slides
 			presentSlides(slide)
+		win.color = color_gray
+		win.flip()
+		text.text = "Press space to begin"
+		text.draw()
+		win.flip()
+		pressSpace()
+
 	elif trial_i == block_starts[6]: #before baseline
-		for slide in range(20,21): ##change later based on slides
+		for slide in range(19,21): ##change later based on slides
 			presentSlides(slide)
+		win.color = color_gray
+		win.flip()
+		text.text = "Press space to begin"
+		text.draw()
+		win.flip()
+		pressSpace()
 
 		
 
@@ -929,9 +956,8 @@ for trial_i in range(N_TOTAL_TRIALS):
 	#else: 
 	#	raise Warning('yikes, part 2')
 
-# End of expt instruction slides
-for end_slide in range(1,6): ##change later based on slides
-	presentSlides(end_slide)
+# End of expt instruction slide
+presentSlides(21)
 
 slack_msg = 'Experiment finished'
 slackMessage(block, slack_msg)
