@@ -894,29 +894,29 @@ for trial_i in range(N_TOTAL_TRIALS):
 	# 	iti()
 	# 	resetTrial()
 
-	# MONITOR
-	if block == 4: 
-		print 'monitor1',trial_i 
-		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-			#print 'probe', probe_n
-			targetProbe(trial_i, probe_n, block, lastProbe = False)
-		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
-		iti()
-		resetTrial()
+	# # MONITOR
+	# if block == 4: 
+	# 	print 'monitor1',trial_i 
+	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+	# 	for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
+	# 		#print 'probe', probe_n
+	# 		targetProbe(trial_i, probe_n, block, lastProbe = False)
+	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
+	# 	iti()
+	# 	resetTrial()
 
-	elif block == 5: 
-		print 'monitor2',trial_i
-		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-			#print 'probe', probe_n
-			targetProbe(trial_i, probe_n, block, lastProbe = False)
-		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
-		iti()
-		resetTrial()
+	# elif block == 5: 
+	# 	print 'monitor2',trial_i
+	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+	# 	for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
+	# 		#print 'probe', probe_n
+	# 		targetProbe(trial_i, probe_n, block, lastProbe = False)
+	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
+	# 	iti()
+	# 	resetTrial()
 
 	## MAINTAIN & MONITOR
-	elif block == 6: 
+	if block == 6: 
 		print 'mnm1',trial_i
 		target(trial_i)
 		delay()
