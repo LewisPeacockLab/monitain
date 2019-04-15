@@ -32,8 +32,8 @@ args = parser.parse_args()
 
 
 PATH = os.path.expanduser('~')
-
 data_dir = PATH+'/Dropbox (LewPeaLab)/BEHAVIOR/monitain'
+FIGURE_PATH = PATH + '/monitain/analysis/output/'
 
 fnames = glob.glob(data_dir+'/v*/*.csv')
 
@@ -57,20 +57,26 @@ def get_block_type(row):
 	block_type = row['block']
 
 #####################################
-#######  By probe accuracy  #########
+#######  By block accuracy  #########
 #####################################
 
-# Find mean rt for baseline blocks
-block1_rt = df_main[df_main['block'] == 1].groupby(['subj', 'block'])['rtProbe0'].mean()
+
+###BASELINE
+# Find mean rt for baseline blocks (ALL RESPONSES)
+#block1_rt = df_main[df_main['block'] == 1].groupby(['subj', 'block'])['rtProbe0'].mean()
+#block8_rt = df_main[df_main['block'] == 8].groupby(['subj', 'block'])['rtProbe0'].mean()
+
+# Find mean rt for baseline blocks (CORRECT RESPONSES)
+block1_rt = df_main[(df_main['block'] == 1) & (df_main['probe0_acc']== 1)]\
+	.groupby(['subj', 'block'])['rtProbe0'].mean()
 block8_rt = df_main[df_main['block'] == 8].groupby(['subj', 'block'])['rtProbe0'].mean()
 
 #dfs for violin plots
-block1 = df_main[df_main['block'] == 1]
-block8 = df_main[df_main['block'] == 8]
+block1 = df_main[(df_main['block'] == 1) & (df_main['probe0_acc']== 1)]
+block8 = df_main[(df_main['block'] == 8) & (df_main['probe0_acc']== 1)]
+baseline_df = pd.concat([block1, block8], axis = 0).reset_index()#axis = 0 for horiz cat, = 1 for vert cat
 
-baselineSeries = pd.concat([block1_rt, block8_rt], axis = 0)
-baseline_df = baselineSeries.to_frame()
-baseline_df = baseline_df.reset_index()
+
 
 
 #15 empty probe groups
@@ -111,5 +117,12 @@ df_main.groupby(['subj','block'])['rtProbe0'].mean()
 ############  Figures  ##############
 #####################################
 
+# Compare baseline 1 to baseline 8 
+ax = sea.violinplot(x='subj', y = 'rtProbe0', hue = 'block', data=baseline_df, palette = "Greens", cut = 0)
+# Cut = 0 so range is limited to observed data
+plt.xlabel('Subject')
+plt.ylabel('Reaction time (s)')
+sea.despine()
+plt.savefig(FIGURE_PATH + 'baseline_compare.png', dpi = 600)
+plt.close()
 
-sea.violinplot(x='subj', y = 'rtProbe0', hue = 'block', data=baseline_df)
