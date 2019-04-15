@@ -60,24 +60,37 @@ def get_block_type(row):
 #######  By probe accuracy  #########
 #####################################
 
-# Find mean rt for baseline 1
-block1_rt = df_main[df_main['block'] == 1].groupby('subj')['rtProbe0'].mean()
-block8_rt = df_main[df_main['block'] == 8].groupby('subj')['rtProbe0'].mean()
+# Find mean rt for baseline blocks
+block1_rt = df_main[df_main['block'] == 1].groupby(['subj', 'block'])['rtProbe0'].mean()
+block8_rt = df_main[df_main['block'] == 8].groupby(['subj', 'block'])['rtProbe0'].mean()
+
+#dfs for violin plots
+block1 = df_main[df_main['block'] == 1]
+block8 = df_main[df_main['block'] == 8]
+
+baselineSeries = pd.concat([block1_rt, block8_rt], axis = 0)
+baseline_df = baselineSeries.to_frame()
+baseline_df = baseline_df.reset_index()
+
 
 #15 empty probe groups
-probe = [0]*16  
-probeGroup = [0]*16 
+n=16
+probe = [0]*n 
+probeGroup = [[[] for i in range(n)] for i in range(n)]
 
 for i in range(1,16): 
 	probe[i] = df_main[df_main['n_probes'] == i]
-	probeGroup[i] = probe[i].groupby(['subj', 'block'])['rtProbe{:d}'.format(i-1)].mean() 
+	for j in range(i): 
+		probeGroup[i][j] = probe[i].groupby(['subj', 'block'])['rtProbe{:d}'.format(j)].mean() 
 	#probe[1] is for 1 probe trials
+	# i is number of probes, j is rt for probe # j is series of 1,2,3,4...n_probes
+
+#n_probes = 1 to 7 are catch trials
 
 
 #Try this? 
 probe[1].groupby(['subj', 'block'])['rtProbe0'].mean()    
 
-for i 
 
 
 for i in range(15): 
@@ -88,3 +101,15 @@ for i in range(15):
 
 
 df_main.groupby(['subj','block'])['rtProbe0'].mean()
+
+
+
+
+
+
+#####################################
+############  Figures  ##############
+#####################################
+
+
+sea.violinplot(x='subj', y = 'rtProbe0', hue = 'block', data=baseline_df)
