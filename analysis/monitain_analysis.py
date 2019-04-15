@@ -24,9 +24,6 @@ plt.ion() # this makes matplotlib SHOW the plots as soon as they are created
 parser = argparse.ArgumentParser()
 args = parser.parse_args()
 
-### Set LOCATION and analysis before running script to match needs ###
-LOCATION = args.loc
-
 
 
 ################################
@@ -51,5 +48,43 @@ for i, fn in enumerate(fnames):
     subj_df['trial'] = range(subj_df.shape[0])
     df_list.append(subj_df)
 
-df = pd.concat(df_list,ignore_index=True)
+df_main = pd.concat(df_list,ignore_index=True)
 
+blockType_grouped = df_main.groupby(['subj', 'block'])
+
+
+def get_block_type(row): 
+	block_type = row['block']
+
+#####################################
+#######  By probe accuracy  #########
+#####################################
+
+# Find mean rt for baseline 1
+block1_rt = df_main[df_main['block'] == 1].groupby('subj')['rtProbe0'].mean()
+block8_rt = df_main[df_main['block'] == 8].groupby('subj')['rtProbe0'].mean()
+
+#15 empty probe groups
+probe = [0]*16  
+probeGroup = [0]*16 
+
+for i in range(1,16): 
+	probe[i] = df_main[df_main['n_probes'] == i]
+	probeGroup[i] = probe[i].groupby(['subj', 'block'])['rtProbe{:d}'.format(i-1)].mean() 
+	#probe[1] is for 1 probe trials
+
+
+#Try this? 
+probe[1].groupby(['subj', 'block'])['rtProbe0'].mean()    
+
+for i 
+
+
+for i in range(15): 
+	probe[i] = df_main[df_main['n_probes'] == i]
+
+
+
+
+
+df_main.groupby(['subj','block'])['rtProbe0'].mean()
