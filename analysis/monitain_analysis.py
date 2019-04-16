@@ -42,13 +42,13 @@ fnames = [ fn for fn in fnames if 's999' not in fn ]
 
 df_list = []
 for i, fn in enumerate(fnames): 
-    subj_df = pd.read_csv(fn)
+    subj_df = pd.read_csv(fn, index_col=0)
     # add subj and trial num to df
     subj_df['subj'] = 's{:02d}'.format(i+1)
     subj_df['trial'] = range(subj_df.shape[0])
     df_list.append(subj_df)
 
-df_main = pd.concat(df_list,ignore_index=True)
+df_main = pd.concat(df_list,ignore_index=False)
 
 blockType_grouped = df_main.groupby(['subj', 'block'])
 
@@ -77,6 +77,23 @@ block8 = df_main[(df_main['block'] == 8) & (df_main['probe0_acc']== 1)]
 baseline_df = pd.concat([block1, block8], axis = 0).reset_index()#axis = 0 for horiz cat, = 1 for vert cat
 
 
+
+
+
+# Create a column for trial accuracy
+df_main['trialAcc'] = 0
+
+
+#master list of all rt probe titles
+rtProbes = []
+for rt in range(0,14): #get rid of probe14 bc you'll never look at it 
+	rtProbes.append('rtProbe{:d}'.format(rt))
+
+accCols = []
+for acc in range(0,15): #get rid of probe14 bc you'll never look at it 
+	accCols.append('probe{:d}_acc'.format(acc))
+
+### MAINTAIN
 ##### KEEP THIS!!!
 block2 = df_main[(df_main['block'] == 2) ]
 #& (df_main['probe0_acc']== 1)]
@@ -105,6 +122,11 @@ plt.close()
 ########KEEP THIS!
 
 
+
+
+
+
+
 #15 empty probe groups
 n=16
 probe = [0]*n 
@@ -124,10 +146,6 @@ for i in range(1,16):
 				ogProbes.append(probeGroup[i][j])
 				#ogProbes 8 to 15 exists
 
-#master list of all rt probe titles
-rtProbes = []
-for rt in range(0,14): #get rid of probe14 bc you'll never look at it 
-	rtProbes.append('rtProbe{:d}'.format(rt))
 
 #####THIS WORKS
 big_og_df_maintain = pd.DataFrame()
