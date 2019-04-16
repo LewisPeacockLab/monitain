@@ -77,6 +77,32 @@ block8 = df_main[(df_main['block'] == 8) & (df_main['probe0_acc']== 1)]
 baseline_df = pd.concat([block1, block8], axis = 0).reset_index()#axis = 0 for horiz cat, = 1 for vert cat
 
 
+##### KEEP THIS!!!
+block2 = df_main[(df_main['block'] == 2) ]
+#& (df_main['probe0_acc']== 1)]
+block3 = df_main[(df_main['block'] == 3) ]
+#& (df_main['probe0_acc']== 1)]
+
+
+#block2[rtProbes].mean(axis=1)
+block2_df = pd.concat([ block2['subj'], block2[rtProbes].mean(axis=1)], axis=1)
+block2_df['block'] = 2
+block3_df = pd.concat([ block3['subj'], block3[rtProbes].mean(axis=1)], axis=1)
+block3_df['block'] = 3
+
+maintain_df = pd.concat([block2_df, block3_df], axis=0)
+maintain_df.columns = ['subj', 'meanTrial_rt', 'block']
+
+ax = sea.violinplot(x='subj', y = 'meanTrial_rt', hue = 'block', data=maintain_df, palette = "Blues", cut = 0)
+# Cut = 0 so range is limited to observed data
+plt.xlabel('Subject')
+plt.ylabel('Reaction time (s)')
+sea.despine()
+plt.savefig(FIGURE_PATH + 'maintain_compare.png', dpi = 600)
+plt.close()
+#Need to take out incorrect responses!!
+
+########KEEP THIS!
 
 
 #15 empty probe groups
@@ -100,15 +126,31 @@ for i in range(1,16):
 
 #master list of all rt probe titles
 rtProbes = []
-for rt in range(0,15):
+for rt in range(0,14): #get rid of probe14 bc you'll never look at it 
 	rtProbes.append('rtProbe{:d}'.format(rt))
 
 #####THIS WORKS
-big_og_df = pd.DataFrame()
+big_og_df_maintain = pd.DataFrame()
 for i in range(8,16): 
-	og_rts = df_main[df_main['n_probes'] == i].groupby(['subj', 'block'])[rtProbes[:(i-1)]].mean()
+	og_rts_maintain = df_main[(df_main['n_probes'] == i) & ((df_main['block'] == 2) | (df_main['block'] == 3))].groupby(['subj', 'block'])[rtProbes[:(i-1)]].mean()
 	#i-1 so you don't get final probe with PM target
-	big_og_df = big_og_df.append(og_rts)
+	big_og_df_maintain = big_og_df_maintain.append(og_rts_maintain)
+	#big_og_df_maintain = big_og_df_maintain.reset_index()
+
+	og_df_maintain = big_og_df_maintain.groupby(['subj', 'block'])[rtProbes].mean()
+	og_df_maintain = og_df_maintain.reset_index()
+
+	ax = sea.violinplot(x='subj', y= og_df_maintain[rtProbes], hue='block', data = og_df_maintain, 
+		palette = "Blues", cut = 0)
+
+	ax = sea.violinplot(x='subj', y = 'rtProbe0', hue = 'block', data=baseline_df, 
+		palette = "Greens", cut = 0)
+# Cut = 0 so range is limited to observed data
+plt.xlabel('Subject')
+plt.ylabel('Reaction time (s)')
+sea.despine()
+plt.savefig(FIGURE_PATH + 'baseline_compare.png', dpi = 600)
+plt.close()
 	#big df of all ogs
 #####THIS WORKS
 
