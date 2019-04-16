@@ -78,11 +78,19 @@ for acc in range(0,15): #get rid of probe14 bc you'll never look at it
 
 
 ###BASELINE
+block1 = df_main[(df_main['block'] == 1)]
+block8 = df_main[(df_main['block'] == 8)]
 
-# Find mean rt for baseline blocks (CORRECT RESPONSES)
-block1_rt = df_main[(df_main['block'] == 1) & (df_main['probe0_acc']== 1)]\
-	.groupby(['subj', 'block'])['rtProbe0'].mean()
-block8_rt = df_main[df_main['block'] == 8].groupby(['subj', 'block'])['rtProbe0'].mean()
+block1_df = pd.concat([ block1['subj'], block1[rtProbes].mean(axis=1)], axis=1)
+block1_df['block'] = 1
+block8_df = pd.concat([ block8['subj'], block8[rtProbes].mean(axis=1)], axis=1)
+block8_df['block'] = 8
+
+
+# # Find mean rt for baseline blocks (CORRECT RESPONSES)
+# block1_rt = df_main[(df_main['block'] == 1) & (df_main['probe0_acc']== 1)]\
+# 	.groupby(['subj', 'block'])['rtProbe0'].mean()
+# block8_rt = df_main[df_main['block'] == 8].groupby(['subj', 'block'])['rtProbe0'].mean()
 
 #dfs for violin plots
 block1 = df_main[(df_main['block'] == 1) & (df_main['probe0_acc']== 1)]
@@ -121,6 +129,83 @@ plt.ylabel('Reaction time (s)')
 sea.despine()
 plt.savefig(FIGURE_PATH + 'maintain_compare.png', dpi = 600)
 plt.close()
+
+
+###MONITOR
+
+block4 = df_main[(df_main['block'] == 4)]
+block5 = df_main[(df_main['block'] == 5)]
+
+
+block4_df = pd.concat([ block4['subj'], block4[rtProbes].mean(axis=1)], axis=1)
+block4_df['block'] = 4
+block5_df = pd.concat([ block5['subj'], block5[rtProbes].mean(axis=1)], axis=1)
+block5_df['block'] = 5
+
+monitor_df = pd.concat([block4_df, block5_df], axis=0)
+monitor_df.columns = ['subj', 'meanTrial_rt', 'block']
+
+ax = sea.violinplot(x='subj', y = 'meanTrial_rt', hue = 'block', data=monitor_df, palette = "Reds", cut = 0)
+# Cut = 0 so range is limited to observed data
+plt.xlabel('Subject')
+plt.ylabel('Reaction time (s)')
+sea.despine()
+plt.savefig(FIGURE_PATH + 'monitor_compare.png', dpi = 600)
+plt.close()
+
+
+###M&M
+
+block6 = df_main[(df_main['block'] == 6)]
+block7 = df_main[(df_main['block'] == 7)]
+
+
+block6_df = pd.concat([ block6['subj'], block6[rtProbes].mean(axis=1)], axis=1)
+block6_df['block'] = 6
+block7_df = pd.concat([ block7['subj'], block7[rtProbes].mean(axis=1)], axis=1)
+block7_df['block'] = 7
+
+mnm_df = pd.concat([block6_df, block7_df], axis=0)
+mnm_df.columns = ['subj', 'meanTrial_rt', 'block']
+
+ax = sea.violinplot(x='subj', y = 'meanTrial_rt', hue = 'block', data=mnm_df, palette = "Purples", cut = 0)
+# Cut = 0 so range is limited to observed data
+plt.xlabel('Subject')
+plt.ylabel('Reaction time (s)')
+sea.despine()
+plt.savefig(FIGURE_PATH + 'mnm_compare.png', dpi = 600)
+plt.close()
+
+
+###ALL BLOCKS
+
+#Get color values to set palette 
+#pal = (sea.color_palette("Greens", n_colors=2))
+#pal.as_hex()
+
+my_pal = ['#aedea7', #Green
+		  '#abd0e6', #Blue 
+		  '#3787c0', #Blue 
+		  '#fca082', #Red 
+		  '#e32f27', #Red
+		  '#c6c7e1', #Purple
+		  '#796eb2', #Purple
+		  '#37a055'  #Green
+		  ]
+
+all_df = pd.concat([block1_df, block2_df, block3_df, block4_df, block5_df, block6_df, block7_df, block8_df], axis=0)
+all_df.columns = ['subj', 'meanTrial_rt', 'block']
+ax = sea.violinplot(x='subj', y = 'meanTrial_rt', hue = 'block', data=all_df, palette = my_pal, cut = 0)
+plt.xlabel('Subject')
+plt.ylabel('Reaction time (s)')
+handles, _ = ax.get_legend_handles_labels()  
+plt.legend(handles, ['Baseline 1', 'Maintain 1', 'Maintain 2',
+	'Monitor 1', 'Monitor 2', 'M&M 1', 'M&M 2', 'Baseline 2'])
+plt.legend(title='Block', loc='upper center', bbox_to_anchor=(1.45, 0.8))
+sea.despine()
+plt.savefig(FIGURE_PATH + 'all_compare.png', dpi = 600)
+plt.close()
+
 
 
 
