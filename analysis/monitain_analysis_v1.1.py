@@ -198,15 +198,28 @@ all_df.columns = ['subj', 'meanTrial_rt', 'block']
 ax = sea.violinplot(x='subj', y = 'meanTrial_rt', hue = 'block', data=all_df, palette = my_pal, cut = 0)
 plt.xlabel('Subject')
 plt.ylabel('Reaction time (s)')
-handles, _ = ax.get_legend_handles_labels()  
-plt.legend(handles, ['Baseline 1', 'Maintain 1', 'Maintain 2',
+plt.get_legend_handles_labels(['Baseline 1', 'Maintain 1', 'Maintain 2',
 	'Monitor 1', 'Monitor 2', 'M&M 1', 'M&M 2', 'Baseline 2'])
-plt.legend(title='Block', loc='upper center', bbox_to_anchor=(1.45, 0.8))
+plt.legend(title = 'Blocks',  
+	bbox_to_anchor=(1.02, 1), loc=2, borderaxespad=0.)
+#handles, _ = ax.get_legend_handles_labels()  
+#plt.legend((),(['Baseline 1', 'Maintain 1', 'Maintain 2',
+	'Monitor 1', 'Monitor 2', 'M&M 1', 'M&M 2', 'Baseline 2'])
+#plt.legend(title='Block', loc='upper center', bbox_to_anchor=(1.45, 0.8))
 sea.despine()
-plt.savefig(FIGURE_PATH + 'all_compare.png', dpi = 600)
+plt.savefig(FIGURE_PATH + 'allBySubj_compare.png', dpi = 600)
 plt.close()
 
 
+
+allTogether_df = pd.concat([block1_df, block2_df, block3_df, block4_df, block5_df, block6_df, block7_df, block8_df], axis=0)
+allTogether_df.columns = ['subj', 'meanTrial_rt', 'block']
+ax = sea.violinplot(x='block', y = 'meanTrial_rt', data=all_df, palette = my_pal, cut = 0)
+plt.xlabel('Block')
+plt.ylabel('Reaction time (s)')
+sea.despine()
+plt.savefig(FIGURE_PATH + 'allTogether_compare.png', dpi = 600)
+plt.close()
 
 
 
