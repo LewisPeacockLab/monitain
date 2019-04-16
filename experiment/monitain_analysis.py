@@ -12,6 +12,7 @@ import glob
 import argparse
 import numpy as np
 import pandas as pd
+import math
 
 import seaborn as sea
 import matplotlib.pyplot as plt
@@ -26,7 +27,7 @@ parser.add_argument('--loc',default='lab',type=str,choices=['lab','home'])
 args = parser.parse_args()
 
 ### Set LOCATION and analysis before running script to match needs ###
-LOCATION = args.loc
+#LOCATION = args.loc
 
 
 

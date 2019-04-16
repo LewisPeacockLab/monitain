@@ -49,12 +49,15 @@ for i, fn in enumerate(fnames):
     df_list.append(subj_df)
 
 df_main = pd.concat(df_list,ignore_index=False)
+df_main = df_main.reset_index()
+# Make a copy to replace inaccurate responses with no RT
+df_main_copy = df_main
 
-blockType_grouped = df_main.groupby(['subj', 'block'])
+#blockType_grouped = df_main.groupby(['subj', 'block'])
 
 
-def get_block_type(row): 
-	block_type = row['block']
+#def get_block_type(row): 
+#	block_type = row['block']
 
 #####################################
 #######  By block accuracy  #########
@@ -76,13 +79,18 @@ block1 = df_main[(df_main['block'] == 1) & (df_main['probe0_acc']== 1)]
 block8 = df_main[(df_main['block'] == 8) & (df_main['probe0_acc']== 1)]
 baseline_df = pd.concat([block1, block8], axis = 0).reset_index()#axis = 0 for horiz cat, = 1 for vert cat
 
+df_main[ (df_main['probe{:d}_acc'.format(probe)])]
+df_main['probe{:d}_acc'.format(probe)]
 
+df_main_copy.loc[1,'probe{:d}_acc'.format(probe)]
 
-
+for i in df_main_copy.index: 
+	for probe in range(0,15): 
+		if df_main_copy.loc[i, 'probe{:d}_acc'.format(probe)] == 0: 
+			df_main_copy.at[i, 'rtProbe{:d}'.format(probe)] = np.nan
 
 # Create a column for trial accuracy
-df_main['trialAcc'] = 0
-
+#df_main['trialAcc'] = 0
 
 #master list of all rt probe titles
 rtProbes = []
@@ -95,9 +103,9 @@ for acc in range(0,15): #get rid of probe14 bc you'll never look at it
 
 ### MAINTAIN
 ##### KEEP THIS!!!
-block2 = df_main[(df_main['block'] == 2) ]
+block2 = df_main_copy[(df_main_copy['block'] == 2) ]
 #& (df_main['probe0_acc']== 1)]
-block3 = df_main[(df_main['block'] == 3) ]
+block3 = df_main_copy[(df_main_copy['block'] == 3) ]
 #& (df_main['probe0_acc']== 1)]
 
 
