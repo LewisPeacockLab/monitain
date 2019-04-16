@@ -84,14 +84,46 @@ n=16
 probe = [0]*n 
 probeGroup = [[[] for i in range(n)] for i in range(n)]
 
+#ogProbes = [[[] for i in range(n)] for i in range(n)]
+ogProbes = pd.DataFrame()
+
 for i in range(1,16): 
 	probe[i] = df_main[df_main['n_probes'] == i]
 	for j in range(i): 
-		probeGroup[i][j] = probe[i].groupby(['subj', 'block'])['rtProbe{:d}'.format(j)].mean() 
+		#probeGroup[i][j] = probe[i].groupby(['subj', 'block'])['rtProbe{:d}'.format(j)].mean()
+		probeGroup[i][j] = probe[i].groupby(['subj', 'block'])['rtProbe{:d}'.format(j)] 
+		if i in range(8,16):
+			if j+1 < i: #if j is not the last probe
+				#ogProbes[i].append(probeGroup[i][j])
+				ogProbes.append(probeGroup[i][j])
+				#ogProbes 8 to 15 exists
+
+#master list of all rt probe titles
+rtProbes = []
+for rt in range(0,15):
+	rtProbes.append('rtProbe{:d}'.format(rt))
+
+#####THIS WORKS
+big_og_df = pd.DataFrame()
+for i in range(8,16): 
+	og_rts = df_main[df_main['n_probes'] == i].groupby(['subj', 'block'])[rtProbes[:(i-1)]].mean()
+	#i-1 so you don't get final probe with PM target
+	big_og_df = big_og_df.append(og_rts)
+	#big df of all ogs
+#####THIS WORKS
+
+	print rtProbes[:i]
+
+
+df_main.groupby(['n_probes','subj'])[rtProbes].mean()
+
 	#probe[1] is for 1 probe trials
-	# i is number of probes, j is rt for probe # j is series of 1,2,3,4...n_probes
+	# i is number of probes, j is rt for probe # j is series of 1,2,3,4...n_probes for rtProbe0 to rtProbe14
+	#lowest is probeGroup[1][0]
+	#highest is probeGroup[15][14]
 
 #n_probes = 1 to 7 are catch trials
+# so probeGroup[1][x] to probeGroup[7][x] don't matter
 
 
 #Try this? 
