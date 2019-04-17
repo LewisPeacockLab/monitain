@@ -276,9 +276,16 @@ plt.close()
 
 
 
-
 my_pal = ['#aedea7', #Green
-		  '#abd0e6', #Blue
+		'#abd0e6', #Blue 
+		'#3787c0', #Blue 
+		'#fca082', #Red 
+		'#e32f27', #Red
+		'#c6c7e1', #Purple
+		'#796eb2', #Purple
+		'#37a055'  #Green
+		  ]
+
 all_df = pd.concat([block1_df, block2_df, block3_df, block4_df, block5_df, block6_df, block7_df, block8_df], axis=0)
 
 # for i in all_df.index: 
@@ -361,13 +368,6 @@ ax.tick_params(axis='x', labelsize=7)
 sea.despine()
 plt.savefig(FIGURE_PATH + 'all_together_compare_pmacc.png', dpi = 600)
 plt.close() 
-		  '#3787c0', #Blue 
-		  '#fca082', #Red 
-		  '#e32f27', #Red
-		  '#c6c7e1', #Purple
-		  '#796eb2', #Purple
-		  '#37a055'  #Green
-		  ]
 
 all_df = pd.concat([block1_df, block2_df, block3_df, block4_df, block5_df, block6_df, block7_df, block8_df], axis=0)
 
