@@ -93,9 +93,10 @@ for acc in range(0,15): #get rid of probe14 bc you'll never look at it
 block1 = df_main[(df_main['block'] == 1)]
 block8 = df_main[(df_main['block'] == 8)]
 
-block1_df = pd.concat([ block1['subj'], block1['acc'], block1[rtProbes].mean(axis=1)], axis=1)
+block1_df = pd.concat([ block1['subj'], block1['acc'], block1[rtProbes].mean(axis=1), block1[accCols].mean(axis=1)], axis=1)
+
 block1_df['block'] = 'Baseline 1'
-block8_df = pd.concat([ block8['subj'], block8['acc'], block8[rtProbes].mean(axis=1)], axis=1)
+block8_df = pd.concat([ block8['subj'], block8['acc'], block8[rtProbes].mean(axis=1), block8[accCols].mean(axis=1)], axis=1)
 block8_df['block'] = 'Baseline 2'
 
 
@@ -108,7 +109,7 @@ block8_df['block'] = 'Baseline 2'
 #block1 = df_main[(df_main['block'] == 1) & (df_main['probe0_acc']== 1)]
 #block8 = df_main[(df_main['block'] == 8) & (df_main['probe0_acc']== 1)]
 baseline_df = pd.concat([block1_df, block8_df], axis = 0)#axis = 0 for horiz cat, = 1 for vert cat
-baseline_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'block']
+baseline_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 
 
 # Compare baseline 1 to baseline 8 
@@ -131,13 +132,13 @@ block2 = df_main[(df_main['block'] == 2)]
 block3 = df_main[(df_main['block'] == 3)]
 
 
-block2_df = pd.concat([ block2['subj'], block2['acc'], block2[rtProbes].mean(axis=1)], axis=1)
+block2_df = pd.concat([ block2['subj'], block2['acc'], block2[rtProbes].mean(axis=1), block2[accCols].mean(axis=1)], axis=1)
 block2_df['block'] = 'Maintain 1'
-block3_df = pd.concat([ block3['subj'], block3['acc'], block3[rtProbes].mean(axis=1)], axis=1)
+block3_df = pd.concat([ block3['subj'], block3['acc'], block3[rtProbes].mean(axis=1), block3[accCols].mean(axis=1)], axis=1)
 block3_df['block'] = 'Maintain 2'
 
 maintain_df = pd.concat([block2_df, block3_df], axis=0)
-maintain_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'block']
+maintain_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 
 ax = sea.violinplot(x='subj', y = 'meanTrial_rt', hue = 'block', data=maintain_df, palette = "Blues", cut = 0)
 # Cut = 0 so range is limited to observed data
@@ -156,6 +157,17 @@ sea.despine()
 plt.savefig(FIGURE_PATH + 'maintain_compare_pmacc.png', dpi = 600)
 plt.close()
 
+# OG Accuracy
+ax = sea.barplot(x='subj', y= 'og_acc', hue= 'block', data=maintain_df, palette="Blues", ci = None)
+plt.xlabel('Subject')
+plt.ylabel('OG accuracy')
+sea.despine()
+plt.savefig(FIGURE_PATH + 'maintain_compare_ogacc.png', dpi = 600)
+plt.close()
+
+
+
+
 
 ###MONITOR
 
@@ -163,13 +175,13 @@ block4 = df_main[(df_main['block'] == 4)]
 block5 = df_main[(df_main['block'] == 5)]
 
 
-block4_df = pd.concat([ block4['subj'], block4['acc'], block4[rtProbes].mean(axis=1)], axis=1)
+block4_df = pd.concat([ block4['subj'], block4['acc'], block4[rtProbes].mean(axis=1), block4[accCols].mean(axis=1)], axis=1)
 block4_df['block'] = 'Monitor 1'
-block5_df = pd.concat([ block5['subj'], block5['acc'], block5[rtProbes].mean(axis=1)], axis=1)
+block5_df = pd.concat([ block5['subj'], block5['acc'], block5[rtProbes].mean(axis=1), block5[accCols].mean(axis=1)], axis=1)
 block5_df['block'] = 'Monitor 2'
 
 monitor_df = pd.concat([block4_df, block5_df], axis=0)
-monitor_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'block']
+monitor_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 
 ax = sea.violinplot(x='subj', y = 'meanTrial_rt', hue = 'block', data=monitor_df, palette = "Reds", cut = 0)
 # Cut = 0 so range is limited to observed data
@@ -187,6 +199,17 @@ sea.despine()
 plt.savefig(FIGURE_PATH + 'monitor_compare_pmacc.png', dpi = 600)
 plt.close()
 
+# OG Accuracy
+ax = sea.barplot(x='subj', y= 'og_acc', hue= 'block', data=monitor_df, palette="Reds", ci = None)
+plt.xlabel('Subject')
+plt.ylabel('OG accuracy')
+sea.despine()
+plt.savefig(FIGURE_PATH + 'monitor_compare_ogacc.png', dpi = 600)
+plt.close()
+
+
+
+
 
 ###M&M
 
@@ -194,13 +217,13 @@ block6 = df_main[(df_main['block'] == 6)]
 block7 = df_main[(df_main['block'] == 7)]
 
 
-block6_df = pd.concat([ block6['subj'], block6['acc'], block6[rtProbes].mean(axis=1)], axis=1)
+block6_df = pd.concat([ block6['subj'], block6['acc'], block6[rtProbes].mean(axis=1), block6[accCols].mean(axis=1)], axis=1)
 block6_df['block'] = 'M&M 1'
-block7_df = pd.concat([ block7['subj'], block7['acc'], block7[rtProbes].mean(axis=1)], axis=1)
+block7_df = pd.concat([ block7['subj'], block7['acc'], block7[rtProbes].mean(axis=1), block7[accCols].mean(axis=1)], axis=1)
 block7_df['block'] = 'M&M 2'
 
 mnm_df = pd.concat([block6_df, block7_df], axis=0)
-mnm_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'block']
+mnm_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 
 ax = sea.violinplot(x='subj', y = 'meanTrial_rt', hue = 'block', data=mnm_df, palette = "Purples", cut = 0)
 # Cut = 0 so range is limited to observed data
@@ -217,6 +240,16 @@ plt.ylabel('PM accuracy')
 sea.despine()
 plt.savefig(FIGURE_PATH + 'mnm_compare_pmacc.png', dpi = 600)
 plt.close()
+
+# OG Accuracy
+ax = sea.barplot(x='subj', y= 'og_acc', hue= 'block', data=mnm_df, palette="Purples", ci = None)
+plt.xlabel('Subject')
+plt.ylabel('OG accuracy')
+sea.despine()
+plt.savefig(FIGURE_PATH + 'mnm_compare_ogacc.png', dpi = 600)
+plt.close()
+
+
 
 
 
@@ -254,7 +287,7 @@ all_df = pd.concat([block1_df, block2_df, block3_df, block4_df, block5_df, block
 # 		all_df.at[i, 'block'] = 'M&M'
 
 
-all_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'block']
+all_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 ax = sea.violinplot(x='subj', y = 'meanTrial_rt', hue = 'block', data=all_df, palette = my_pal, cut = 0, label = legend_labels)
 plt.xlabel('Subject')
 plt.ylabel('Reaction time (s)')
@@ -284,16 +317,28 @@ sea.despine()
 plt.savefig(FIGURE_PATH + 'all_bysubj_compare_pmacc.png', dpi = 600)
 plt.close()
 
+# OG Accuracy
+ax = sea.barplot(x='subj', y= 'og_acc', hue= 'block', data=all_df, palette=my_pal, ci = None)
+plt.xlabel('Subject')
+plt.ylabel('OG accuracy')
+plt.legend(title = 'Blocks',  
+	bbox_to_anchor=(1.02, 1), loc=2, borderaxespad=0.)
+ax.tick_params(axis='x', labelsize=7)
+sea.despine()
+plt.savefig(FIGURE_PATH + 'all_bysubj_compare_ogacc.png', dpi = 600)
+plt.close() 
+ 
+
+
+
+
+
+
 
 #allTogether_df = pd.concat([block1_df, block2_df, block3_df, block4_df, block5_df, block6_df, block7_df, block8_df], axis=0)
 
-for i in df_main.index: 
-	for probe in range(0,15): 
-		if df_main.loc[i, 'probe{:d}_acc'.format(probe)] == 0: 
-			df_main.at[i, 'rtProbe{:d}'.format(probe)] = np.nan
 
-
-allTogether_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'block']
+#allTogether_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'block']
 ax = sea.violinplot(x='block', y = 'meanTrial_rt', data=all_df, palette = my_pal, cut = 0)
 plt.xlabel('Block')
 plt.ylabel('Reaction time (s)')
@@ -306,11 +351,19 @@ plt.close()
 ax = sea.barplot(x='block', y= 'pm_acc', data=all_df, palette=my_pal, ci = None)
 plt.xlabel('Block')
 plt.ylabel('PM accuracy')
-#sea.set_context(font_scale = 0.5)
 ax.tick_params(axis='x', labelsize=7)
 sea.despine()
 plt.savefig(FIGURE_PATH + 'all_together_compare_pmacc.png', dpi = 600)
 plt.close()
+
+# OG Accuracy
+ax = sea.barplot(x='block', y= 'og_acc', data=all_df, palette=my_pal, ci = None)
+plt.xlabel('Subject')
+plt.ylabel('OG accuracy')
+ax.tick_params(axis='x', labelsize=7)
+sea.despine()
+plt.savefig(FIGURE_PATH + 'all_together_compare_ogacc.png', dpi = 600)
+plt.close() 
 
 
 
