@@ -367,6 +367,15 @@ plt.close()
 
 
 
+#### PM cost
+base_cost = pd.concat([block1_df, block8_df])
+base_cost.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
+
+base_cost_VAL = (base_cost.groupby('subj')['meanTrial_rt'].mean())
+
+for item in all_df.index: 
+	all_df.loc
+
 
 #####################################
 ############  Figures  ##############
