@@ -402,12 +402,13 @@ sea.despine()
 plt.savefig(FIGURE_PATH + 'all_bysubj_compare_rt.png', dpi = 600)
 plt.close()
 
-all_df_minusBase = all_df.drop(all_df[all_df['block'] == "Baseline 2"].index, inplace=True)
-all_df_minusBase = all_df.drop(all_df[all_df['block'] == "Baseline 1"].index, inplace=True)
+all_df_minusBase = all_df.copy()
+all_df_minusBase.drop(all_df_minusBase[all_df_minusBase['block'] == "Baseline 2"].index, inplace=True)
+all_df_minusBase.drop(all_df_minusBase[all_df_minusBase['block'] == "Baseline 1"].index, inplace=True)
 
 
 # PM Accuracy
-ax = sea.barplot(x='subj', y= 'pm_acc', hue= 'block', data=all_df_minusBase, palette=my_pal, ci = None)
+ax = sea.barplot(x='subj', y= 'pm_acc', hue= 'block', data=all_df_minusBase, palette=my_pal[1:-1], ci = None)
 plt.xlabel('Subject')
 plt.ylabel('PM accuracy')
 plt.legend(title = 'Blocks',  
@@ -440,7 +441,7 @@ plt.savefig(FIGURE_PATH + 'all_together_compare_rt.png', dpi = 600)
 plt.close()
 
 # PM Accuracy
-ax = sea.barplot(x='block', y= 'pm_acc', data=all_df, palette=my_pal, ci = None)
+ax = sea.barplot(x='block', y= 'pm_acc', data=all_df_minusBase, palette=my_pal[1:-1], ci = None)
 plt.xlabel('Block')
 plt.ylabel('PM accuracy')
 ax.tick_params(axis='x', labelsize=7)
