@@ -1,0 +1,2938 @@
+Last login: Thu May  9 11:26:37 on ttys001
+dhcp-128-83-192-116:~ krh2382$ cd monitain/experiment
+dhcp-128-83-192-116:experiment krh2382$ ipython
+Python 2.7.14 |Anaconda, Inc.| (default, Dec  7 2017, 11:07:58) 
+Type "copyright", "credits" or "license" for more information.
+
+IPython 5.4.1 -- An enhanced Interactive Python.
+?         -> Introduction and overview of IPython's features.
+%quickref -> Quick reference.
+help      -> Python's own help system.
+object?   -> Details about 'object', use 'object??' for extra details.
+
+In [1]: from collections import OrderedDict
+   ...: 
+   ...: 
+   ...: ## Thank yoooouuu Remy
+   ...: SCREENS = {
+   ...:     'animal':          dict(distance_cm= 60,width_cm=47.3,pixel_dims=[19
+   ...: 20,1080]),
+   ...:     'beauregard':      dict(distance_cm= 60,width_cm=47.3,pixel_dims=[19
+   ...: 20,1080]),
+   ...:     'camilla':         dict(distance_cm= 60,width_cm=47.3,pixel_dims=[19
+   ...: 20,1080]),
+   ...:     'scooter':         dict(distance_cm= 67,width_cm=28.5,pixel_dims=[14
+   ...: 40,900]),
+   ...:     'misspiggy_main':  dict(distance_cm= 67,width_cm=68.58,pixel_dims=[2
+   ...: 560,1440]),
+   ...:     'misspiggy_side':  dict(distance_cm= 67,width_cm=50.8,pixel_dims=[16
+   ...: 80,1050]),
+   ...:     'swedishchef':     dict(distance_cm= 67,width_cm=33.0,pixel_dims=[14
+   ...: 40,900]),
+   ...:     'alice':           dict(distance_cm= 67,width_cm=28.5,pixel_dims=[14
+   ...: 40,900]),
+   ...: 
+   ...: }
+   ...: 
+pygame 1.9.4
+Hello from the pygame community. https://www.pygame.org/contribute.html
+
+In [2]: /Users/krh2382/monitain/experiment/stimuli/grayscale/th_5.png 
+  File "<ipython-input-2-6b419e207b67>", line 1
+    Users(/krh2382/monitain/experiment/stimuli/grayscale/th_5.png)
+          ^
+SyntaxError: invalid syntax
+
+
+In [3]: 
+   ...: win = psychopy.visual.Window(
+   ...:     size=[400, 400],
+   ...:     units="pix",
+   ...:     fullscr=False
+   ...: )
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+<ipython-input-3-5a809ec0af92> in <module>()
+      1 
+----> 2 win = psychopy.visual.Window(
+      3     size=[400, 400],
+      4     units="pix",
+      5     fullscr=False
+
+NameError: name 'psychopy' is not defined
+
+In [4]: 
+   ...: win = visual.Window(
+   ...:     size=[400, 400],
+   ...:     units="pix",
+   ...:     fullscr=False
+   ...: )
+
+In [5]: img = visual.ImageStim(win=win, image="/stimuli/grayscale/th_5.png", uni
+   ...: ts = "pix")
+62.6676 	WARNING 	Monitor specification not found. Creating a temporary one...
+119.6800 	ERROR 	Couldn't find image /stimuli/grayscale/th_5.png; check path? (tried: /stimuli/grayscale/th_5.png)
+---------------------------------------------------------------------------
+IOError                                   Traceback (most recent call last)
+<ipython-input-5-623041ba54dc> in <module>()
+----> 1 img = visual.ImageStim(win=win, image="/stimuli/grayscale/th_5.png", units = "pix")
+
+/Users/krh2382/anaconda2/lib/python2.7/site-packages/psychopy/visual/image.pyc in __init__(self, win, image, mask, units, pos, size, ori, color, colorSpace, contrast, opacity, depth, interpolate, flipHoriz, flipVert, texRes, name, autoLog, maskParams)
+    100 
+    101         # Set the image and mask-
+--> 102         self.setImage(image, log=False)
+    103         self.texRes = texRes  # rebuilds the mask
+    104 
+
+/Users/krh2382/anaconda2/lib/python2.7/site-packages/psychopy/visual/image.pyc in setImage(self, value, log)
+    299         but use this method if you need to suppress the log message.
+    300         """
+--> 301         setAttribute(self, 'image', value, log)
+    302 
+    303     @attributeSetter
+
+/Users/krh2382/anaconda2/lib/python2.7/site-packages/psychopy/tools/attributetools.pyc in setAttribute(self, attrib, value, log, operation, stealth)
+    139         self.__dict__['autoLog'] = log or autoLogOrig and log is None
+    140         # set attribute, calling attributeSetter if it exists
+--> 141         setattr(self, attrib, value)
+    142         # hack: if attrib was 'autoLog', do not set it back to original value!
+    143         if attrib != 'autoLog':
+
+/Users/krh2382/anaconda2/lib/python2.7/site-packages/psychopy/tools/attributetools.pyc in __set__(self, obj, value)
+     30 
+     31     def __set__(self, obj, value):
+---> 32         newValue = self.func(obj, value)
+     33         # log=None defaults to obj.autoLog:
+     34         logAttrib(obj, log=None, attrib=self.func.__name__,
+
+/Users/krh2382/anaconda2/lib/python2.7/site-packages/psychopy/visual/image.pyc in image(self, value)
+    286                                                   dataType=datatype,
+    287                                                   maskParams=self.maskParams,
+--> 288                                                   forcePOW2=False)
+    289         # if user requested size=None then update the size for new stim here
+    290         if hasattr(self, '_requestedSize') and self._requestedSize is None:
+
+/Users/krh2382/anaconda2/lib/python2.7/site-packages/psychopy/visual/basevisual.pyc in _createTexture(self, tex, id, pixFormat, stim, res, maskParams, forcePOW2, dataType)
+    812                     logging.error(msg % (tex, os.path.abspath(tex)))
+    813                     logging.flush()
+--> 814                     raise IOError(msg % (tex, os.path.abspath(tex)))
+    815                 try:
+    816                     im = Image.open(filename)
+
+IOError: Couldn't find image /stimuli/grayscale/th_5.png; check path? (tried: /stimuli/grayscale/th_5.png)
+
+In [6]: img = visual.ImageStim(win=win, image="th_5.png", units = "pix")
+
+In [7]: img.draw()
+
+In [8]: win.flip()
+Out[8]: 151.43730902671814
+
+In [9]: Image.open("th_5.png")
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+<ipython-input-9-cb1798e397a0> in <module>()
+----> 1 Image.open("th_5.png")
+
+NameError: name 'Image' is not defined
+
+In [10]: from PIL import Image
+
+In [11]: Image.open("th_5.png")
+Out[11]: <PIL.PngImagePlugin.PngImageFile image mode=RGBA size=128x128 at 0x181ED4BB50>
+
+In [12]: img = Image.open("th_5.png")
+
+In [13]: win.flip()
+Out[13]: 342.1565508842468
+
+In [14]: image = Image.open("th_5.png")
+
+In [15]: img = visual.ImageStim(win=win, image=image, units = "pix")
+
+In [16]: img.draw()
+
+In [17]: win.flip()
+Out[17]: 396.8933119773865
+
+In [18]: Image.open("stimuli/grayscale/th_2.png")
+Out[18]: <PIL.PngImagePlugin.PngImageFile image mode=RGBA size=128x128 at 0x181ED79090>
+
+In [19]: for imagename in os.listdir("stimuli/grayscale/")
+  File "<ipython-input-19-c6d448766530>", line 1
+    for imagename in os.listdir("stimuli/grayscale/")
+                                                     ^
+SyntaxError: invalid syntax
+
+
+In [20]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...:     print imagename
+    ...:     
+th_74.png
+th_88.png
+th_77.png
+.DS_Store
+th_9.png
+th_58.png
+th_28.png
+th_38.png
+th_13.png
+th_25.png
+th_27.png
+th_96.png
+th_68.png
+th_97.png
+th_81.png
+th_95.png
+th_56.png
+th_94.png
+th_93.png
+th_2.png
+th_45.png
+
+In [21]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...:     if imagename.endswith(".png"): 
+    ...:         print imagename
+    ...:         
+    ...:     
+th_74.png
+th_88.png
+th_77.png
+th_9.png
+th_58.png
+th_28.png
+th_38.png
+th_13.png
+th_25.png
+th_27.png
+th_96.png
+th_68.png
+th_97.png
+th_81.png
+th_95.png
+th_56.png
+th_94.png
+th_93.png
+th_2.png
+th_45.png
+
+In [22]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...:     if imagename.endswith(".png"): 
+    ...:         print imagename
+    ...:         
+    ...:     
+frac_20.png
+frac_18.png
+frac_19.png
+frac_3.png
+frac_2.png
+frac_1.png
+frac_5.png
+frac_4.png
+frac_6.png
+frac_7.png
+frac_9.png
+frac_8.png
+frac_14.png
+frac_15.png
+frac_17.png
+frac_16.png
+frac_12.png
+frac_13.png
+frac_11.png
+frac_10.png
+
+In [23]: # Import fractals
+    ...: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...: ^Iif imagename.endswith(".png"): 
+    ...: ^I^Iimagename = Image.open(imagename)
+    ...:   
+---------------------------------------------------------------------------
+IOError                                   Traceback (most recent call last)
+<ipython-input-23-4d10ea5f3166> in <module>()
+      2 for imagename in os.listdir("stimuli/grayscale/"):
+      3         if imagename.endswith(".png"):
+----> 4                 imagename = Image.open(imagename)
+      5 
+
+/Users/krh2382/anaconda2/lib/python2.7/site-packages/PIL/Image.pyc in open(fp, mode)
+   2541 
+   2542     if filename:
+-> 2543         fp = builtins.open(filename, "rb")
+   2544         exclusive_fp = True
+   2545 
+
+IOError: [Errno 2] No such file or directory: 'frac_20.png'
+
+In [24]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...: ^Iif imagename.endswith(".png"): 
+    ...: ^I^Iimagename = Image.open(imagename)
+    ...:   
+---------------------------------------------------------------------------
+IOError                                   Traceback (most recent call last)
+<ipython-input-24-fbefacca7904> in <module>()
+      1 for imagename in os.listdir("stimuli/grayscale/"):
+      2         if imagename.endswith(".png"):
+----> 3                 imagename = Image.open(imagename)
+      4 
+
+/Users/krh2382/anaconda2/lib/python2.7/site-packages/PIL/Image.pyc in open(fp, mode)
+   2541 
+   2542     if filename:
+-> 2543         fp = builtins.open(filename, "rb")
+   2544         exclusive_fp = True
+   2545 
+
+IOError: [Errno 2] No such file or directory: 'frac_20.png'
+
+In [25]: pwd
+Out[25]: u'/Users/krh2382/monitain/experiment'
+
+In [26]: ls /stimuli/grayscale
+ls: /stimuli/grayscale: No such file or directory
+
+In [27]: ls ~/stimuli/grayscale
+ls: /Users/krh2382/stimuli/grayscale: No such file or directory
+
+In [28]: ls ~/monitain/experiment/stimuli/grayscale
+frac_1.png   frac_13.png  frac_17.png  frac_20.png  frac_6.png
+frac_10.png  frac_14.png  frac_18.png  frac_3.png   frac_7.png
+frac_11.png  frac_15.png  frac_19.png  frac_4.png   frac_8.png
+frac_12.png  frac_16.png  frac_2.png   frac_5.png   frac_9.png
+
+In [29]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...: ^Iif imagename.endswith(".png"): 
+    ...: ^I^Iprint imagename
+    ...:   
+frac_20.png
+frac_18.png
+frac_19.png
+frac_3.png
+frac_2.png
+frac_1.png
+frac_5.png
+frac_4.png
+frac_6.png
+frac_7.png
+frac_9.png
+frac_8.png
+frac_14.png
+frac_15.png
+frac_17.png
+frac_16.png
+frac_12.png
+frac_13.png
+frac_11.png
+frac_10.png
+
+In [30]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...: ^Iif imagename.endswith(".png"): 
+    ...: ^I^IImage.open(imagename)
+    ...:   
+    ...:   
+---------------------------------------------------------------------------
+IOError                                   Traceback (most recent call last)
+<ipython-input-30-b3510546589e> in <module>()
+      1 for imagename in os.listdir("stimuli/grayscale/"):
+      2         if imagename.endswith(".png"):
+----> 3                 Image.open(imagename)
+      4 
+      5 
+
+/Users/krh2382/anaconda2/lib/python2.7/site-packages/PIL/Image.pyc in open(fp, mode)
+   2541 
+   2542     if filename:
+-> 2543         fp = builtins.open(filename, "rb")
+   2544         exclusive_fp = True
+   2545 
+
+IOError: [Errno 2] No such file or directory: 'frac_20.png'
+
+In [31]: cd monitain
+[Errno 2] No such file or directory: 'monitain'
+/Users/krh2382/monitain/experiment
+
+In [32]: pwd
+Out[32]: u'/Users/krh2382/monitain/experiment'
+
+In [33]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...: ^Iif imagename.endswith(".png"): 
+    ...:      print imagename
+  File "<ipython-input-33-8e1ce5e82af4>", line 3
+    print imagename
+                   ^
+IndentationError: unindent does not match any outer indentation level
+
+
+In [34]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...:     if imagename.endswith(".png"): 
+    ...:         print imagename
+    ...:         
+frac_20.png
+frac_18.png
+frac_19.png
+frac_3.png
+frac_2.png
+frac_1.png
+frac_5.png
+frac_4.png
+frac_6.png
+frac_7.png
+frac_9.png
+frac_8.png
+frac_14.png
+frac_15.png
+frac_17.png
+frac_16.png
+frac_12.png
+frac_13.png
+frac_11.png
+frac_10.png
+
+In [35]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...: ^Iif imagename.endswith(".png"): 
+    ...: ^I^IImage.open(imagename)
+    ...:   
+---------------------------------------------------------------------------
+IOError                                   Traceback (most recent call last)
+<ipython-input-35-8b81792e843a> in <module>()
+      1 for imagename in os.listdir("stimuli/grayscale/"):
+      2         if imagename.endswith(".png"):
+----> 3                 Image.open(imagename)
+      4 
+
+/Users/krh2382/anaconda2/lib/python2.7/site-packages/PIL/Image.pyc in open(fp, mode)
+   2541 
+   2542     if filename:
+-> 2543         fp = builtins.open(filename, "rb")
+   2544         exclusive_fp = True
+   2545 
+
+IOError: [Errno 2] No such file or directory: 'frac_20.png'
+
+In [36]: imagename
+Out[36]: 'frac_20.png'
+
+In [37]: Image.open(imagename)
+---------------------------------------------------------------------------
+IOError                                   Traceback (most recent call last)
+<ipython-input-37-b97abcda2502> in <module>()
+----> 1 Image.open(imagename)
+
+/Users/krh2382/anaconda2/lib/python2.7/site-packages/PIL/Image.pyc in open(fp, mode)
+   2541 
+   2542     if filename:
+-> 2543         fp = builtins.open(filename, "rb")
+   2544         exclusive_fp = True
+   2545 
+
+IOError: [Errno 2] No such file or directory: 'frac_20.png'
+
+In [38]: from PIL import Image
+
+In [39]: 
+
+In [39]: Image.open(imagename)
+---------------------------------------------------------------------------
+IOError                                   Traceback (most recent call last)
+<ipython-input-39-b97abcda2502> in <module>()
+----> 1 Image.open(imagename)
+
+/Users/krh2382/anaconda2/lib/python2.7/site-packages/PIL/Image.pyc in open(fp, mode)
+   2541 
+   2542     if filename:
+-> 2543         fp = builtins.open(filename, "rb")
+   2544         exclusive_fp = True
+   2545 
+
+IOError: [Errno 2] No such file or directory: 'frac_20.png'
+
+In [40]: Image.open("imagename")
+---------------------------------------------------------------------------
+IOError                                   Traceback (most recent call last)
+<ipython-input-40-1b3c722a8ed0> in <module>()
+----> 1 Image.open("imagename")
+
+/Users/krh2382/anaconda2/lib/python2.7/site-packages/PIL/Image.pyc in open(fp, mode)
+   2541 
+   2542     if filename:
+-> 2543         fp = builtins.open(filename, "rb")
+   2544         exclusive_fp = True
+   2545 
+
+IOError: [Errno 2] No such file or directory: 'imagename'
+
+In [41]: Image.open(imagename)
+---------------------------------------------------------------------------
+IOError                                   Traceback (most recent call last)
+<ipython-input-41-b97abcda2502> in <module>()
+----> 1 Image.open(imagename)
+
+/Users/krh2382/anaconda2/lib/python2.7/site-packages/PIL/Image.pyc in open(fp, mode)
+   2541 
+   2542     if filename:
+-> 2543         fp = builtins.open(filename, "rb")
+   2544         exclusive_fp = True
+   2545 
+
+IOError: [Errno 2] No such file or directory: 'frac_20.png'
+
+In [42]: Image.open("frac_20.png")
+---------------------------------------------------------------------------
+IOError                                   Traceback (most recent call last)
+<ipython-input-42-7c3f184bc007> in <module>()
+----> 1 Image.open("frac_20.png")
+
+/Users/krh2382/anaconda2/lib/python2.7/site-packages/PIL/Image.pyc in open(fp, mode)
+   2541 
+   2542     if filename:
+-> 2543         fp = builtins.open(filename, "rb")
+   2544         exclusive_fp = True
+   2545 
+
+IOError: [Errno 2] No such file or directory: 'frac_20.png'
+
+In [43]: ls
+exptInstruct/         monitain_v1.1.py      th_5.png
+exptInstruct.key*     monitain_v1_s999.csv  words.csv
+exptInstruct.pdf      nonwords.csv
+monitain_v1.0.py      stimuli/
+
+In [44]: Image.open("frac_20.png")
+Out[44]: <PIL.PngImagePlugin.PngImageFile image mode=RGBA size=128x128 at 0x181ED7C890>
+
+In [45]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...: ^Iif imagename.endswith(".png"): 
+    ...: ^I^Iimagename = Image.open(imagename)
+    ...:   
+
+In [46]: 
+
+In [46]: imagename
+Out[46]: <PIL.PngImagePlugin.PngImageFile image mode=RGBA size=128x128 at 0x1827C48F50>
+
+In [47]: for imagename in os.listdir("stimuli/grascale/"): 
+    ...:     if imagename.endswith(".png"): 
+    ...:         print imagename[-2:-1]
+    ...:         
+---------------------------------------------------------------------------
+OSError                                   Traceback (most recent call last)
+<ipython-input-47-1be79dbbdd2a> in <module>()
+----> 1 for imagename in os.listdir("stimuli/grascale/"):
+      2     if imagename.endswith(".png"):
+      3         print imagename[-2:-1]
+      4 
+
+OSError: [Errno 2] No such file or directory: 'stimuli/grascale/'
+
+In [48]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...:     if imagename.endswith(".png"): 
+    ...:         print imagename[-2:-1]
+    ...:         
+    ...:         
+n
+n
+n
+n
+n
+n
+n
+n
+n
+n
+n
+n
+n
+n
+n
+n
+n
+n
+n
+n
+
+In [49]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...:     if imagename.endswith(".png"): 
+    ...:         print imagename[-5:-3]
+    ...:         
+    ...:         
+    ...:         
+0.
+8.
+9.
+3.
+2.
+1.
+5.
+4.
+6.
+7.
+9.
+8.
+4.
+5.
+7.
+6.
+2.
+3.
+1.
+0.
+
+In [50]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...:     if imagename.endswith(".png"): 
+    ...:         print imagename[-5:-4]
+    ...:         
+0
+8
+9
+3
+2
+1
+5
+4
+6
+7
+9
+8
+4
+5
+7
+6
+2
+3
+1
+0
+
+In [51]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...:     if imagename.endswith(".png"): 
+    ...:         print imagename[-6:-4]
+    ...:         
+    ...:         
+20
+18
+19
+_3
+_2
+_1
+_5
+_4
+_6
+_7
+_9
+_8
+14
+15
+17
+16
+12
+13
+11
+10
+
+In [52]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...:     if imagename.endswith(".png"): 
+    ...:         print imagename[-6:-4]
+    ...:         
+    ...:         
+20
+18
+19
+_3
+_2
+_1
+_5
+_4
+_6
+_7
+_9
+_8
+14
+15
+17
+16
+12
+13
+11
+10
+
+In [53]: ls
+exptInstruct/         frac_08.png           frac_18.png
+exptInstruct.key*     frac_09.png           frac_19.png
+exptInstruct.pdf      frac_10.png           frac_20.png
+frac_01.png           frac_11.png           monitain_v1.0.py
+frac_02.png           frac_12.png           monitain_v1.1.py
+frac_03.png           frac_13.png           monitain_v1_s999.csv
+frac_04.png           frac_14.png           nonwords.csv
+frac_05.png           frac_15.png           stimuli/
+frac_06.png           frac_16.png           th_5.png
+frac_07.png           frac_17.png           words.csv
+
+In [54]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...:     if imagename.endswith(".png"): 
+    ...:         print imagename[-6:-4]
+    ...:         
+    ...:         
+20
+18
+19
+_3
+_2
+_1
+_5
+_4
+_6
+_7
+_9
+_8
+14
+15
+17
+16
+12
+13
+11
+10
+
+In [55]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...:     if imagename.endswith(".png"): 
+    ...:         print imagename[-7:-4]
+    ...:         
+    ...:         
+    ...:         
+_20
+_18
+_19
+c_3
+c_2
+c_1
+c_5
+c_4
+c_6
+c_7
+c_9
+c_8
+_14
+_15
+_17
+_16
+_12
+_13
+_11
+_10
+
+In [56]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...:     if imagename.endswith(".png"): 
+    ...:         print imagename[-5:-4]
+    ...:         
+    ...:         
+    ...:         
+    ...:         
+0
+8
+9
+3
+2
+1
+5
+4
+6
+7
+9
+8
+4
+5
+7
+6
+2
+3
+1
+0
+
+In [57]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...:     if imagename.endswith(".png"): 
+    ...:         print imagename[-5:-3]
+    ...:         
+    ...:         
+    ...:         
+    ...:         
+    ...:         
+0.
+8.
+9.
+3.
+2.
+1.
+5.
+4.
+6.
+7.
+9.
+8.
+4.
+5.
+7.
+6.
+2.
+3.
+1.
+0.
+
+In [58]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...:     if imagename.endswith(".png"): 
+    ...:         print imagename[-6:-4]
+    ...:         
+    ...:         
+    ...:         
+    ...:         
+    ...:         
+    ...:         
+20
+18
+19
+_3
+_2
+_1
+_5
+_4
+_6
+_7
+_9
+_8
+14
+15
+17
+16
+12
+13
+11
+10
+
+In [59]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...:     if imagename.endswith(".png"): 
+    ...:         print imagename[-6:-4]
+    ...:         
+    ...:         
+    ...:         
+    ...:         
+    ...:         
+    ...:         for imagename in os.listdir("stimuli/grayscale/"): 
+    ...: ^Iif imagename.endswith(".png"): 
+    ...: ^I^Iimagename[-6:-4] = Image.open(imagename)
+  File "<ipython-input-59-f02fed945eaa>", line 10
+    if imagename.endswith(".png"):
+     ^
+IndentationError: expected an indented block
+
+
+In [60]: 
+
+In [60]: for imagename in os.listdir("stimuli/grayscale/"): 
+    ...: ^Iif imagename.endswith(".png"): 
+    ...: ^I^Iimagename[-6:-4] = Image.open(imagename)
+    ...:   
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-60-7a526b7bb568> in <module>()
+      1 for imagename in os.listdir("stimuli/grayscale/"):
+      2         if imagename.endswith(".png"):
+----> 3                 imagename[-6:-4] = Image.open(imagename)
+      4 
+
+TypeError: 'str' object does not support item assignment
+
+In [61]: imagename
+Out[61]: 'frac_20.png'
+
+In [62]: imagename[-6:-4]
+Out[62]: '20'
+
+In [63]: imagename[-6:-4] + word
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+<ipython-input-63-4993514a06cc> in <module>()
+----> 1 imagename[-6:-4] + word
+
+NameError: name 'word' is not defined
+
+In [64]: imagename[-6:-4] + "word"
+Out[64]: '20word'
+
+In [65]: pwd
+Out[65]: u'/Users/krh2382/monitain/experiment'
+
+In [66]: x_data = []
+
+In [67]: files = glob.glob("/stimuli/grayscale/*.png")
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+<ipython-input-67-60b065d64cf7> in <module>()
+----> 1 files = glob.glob("/stimuli/grayscale/*.png")
+
+NameError: name 'glob' is not defined
+
+In [68]: import glob
+
+In [69]: files = glob.glob("/stimuli/grayscale/*.png")
+
+In [70]: files
+Out[70]: []
+
+In [71]: x_data = []
+    ...: files = glob.glob("/stimuli/grayscale/*.png") 
+    ...: for myFile in files: 
+    ...: ^Iimage = cv2.imread(myFile)
+    ...: ^Ix_data.append(image)
+    ...:  
+
+In [72]: x_data
+Out[72]: []
+
+In [73]: pwd
+Out[73]: u'/Users/krh2382/monitain/experiment'
+
+In [74]: glob.glob("/stimuli/grayscale/*.png") 
+Out[74]: []
+
+In [75]: glob.glob("stimuli/grayscale/*.png") 
+Out[75]: 
+['stimuli/grayscale/frac_20.png',
+ 'stimuli/grayscale/frac_18.png',
+ 'stimuli/grayscale/frac_19.png',
+ 'stimuli/grayscale/frac_3.png',
+ 'stimuli/grayscale/frac_2.png',
+ 'stimuli/grayscale/frac_1.png',
+ 'stimuli/grayscale/frac_5.png',
+ 'stimuli/grayscale/frac_4.png',
+ 'stimuli/grayscale/frac_6.png',
+ 'stimuli/grayscale/frac_7.png',
+ 'stimuli/grayscale/frac_9.png',
+ 'stimuli/grayscale/frac_8.png',
+ 'stimuli/grayscale/frac_14.png',
+ 'stimuli/grayscale/frac_15.png',
+ 'stimuli/grayscale/frac_17.png',
+ 'stimuli/grayscale/frac_16.png',
+ 'stimuli/grayscale/frac_12.png',
+ 'stimuli/grayscale/frac_13.png',
+ 'stimuli/grayscale/frac_11.png',
+ 'stimuli/grayscale/frac_10.png']
+
+In [76]: x_data = []
+    ...: files = glob.glob("stimuli/grayscale/*.png") 
+    ...: for myFile in files: 
+    ...: ^Iimage = cv2.imread(myFile)
+    ...: ^Ix_data.append(image)
+    ...:  
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+<ipython-input-76-0b25deff7613> in <module>()
+      2 files = glob.glob("stimuli/grayscale/*.png")
+      3 for myFile in files:
+----> 4         image = cv2.imread(myFile)
+      5         x_data.append(image)
+      6 
+
+NameError: name 'cv2' is not defined
+
+In [77]: import cv2
+
+In [78]: x_data = []
+    ...: files = glob.glob("stimuli/grayscale/*.png") 
+    ...: for myFile in files: 
+    ...: ^Iimage = cv2.imread(myFile)
+    ...: ^Ix_data.append(image)
+    ...:  
+
+In [79]: x_data
+Out[79]: 
+[array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        ...,
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+ 
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         ...,
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]], dtype=uint8)]
+
+In [80]: x_data[0]
+Out[80]: 
+array([[[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+        ...,
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]],
+
+       [[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+        ...,
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]],
+
+       [[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+        ...,
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]],
+
+       ...,
+
+       [[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+        ...,
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]],
+
+       [[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+        ...,
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]],
+
+       [[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+        ...,
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]]], dtype=uint8)
+
+In [81]: x_data[2]
+Out[81]: 
+array([[[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+        ...,
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]],
+
+       [[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+        ...,
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]],
+
+       [[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+        ...,
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]],
+
+       ...,
+
+       [[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+        ...,
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]],
+
+       [[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+        ...,
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]],
+
+       [[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+        ...,
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]]], dtype=uint8)
+
+In [82]: print('x_data shape:', np.array(x_data).shape)
+('x_data shape:', (20, 128, 128, 3))
+
+In [83]: Image.open(x_data[0])
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+<ipython-input-83-87ae16b1fd95> in <module>()
+----> 1 Image.open(x_data[0])
+
+/Users/krh2382/anaconda2/lib/python2.7/site-packages/PIL/Image.pyc in open(fp, mode)
+   2547         fp.seek(0)
+   2548     except (AttributeError, io.UnsupportedOperation):
+-> 2549         fp = io.BytesIO(fp.read())
+   2550         exclusive_fp = True
+   2551 
+
+AttributeError: 'numpy.ndarray' object has no attribute 'read'
+
+In [84]: Image.fromarray(x_data)
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+<ipython-input-84-e2bc3975c0c3> in <module>()
+----> 1 Image.fromarray(x_data)
+
+/Users/krh2382/anaconda2/lib/python2.7/site-packages/PIL/Image.pyc in fromarray(obj, mode)
+   2414     .. versionadded:: 1.1.6
+   2415     """
+-> 2416     arr = obj.__array_interface__
+   2417     shape = arr['shape']
+   2418     ndim = len(shape)
+
+AttributeError: 'list' object has no attribute '__array_interface__'
+
+In [85]: type(x_data)
+Out[85]: list
+
+In [86]: img_dir = "stimuli/grayscale/"
+
+In [87]: img_lists = { k: sorted(glob.glob(v+'/*.png')) for k, v in img_dir.iter
+    ...: items() }
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+<ipython-input-87-c156c7e8a636> in <module>()
+----> 1 img_lists = { k: sorted(glob.glob(v+'/*.png')) for k, v in img_dir.iteritems() }
+
+AttributeError: 'str' object has no attribute 'iteritems'
+
+In [88]: img_dir
+Out[88]: 'stimuli/grayscale/'
+
+In [89]: img_dir = "stimuli/grayscale/*/"
+
+In [90]: img_lists = { k: sorted(glob.glob(v+'/*.png')) for k, v in img_dir.iter
+    ...: items() }
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+<ipython-input-90-c156c7e8a636> in <module>()
+----> 1 img_lists = { k: sorted(glob.glob(v+'/*.png')) for k, v in img_dir.iteritems() }
+
+AttributeError: 'str' object has no attribute 'iteritems'
+
+In [91]: img_list = glob.glob("stimuli/grayscale/*.png")
+
+In [92]: img_list
+Out[92]: 
+['stimuli/grayscale/frac_20.png',
+ 'stimuli/grayscale/frac_18.png',
+ 'stimuli/grayscale/frac_19.png',
+ 'stimuli/grayscale/frac_3.png',
+ 'stimuli/grayscale/frac_2.png',
+ 'stimuli/grayscale/frac_1.png',
+ 'stimuli/grayscale/frac_5.png',
+ 'stimuli/grayscale/frac_4.png',
+ 'stimuli/grayscale/frac_6.png',
+ 'stimuli/grayscale/frac_7.png',
+ 'stimuli/grayscale/frac_9.png',
+ 'stimuli/grayscale/frac_8.png',
+ 'stimuli/grayscale/frac_14.png',
+ 'stimuli/grayscale/frac_15.png',
+ 'stimuli/grayscale/frac_17.png',
+ 'stimuli/grayscale/frac_16.png',
+ 'stimuli/grayscale/frac_12.png',
+ 'stimuli/grayscale/frac_13.png',
+ 'stimuli/grayscale/frac_11.png',
+ 'stimuli/grayscale/frac_10.png']
+
+In [93]: img_dir = 'stimuli/grayscale/*/'
+
+In [94]: img_list = {k: sorted(glob.glob(v+'/*.png')) for k, v in img_dir.iterit
+    ...: ems() }
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+<ipython-input-94-0a142b14bb48> in <module>()
+----> 1 img_list = {k: sorted(glob.glob(v+'/*.png')) for k, v in img_dir.iteritems() }
+
+AttributeError: 'str' object has no attribute 'iteritems'
+
+In [95]: (glob.glob(v+'/*.png'))
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+<ipython-input-95-fbf5da48a95e> in <module>()
+----> 1 (glob.glob(v+'/*.png'))
+
+NameError: name 'v' is not defined
+
+In [96]: img_list = {k: sorted(glob.glob(v+'/*.png')) for k, v in img_dir }
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+<ipython-input-96-8622f0f71650> in <module>()
+----> 1 img_list = {k: sorted(glob.glob(v+'/*.png')) for k, v in img_dir }
+
+<ipython-input-96-8622f0f71650> in <dictcomp>(***failed resolving arguments***)
+----> 1 img_list = {k: sorted(glob.glob(v+'/*.png')) for k, v in img_dir }
+
+ValueError: need more than 1 value to unpack
+
+In [97]: img_dir
+Out[97]: 'stimuli/grayscale/*/'
+
+In [98]: img_dir = 'stimuli/grayscale/'
+
+In [99]: img_list = {k: sorted(glob.glob(v+'/*.png')) for k, v in img_dir }
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+<ipython-input-99-8622f0f71650> in <module>()
+----> 1 img_list = {k: sorted(glob.glob(v+'/*.png')) for k, v in img_dir }
+
+<ipython-input-99-8622f0f71650> in <dictcomp>(***failed resolving arguments***)
+----> 1 img_list = {k: sorted(glob.glob(v+'/*.png')) for k, v in img_dir }
+
+ValueError: need more than 1 value to unpack
+
+In [100]: img_dir.iteritmes()
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+<ipython-input-100-4d5106be5732> in <module>()
+----> 1 img_dir.iteritmes()
+
+AttributeError: 'str' object has no attribute 'iteritmes'
+
+In [101]: img_dir.iteritems()
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+<ipython-input-101-b8414cef5eac> in <module>()
+----> 1 img_dir.iteritems()
+
+AttributeError: 'str' object has no attribute 'iteritems'
+
+In [102]: glob.glob("stimuli/grayscale/*.png") 
+Out[102]: 
+['stimuli/grayscale/frac_20.png',
+ 'stimuli/grayscale/frac_18.png',
+ 'stimuli/grayscale/frac_19.png',
+ 'stimuli/grayscale/frac_3.png',
+ 'stimuli/grayscale/frac_2.png',
+ 'stimuli/grayscale/frac_1.png',
+ 'stimuli/grayscale/frac_5.png',
+ 'stimuli/grayscale/frac_4.png',
+ 'stimuli/grayscale/frac_6.png',
+ 'stimuli/grayscale/frac_7.png',
+ 'stimuli/grayscale/frac_9.png',
+ 'stimuli/grayscale/frac_8.png',
+ 'stimuli/grayscale/frac_14.png',
+ 'stimuli/grayscale/frac_15.png',
+ 'stimuli/grayscale/frac_17.png',
+ 'stimuli/grayscale/frac_16.png',
+ 'stimuli/grayscale/frac_12.png',
+ 'stimuli/grayscale/frac_13.png',
+ 'stimuli/grayscale/frac_11.png',
+ 'stimuli/grayscale/frac_10.png']
+
+In [103]: glob.glob("stimuli/grayscale/*.png")[1]
+Out[103]: 'stimuli/grayscale/frac_18.png'
+
+In [104]: glob.glob("stimuli/grayscale/*.png").iteritems()
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+<ipython-input-104-628cdc2aaa4b> in <module>()
+----> 1 glob.glob("stimuli/grayscale/*.png").iteritems()
+
+AttributeError: 'list' object has no attribute 'iteritems'
+
+In [105]: typeE(glob.glob("stimuli/grayscale/*.png"))
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+<ipython-input-105-ae231e1f3619> in <module>()
+----> 1 typeE(glob.glob("stimuli/grayscale/*.png"))
+
+NameError: name 'typeE' is not defined
+
+In [106]: type(glob.glob("stimuli/grayscale/*.png"))
+Out[106]: list
+
+In [107]: for i in glob.glob("stimuli/grayscale/*.png"): 
+     ...:     print i
+     ...:     
+stimuli/grayscale/frac_20.png
+stimuli/grayscale/frac_18.png
+stimuli/grayscale/frac_19.png
+stimuli/grayscale/frac_3.png
+stimuli/grayscale/frac_2.png
+stimuli/grayscale/frac_1.png
+stimuli/grayscale/frac_5.png
+stimuli/grayscale/frac_4.png
+stimuli/grayscale/frac_6.png
+stimuli/grayscale/frac_7.png
+stimuli/grayscale/frac_9.png
+stimuli/grayscale/frac_8.png
+stimuli/grayscale/frac_14.png
+stimuli/grayscale/frac_15.png
+stimuli/grayscale/frac_17.png
+stimuli/grayscale/frac_16.png
+stimuli/grayscale/frac_12.png
+stimuli/grayscale/frac_13.png
+stimuli/grayscale/frac_11.png
+stimuli/grayscale/frac_10.png
+
+In [108]: for i in glob.glob("stimuli/grayscale/*.png"): 
+     ...:     image.open(i)
+     ...:     
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+<ipython-input-108-bf96b04a1012> in <module>()
+      1 for i in glob.glob("stimuli/grayscale/*.png"):
+----> 2     image.open(i)
+      3 
+
+AttributeError: 'numpy.ndarray' object has no attribute 'open'
+
+In [109]: for i in glob.glob("stimuli/grayscale/*.png"): 
+     ...:     image.open(str(i))
+     ...:     
+     ...:     
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+<ipython-input-109-3ac2cc283632> in <module>()
+      1 for i in glob.glob("stimuli/grayscale/*.png"):
+----> 2     image.open(str(i))
+      3 
+      4 
+
+AttributeError: 'numpy.ndarray' object has no attribute 'open'
+
+In [110]: for i in glob.glob("stimuli/grayscale/*.png"): 
+     ...:     Image.open(i)
+     ...:     
+     ...:     
+
+In [111]: for i in glob.glob("stimuli/grayscale/*.png"): 
+     ...:     Image.open(i)
+     ...:     print i
+     ...:     
+     ...:     
+stimuli/grayscale/frac_20.png
+stimuli/grayscale/frac_18.png
+stimuli/grayscale/frac_19.png
+stimuli/grayscale/frac_3.png
+stimuli/grayscale/frac_2.png
+stimuli/grayscale/frac_1.png
+stimuli/grayscale/frac_5.png
+stimuli/grayscale/frac_4.png
+stimuli/grayscale/frac_6.png
+stimuli/grayscale/frac_7.png
+stimuli/grayscale/frac_9.png
+stimuli/grayscale/frac_8.png
+stimuli/grayscale/frac_14.png
+stimuli/grayscale/frac_15.png
+stimuli/grayscale/frac_17.png
+stimuli/grayscale/frac_16.png
+stimuli/grayscale/frac_12.png
+stimuli/grayscale/frac_13.png
+stimuli/grayscale/frac_11.png
+stimuli/grayscale/frac_10.png
+
+In [112]: glob.glob("stimuli/grayscale/*.png")
+Out[112]: 
+['stimuli/grayscale/frac_20.png',
+ 'stimuli/grayscale/frac_18.png',
+ 'stimuli/grayscale/frac_19.png',
+ 'stimuli/grayscale/frac_3.png',
+ 'stimuli/grayscale/frac_2.png',
+ 'stimuli/grayscale/frac_1.png',
+ 'stimuli/grayscale/frac_5.png',
+ 'stimuli/grayscale/frac_4.png',
+ 'stimuli/grayscale/frac_6.png',
+ 'stimuli/grayscale/frac_7.png',
+ 'stimuli/grayscale/frac_9.png',
+ 'stimuli/grayscale/frac_8.png',
+ 'stimuli/grayscale/frac_14.png',
+ 'stimuli/grayscale/frac_15.png',
+ 'stimuli/grayscale/frac_17.png',
+ 'stimuli/grayscale/frac_16.png',
+ 'stimuli/grayscale/frac_12.png',
+ 'stimuli/grayscale/frac_13.png',
+ 'stimuli/grayscale/frac_11.png',
+ 'stimuli/grayscale/frac_10.png']
+
+In [113]: glob.glob("stimuli/grayscale/*.png")
+Out[113]: 
+['stimuli/grayscale/frac_20.png',
+ 'stimuli/grayscale/frac_18.png',
+ 'stimuli/grayscale/frac_19.png',
+ 'stimuli/grayscale/frac_3.png',
+ 'stimuli/grayscale/frac_2.png',
+ 'stimuli/grayscale/frac_1.png',
+ 'stimuli/grayscale/frac_5.png',
+ 'stimuli/grayscale/frac_4.png',
+ 'stimuli/grayscale/frac_6.png',
+ 'stimuli/grayscale/frac_7.png',
+ 'stimuli/grayscale/frac_9.png',
+ 'stimuli/grayscale/frac_8.png',
+ 'stimuli/grayscale/frac_14.png',
+ 'stimuli/grayscale/frac_15.png',
+ 'stimuli/grayscale/frac_17.png',
+ 'stimuli/grayscale/frac_16.png',
+ 'stimuli/grayscale/frac_12.png',
+ 'stimuli/grayscale/frac_13.png',
+ 'stimuli/grayscale/frac_11.png',
+ 'stimuli/grayscale/frac_10.png']
+
+In [114]: a = glob.glob("stimuli/grayscale/*.png")
+
+In [115]: a = glob.glob("stimuli/grayscale/*.png")[0]
+
+In [116]: a
+Out[116]: 'stimuli/grayscale/frac_20.png'
+
+In [117]: visual.ImageStim(win=win,image=a)
+Out[117]: <psychopy.visual.image.ImageStim at 0x1827dcc150>
+
+In [118]: [ fn for fn in glob.glob("stimuli/grayscale/*.png") ]
+Out[118]: 
+['stimuli/grayscale/frac_20.png',
+ 'stimuli/grayscale/frac_18.png',
+ 'stimuli/grayscale/frac_19.png',
+ 'stimuli/grayscale/frac_3.png',
+ 'stimuli/grayscale/frac_2.png',
+ 'stimuli/grayscale/frac_1.png',
+ 'stimuli/grayscale/frac_5.png',
+ 'stimuli/grayscale/frac_4.png',
+ 'stimuli/grayscale/frac_6.png',
+ 'stimuli/grayscale/frac_7.png',
+ 'stimuli/grayscale/frac_9.png',
+ 'stimuli/grayscale/frac_8.png',
+ 'stimuli/grayscale/frac_14.png',
+ 'stimuli/grayscale/frac_15.png',
+ 'stimuli/grayscale/frac_17.png',
+ 'stimuli/grayscale/frac_16.png',
+ 'stimuli/grayscale/frac_12.png',
+ 'stimuli/grayscale/frac_13.png',
+ 'stimuli/grayscale/frac_11.png',
+ 'stimuli/grayscale/frac_10.png']
+
+In [119]: [ x for x in range(10) ]
+Out[119]: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+In [120]: range(10)
+Out[120]: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+In [121]: [ x*2 for x in range(10) ]
+Out[121]: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+
+In [122]: [ fn for fn in glob.glob("stimuli/grayscale/*.png") ]
+Out[122]: 
+['stimuli/grayscale/frac_20.png',
+ 'stimuli/grayscale/frac_18.png',
+ 'stimuli/grayscale/frac_19.png',
+ 'stimuli/grayscale/frac_3.png',
+ 'stimuli/grayscale/frac_2.png',
+ 'stimuli/grayscale/frac_1.png',
+ 'stimuli/grayscale/frac_5.png',
+ 'stimuli/grayscale/frac_4.png',
+ 'stimuli/grayscale/frac_6.png',
+ 'stimuli/grayscale/frac_7.png',
+ 'stimuli/grayscale/frac_9.png',
+ 'stimuli/grayscale/frac_8.png',
+ 'stimuli/grayscale/frac_14.png',
+ 'stimuli/grayscale/frac_15.png',
+ 'stimuli/grayscale/frac_17.png',
+ 'stimuli/grayscale/frac_16.png',
+ 'stimuli/grayscale/frac_12.png',
+ 'stimuli/grayscale/frac_13.png',
+ 'stimuli/grayscale/frac_11.png',
+ 'stimuli/grayscale/frac_10.png']
+
+In [123]: visual.ImageStim(win=win,image=a)
+Out[123]: <psychopy.visual.image.ImageStim at 0x1827d90ed0>
+
+In [124]: visual.ImageStim(win=win,image=a)
+Out[124]: <psychopy.visual.image.ImageStim at 0x1827dc8fd0>
+
+In [125]: visual.ImageStim(win=win,image=a)
+Out[125]: <psychopy.visual.image.ImageStim at 0x1827dc89d0>
+
+In [126]: visual.ImageStim(win=win,image=a)
+Out[126]: <psychopy.visual.image.ImageStim at 0x1827dc8310>
+
+In [127]: visual.ImageStim(win=win,image=a)
+Out[127]: <psychopy.visual.image.ImageStim at 0x1827dc8110>
+
+In [128]: stim = visual.ImageStim(win=win,image=a)
+
+In [129]: stim.draw()
+
+In [130]: win.flip()
+Out[130]: 5838.2686450481415
+
+In [131]: [ fn for fn in glob.glob("stimuli/grayscale/*.png") ]
+Out[131]: 
+['stimuli/grayscale/frac_20.png',
+ 'stimuli/grayscale/frac_18.png',
+ 'stimuli/grayscale/frac_19.png',
+ 'stimuli/grayscale/frac_3.png',
+ 'stimuli/grayscale/frac_2.png',
+ 'stimuli/grayscale/frac_1.png',
+ 'stimuli/grayscale/frac_5.png',
+ 'stimuli/grayscale/frac_4.png',
+ 'stimuli/grayscale/frac_6.png',
+ 'stimuli/grayscale/frac_7.png',
+ 'stimuli/grayscale/frac_9.png',
+ 'stimuli/grayscale/frac_8.png',
+ 'stimuli/grayscale/frac_14.png',
+ 'stimuli/grayscale/frac_15.png',
+ 'stimuli/grayscale/frac_17.png',
+ 'stimuli/grayscale/frac_16.png',
+ 'stimuli/grayscale/frac_12.png',
+ 'stimuli/grayscale/frac_13.png',
+ 'stimuli/grayscale/frac_11.png',
+ 'stimuli/grayscale/frac_10.png']
+
+In [132]: [ visual.ImageStim(win=win,image=fn) for fn in glob.glob("stimuli/gray
+     ...: scale/*.png") ]
+Out[132]: 
+[<psychopy.visual.image.ImageStim at 0x1827dc8b50>,
+ <psychopy.visual.image.ImageStim at 0x1827dc8c50>,
+ <psychopy.visual.image.ImageStim at 0x10d641090>,
+ <psychopy.visual.image.ImageStim at 0x182e0473d0>,
+ <psychopy.visual.image.ImageStim at 0x182e047090>,
+ <psychopy.visual.image.ImageStim at 0x182e0474d0>,
+ <psychopy.visual.image.ImageStim at 0x182e047610>,
+ <psychopy.visual.image.ImageStim at 0x182e047750>,
+ <psychopy.visual.image.ImageStim at 0x1827c39710>,
+ <psychopy.visual.image.ImageStim at 0x181e933d10>,
+ <psychopy.visual.image.ImageStim at 0x181e9b3310>,
+ <psychopy.visual.image.ImageStim at 0x1827dc8210>,
+ <psychopy.visual.image.ImageStim at 0x1827da3e90>,
+ <psychopy.visual.image.ImageStim at 0x182e047590>,
+ <psychopy.visual.image.ImageStim at 0x182e0478d0>,
+ <psychopy.visual.image.ImageStim at 0x182e047290>,
+ <psychopy.visual.image.ImageStim at 0x182e047390>,
+ <psychopy.visual.image.ImageStim at 0x182e047050>,
+ <psychopy.visual.image.ImageStim at 0x182e0476d0>,
+ <psychopy.visual.image.ImageStim at 0x182e047a90>]
+
+In [133]: stim_list = [ visual.ImageStim(win=win,image=fn) for fn in glob.glob("
+     ...: stimuli/grayscale/*.png") ]
+
+In [134]: stim_list[0]
+Out[134]: <psychopy.visual.image.ImageStim at 0x1827d90610>
+
+In [135]: stim_list[1]
+Out[135]: <psychopy.visual.image.ImageStim at 0x181ed7a150>
+
+In [136]: stim_list[2]
+Out[136]: <psychopy.visual.image.ImageStim at 0x1827dc8450>
+
+In [137]: glob.glob("stimuli/grayscale/*.png")
+Out[137]: 
+['stimuli/grayscale/frac_20.png',
+ 'stimuli/grayscale/frac_18.png',
+ 'stimuli/grayscale/frac_19.png',
+ 'stimuli/grayscale/frac_3.png',
+ 'stimuli/grayscale/frac_2.png',
+ 'stimuli/grayscale/frac_1.png',
+ 'stimuli/grayscale/frac_5.png',
+ 'stimuli/grayscale/frac_4.png',
+ 'stimuli/grayscale/frac_6.png',
+ 'stimuli/grayscale/frac_7.png',
+ 'stimuli/grayscale/frac_9.png',
+ 'stimuli/grayscale/frac_8.png',
+ 'stimuli/grayscale/frac_14.png',
+ 'stimuli/grayscale/frac_15.png',
+ 'stimuli/grayscale/frac_17.png',
+ 'stimuli/grayscale/frac_16.png',
+ 'stimuli/grayscale/frac_12.png',
+ 'stimuli/grayscale/frac_13.png',
+ 'stimuli/grayscale/frac_11.png',
+ 'stimuli/grayscale/frac_10.png']
+
+In [138]: sorted(glob.glob("stimuli/grayscale/*.png"))
+Out[138]: 
+['stimuli/grayscale/frac_1.png',
+ 'stimuli/grayscale/frac_10.png',
+ 'stimuli/grayscale/frac_11.png',
+ 'stimuli/grayscale/frac_12.png',
+ 'stimuli/grayscale/frac_13.png',
+ 'stimuli/grayscale/frac_14.png',
+ 'stimuli/grayscale/frac_15.png',
+ 'stimuli/grayscale/frac_16.png',
+ 'stimuli/grayscale/frac_17.png',
+ 'stimuli/grayscale/frac_18.png',
+ 'stimuli/grayscale/frac_19.png',
+ 'stimuli/grayscale/frac_2.png',
+ 'stimuli/grayscale/frac_20.png',
+ 'stimuli/grayscale/frac_3.png',
+ 'stimuli/grayscale/frac_4.png',
+ 'stimuli/grayscale/frac_5.png',
+ 'stimuli/grayscale/frac_6.png',
+ 'stimuli/grayscale/frac_7.png',
+ 'stimuli/grayscale/frac_8.png',
+ 'stimuli/grayscale/frac_9.png']
+
+In [139]: [ visual.ImageStim(win=win,image=fn) for fn in glob.glob("stimuli/gray
+     ...: scale/*.png") ]
+Out[139]: 
+[<psychopy.visual.image.ImageStim at 0x182e047cd0>,
+ <psychopy.visual.image.ImageStim at 0x182e047350>,
+ <psychopy.visual.image.ImageStim at 0x1827da3f10>,
+ <psychopy.visual.image.ImageStim at 0x182e026410>,
+ <psychopy.visual.image.ImageStim at 0x182e026450>,
+ <psychopy.visual.image.ImageStim at 0x182e026250>,
+ <psychopy.visual.image.ImageStim at 0x1827d90950>,
+ <psychopy.visual.image.ImageStim at 0x1827dcc790>,
+ <psychopy.visual.image.ImageStim at 0x181e9b3290>,
+ <psychopy.visual.image.ImageStim at 0x181e9968d0>,
+ <psychopy.visual.image.ImageStim at 0x182e047110>,
+ <psychopy.visual.image.ImageStim at 0x182e047250>,
+ <psychopy.visual.image.ImageStim at 0x181ed83f90>,
+ <psychopy.visual.image.ImageStim at 0x182e047710>,
+ <psychopy.visual.image.ImageStim at 0x182e047510>,
+ <psychopy.visual.image.ImageStim at 0x182e026150>,
+ <psychopy.visual.image.ImageStim at 0x182e026290>,
+ <psychopy.visual.image.ImageStim at 0x182e0264d0>,
+ <psychopy.visual.image.ImageStim at 0x182e0266d0>,
+ <psychopy.visual.image.ImageStim at 0x182e026810>]
+
+In [140]: [ visual.ImageStim(win=win,image=fn) for fn in glob.glob("stimuli/gray
+     ...: scale/*.png") ][0]
+Out[140]: <psychopy.visual.image.ImageStim at 0x182e047b10>
+
+In [141]: [ visual.ImageStim(win=win,image=fn) for fn in glob.glob("stimuli/gray
+     ...: scale/*.png") ][1]
+Out[141]: <psychopy.visual.image.ImageStim at 0x182e047150>
+
+In [142]: [ visual.ImageStim(win=win,image=fn) for fn in glob.glob("stimuli/gray
+     ...: scale/*.png") ]
+Out[142]: 
+[<psychopy.visual.image.ImageStim at 0x182e026190>,
+ <psychopy.visual.image.ImageStim at 0x182e026fd0>,
+ <psychopy.visual.image.ImageStim at 0x182e047790>,
+ <psychopy.visual.image.ImageStim at 0x182e047ad0>,
+ <psychopy.visual.image.ImageStim at 0x182e047650>,
+ <psychopy.visual.image.ImageStim at 0x182e047690>,
+ <psychopy.visual.image.ImageStim at 0x181ed74e90>,
+ <psychopy.visual.image.ImageStim at 0x1827da3510>,
+ <psychopy.visual.image.ImageStim at 0x1827dccf90>,
+ <psychopy.visual.image.ImageStim at 0x181ed58410>,
+ <psychopy.visual.image.ImageStim at 0x181ed4b950>,
+ <psychopy.visual.image.ImageStim at 0x1827da3c50>,
+ <psychopy.visual.image.ImageStim at 0x1827da30d0>,
+ <psychopy.visual.image.ImageStim at 0x1827da3d50>,
+ <psychopy.visual.image.ImageStim at 0x181ed7a290>,
+ <psychopy.visual.image.ImageStim at 0x182e0471d0>,
+ <psychopy.visual.image.ImageStim at 0x182e0477d0>,
+ <psychopy.visual.image.ImageStim at 0x182e026e50>,
+ <psychopy.visual.image.ImageStim at 0x182e026110>,
+ <psychopy.visual.image.ImageStim at 0x182e026590>]
+
+In [143]: [ x for x in range(10) ]
+Out[143]: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+In [144]: [ visual.ImageStim(win=win,image=fn) for fn in glob.glob("stimuli/gray
+     ...: scale/*.png") ]
+Out[144]: 
+[<psychopy.visual.image.ImageStim at 0x182e047e50>,
+ <psychopy.visual.image.ImageStim at 0x182e026d50>,
+ <psychopy.visual.image.ImageStim at 0x182e047e90>,
+ <psychopy.visual.image.ImageStim at 0x182e026e10>,
+ <psychopy.visual.image.ImageStim at 0x1827da3850>,
+ <psychopy.visual.image.ImageStim at 0x181ed565d0>,
+ <psychopy.visual.image.ImageStim at 0x1827dc8b90>,
+ <psychopy.visual.image.ImageStim at 0x1827dc8cd0>,
+ <psychopy.visual.image.ImageStim at 0x1827dc8ed0>,
+ <psychopy.visual.image.ImageStim at 0x1827dc8850>,
+ <psychopy.visual.image.ImageStim at 0x1827dc8d10>,
+ <psychopy.visual.image.ImageStim at 0x1827dcc510>,
+ <psychopy.visual.image.ImageStim at 0x1827d90410>,
+ <psychopy.visual.image.ImageStim at 0x181ed88150>,
+ <psychopy.visual.image.ImageStim at 0x1813bd11d0>,
+ <psychopy.visual.image.ImageStim at 0x1827d90510>,
+ <psychopy.visual.image.ImageStim at 0x1827dcc0d0>,
+ <psychopy.visual.image.ImageStim at 0x1827d90710>,
+ <psychopy.visual.image.ImageStim at 0x1827dcccd0>,
+ <psychopy.visual.image.ImageStim at 0x1827dc8350>]
+
+In [145]: sorted(glob.glob("stimuli/grayscale/*.png"))
+Out[145]: 
+['stimuli/grayscale/frac_1.png',
+ 'stimuli/grayscale/frac_10.png',
+ 'stimuli/grayscale/frac_11.png',
+ 'stimuli/grayscale/frac_12.png',
+ 'stimuli/grayscale/frac_13.png',
+ 'stimuli/grayscale/frac_14.png',
+ 'stimuli/grayscale/frac_15.png',
+ 'stimuli/grayscale/frac_16.png',
+ 'stimuli/grayscale/frac_17.png',
+ 'stimuli/grayscale/frac_18.png',
+ 'stimuli/grayscale/frac_19.png',
+ 'stimuli/grayscale/frac_2.png',
+ 'stimuli/grayscale/frac_20.png',
+ 'stimuli/grayscale/frac_3.png',
+ 'stimuli/grayscale/frac_4.png',
+ 'stimuli/grayscale/frac_5.png',
+ 'stimuli/grayscale/frac_6.png',
+ 'stimuli/grayscale/frac_7.png',
+ 'stimuli/grayscale/frac_8.png',
+ 'stimuli/grayscale/frac_9.png']
+
+In [146]: a
+Out[146]: 'stimuli/grayscale/frac_20.png'
+
+In [147]: a.split('/')
+Out[147]: ['stimuli', 'grayscale', 'frac_20.png']
+
+In [148]: a.split('grayscale')
+Out[148]: ['stimuli/', '/frac_20.png']
+
+In [149]: a.split('gray')
+Out[149]: ['stimuli/', 'scale/frac_20.png']
+
+In [150]: a.split('/')
+Out[150]: ['stimuli', 'grayscale', 'frac_20.png']
+
+In [151]: a.split('/')[-1]
+Out[151]: 'frac_20.png'
+
+In [152]: a.split('/')[-1].split('.')
+Out[152]: ['frac_20', 'png']
+
+In [153]: a.split('/')[-1].split('.')[0]
+Out[153]: 'frac_20'
+
+In [154]: { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=win,image=fn) 
+     ...: for fn in glob.glob("stimuli/grayscale/*.png") }
+Out[154]: 
+{'frac_1': <psychopy.visual.image.ImageStim at 0x182ededa10>,
+ 'frac_10': <psychopy.visual.image.ImageStim at 0x182eded9d0>,
+ 'frac_11': <psychopy.visual.image.ImageStim at 0x182ededd10>,
+ 'frac_12': <psychopy.visual.image.ImageStim at 0x181e9b3210>,
+ 'frac_13': <psychopy.visual.image.ImageStim at 0x182ededd90>,
+ 'frac_14': <psychopy.visual.image.ImageStim at 0x1827dc8610>,
+ 'frac_15': <psychopy.visual.image.ImageStim at 0x1827dc8b10>,
+ 'frac_16': <psychopy.visual.image.ImageStim at 0x1827dcc350>,
+ 'frac_17': <psychopy.visual.image.ImageStim at 0x1827d90810>,
+ 'frac_18': <psychopy.visual.image.ImageStim at 0x182eded5d0>,
+ 'frac_19': <psychopy.visual.image.ImageStim at 0x182e047950>,
+ 'frac_2': <psychopy.visual.image.ImageStim at 0x182eded4d0>,
+ 'frac_20': <psychopy.visual.image.ImageStim at 0x182eded550>,
+ 'frac_3': <psychopy.visual.image.ImageStim at 0x182eded7d0>,
+ 'frac_4': <psychopy.visual.image.ImageStim at 0x182ededc90>,
+ 'frac_5': <psychopy.visual.image.ImageStim at 0x182ededb50>,
+ 'frac_6': <psychopy.visual.image.ImageStim at 0x1827da3cd0>,
+ 'frac_7': <psychopy.visual.image.ImageStim at 0x182e047a50>,
+ 'frac_8': <psychopy.visual.image.ImageStim at 0x1827dc87d0>,
+ 'frac_9': <psychopy.visual.image.ImageStim at 0x1827da3ed0>}
+
+In [155]: { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=win,image=fn) 
+     ...: for fn in glob.glob("stimuli/grayscale/*.png") }
+Out[155]: 
+{'frac_1': <psychopy.visual.image.ImageStim at 0x182ededfd0>,
+ 'frac_10': <psychopy.visual.image.ImageStim at 0x182e0470d0>,
+ 'frac_11': <psychopy.visual.image.ImageStim at 0x182edfc250>,
+ 'frac_12': <psychopy.visual.image.ImageStim at 0x182e047e10>,
+ 'frac_13': <psychopy.visual.image.ImageStim at 0x182edfc1d0>,
+ 'frac_14': <psychopy.visual.image.ImageStim at 0x1827dc8a50>,
+ 'frac_15': <psychopy.visual.image.ImageStim at 0x182e047550>,
+ 'frac_16': <psychopy.visual.image.ImageStim at 0x1827da3dd0>,
+ 'frac_17': <psychopy.visual.image.ImageStim at 0x1827dc8390>,
+ 'frac_18': <psychopy.visual.image.ImageStim at 0x182ededdd0>,
+ 'frac_19': <psychopy.visual.image.ImageStim at 0x182eded710>,
+ 'frac_2': <psychopy.visual.image.ImageStim at 0x182eded790>,
+ 'frac_20': <psychopy.visual.image.ImageStim at 0x182eded590>,
+ 'frac_3': <psychopy.visual.image.ImageStim at 0x181e992f90>,
+ 'frac_4': <psychopy.visual.image.ImageStim at 0x182eded850>,
+ 'frac_5': <psychopy.visual.image.ImageStim at 0x182eded510>,
+ 'frac_6': <psychopy.visual.image.ImageStim at 0x1827dcc990>,
+ 'frac_7': <psychopy.visual.image.ImageStim at 0x182eded690>,
+ 'frac_8': <psychopy.visual.image.ImageStim at 0x1827dc8d90>,
+ 'frac_9': <psychopy.visual.image.ImageStim at 0x181e9b3c10>}
+
+In [156]: { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=win,image=fn) 
+     ...: for fn in glob.glob("stimuli/grayscale/*.png") }
+Out[156]: 
+{'frac_1': <psychopy.visual.image.ImageStim at 0x182edede50>,
+ 'frac_10': <psychopy.visual.image.ImageStim at 0x1827dc8410>,
+ 'frac_11': <psychopy.visual.image.ImageStim at 0x182ededb90>,
+ 'frac_12': <psychopy.visual.image.ImageStim at 0x182eded750>,
+ 'frac_13': <psychopy.visual.image.ImageStim at 0x182ededb10>,
+ 'frac_14': <psychopy.visual.image.ImageStim at 0x182edfc090>,
+ 'frac_15': <psychopy.visual.image.ImageStim at 0x182edfc690>,
+ 'frac_16': <psychopy.visual.image.ImageStim at 0x182ededc10>,
+ 'frac_17': <psychopy.visual.image.ImageStim at 0x182eded6d0>,
+ 'frac_18': <psychopy.visual.image.ImageStim at 0x182eded310>,
+ 'frac_19': <psychopy.visual.image.ImageStim at 0x182eded190>,
+ 'frac_2': <psychopy.visual.image.ImageStim at 0x182ededc50>,
+ 'frac_20': <psychopy.visual.image.ImageStim at 0x182eded490>,
+ 'frac_3': <psychopy.visual.image.ImageStim at 0x182eded210>,
+ 'frac_4': <psychopy.visual.image.ImageStim at 0x182eded610>,
+ 'frac_5': <psychopy.visual.image.ImageStim at 0x182ededa50>,
+ 'frac_6': <psychopy.visual.image.ImageStim at 0x182eded8d0>,
+ 'frac_7': <psychopy.visual.image.ImageStim at 0x182edfc490>,
+ 'frac_8': <psychopy.visual.image.ImageStim at 0x182edfc110>,
+ 'frac_9': <psychopy.visual.image.ImageStim at 0x182edfc4d0>}
+
+In [157]: { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=win,image=fn) 
+     ...: for fn in glob.glob("stimuli/grayscale/*.png") }
+Out[157]: 
+{'frac_1': <psychopy.visual.image.ImageStim at 0x182edfc050>,
+ 'frac_10': <psychopy.visual.image.ImageStim at 0x182edfc510>,
+ 'frac_11': <psychopy.visual.image.ImageStim at 0x182edfc590>,
+ 'frac_12': <psychopy.visual.image.ImageStim at 0x182edfcb50>,
+ 'frac_13': <psychopy.visual.image.ImageStim at 0x182edfcad0>,
+ 'frac_14': <psychopy.visual.image.ImageStim at 0x182eded3d0>,
+ 'frac_15': <psychopy.visual.image.ImageStim at 0x182ededbd0>,
+ 'frac_16': <psychopy.visual.image.ImageStim at 0x182edede90>,
+ 'frac_17': <psychopy.visual.image.ImageStim at 0x182eded650>,
+ 'frac_18': <psychopy.visual.image.ImageStim at 0x182e047a10>,
+ 'frac_19': <psychopy.visual.image.ImageStim at 0x182e047810>,
+ 'frac_2': <psychopy.visual.image.ImageStim at 0x182edfc2d0>,
+ 'frac_20': <psychopy.visual.image.ImageStim at 0x182e0472d0>,
+ 'frac_3': <psychopy.visual.image.ImageStim at 0x182edfc910>,
+ 'frac_4': <psychopy.visual.image.ImageStim at 0x182edfc7d0>,
+ 'frac_5': <psychopy.visual.image.ImageStim at 0x182edfc310>,
+ 'frac_6': <psychopy.visual.image.ImageStim at 0x182edfca50>,
+ 'frac_7': <psychopy.visual.image.ImageStim at 0x1827dc8050>,
+ 'frac_8': <psychopy.visual.image.ImageStim at 0x182eded150>,
+ 'frac_9': <psychopy.visual.image.ImageStim at 0x182e0479d0>}
+
+In [158]: stim_list = { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=wi
+     ...: n,image=fn) for fn in glob.glob("stimuli/grayscale/*.png") }
+
+In [159]: stim_list
+Out[159]: 
+{'frac_1': <psychopy.visual.image.ImageStim at 0x182e047d90>,
+ 'frac_10': <psychopy.visual.image.ImageStim at 0x182edfc290>,
+ 'frac_11': <psychopy.visual.image.ImageStim at 0x182edfcb10>,
+ 'frac_12': <psychopy.visual.image.ImageStim at 0x182edfc550>,
+ 'frac_13': <psychopy.visual.image.ImageStim at 0x182edfcf10>,
+ 'frac_14': <psychopy.visual.image.ImageStim at 0x182edfcd50>,
+ 'frac_15': <psychopy.visual.image.ImageStim at 0x182edfcf50>,
+ 'frac_16': <psychopy.visual.image.ImageStim at 0x182edfce10>,
+ 'frac_17': <psychopy.visual.image.ImageStim at 0x182edfce90>,
+ 'frac_18': <psychopy.visual.image.ImageStim at 0x182ededed0>,
+ 'frac_19': <psychopy.visual.image.ImageStim at 0x1827d90dd0>,
+ 'frac_2': <psychopy.visual.image.ImageStim at 0x182e047ed0>,
+ 'frac_20': <psychopy.visual.image.ImageStim at 0x182ededad0>,
+ 'frac_3': <psychopy.visual.image.ImageStim at 0x182eded290>,
+ 'frac_4': <psychopy.visual.image.ImageStim at 0x182edfc6d0>,
+ 'frac_5': <psychopy.visual.image.ImageStim at 0x182edfc790>,
+ 'frac_6': <psychopy.visual.image.ImageStim at 0x182edfc750>,
+ 'frac_7': <psychopy.visual.image.ImageStim at 0x182edfcc10>,
+ 'frac_8': <psychopy.visual.image.ImageStim at 0x182edfc3d0>,
+ 'frac_9': <psychopy.visual.image.ImageStim at 0x182edfcc50>}
+
+In [160]: stim_list['frac_1']
+Out[160]: <psychopy.visual.image.ImageStim at 0x182e047d90>
+
+In [161]: stim_dict = { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=wi
+     ...: n,image=fn) for fn in glob.glob("stimuli/grayscale/*.png") }
+
+In [162]: for i in stim_dict.keys():
+     ...:     print i
+     ...:     
+frac_9
+frac_8
+frac_3
+frac_2
+frac_1
+frac_7
+frac_6
+frac_5
+frac_4
+frac_13
+frac_12
+frac_11
+frac_10
+frac_17
+frac_16
+frac_15
+frac_14
+frac_20
+frac_18
+frac_19
+
+In [163]: for i in stim_dict.values():
+     ...:     print i
+     ...:     
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_9.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_8.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_3.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_2.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_1.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_7.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_6.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_5.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_4.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_13.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_12.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_11.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_10.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_17.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_16.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_15.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_14.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_20.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_18.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_19.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+
+In [164]: for k, v in stim_dict.items():
+     ...:     print k
+     ...:     print v
+     ...:     
+frac_9
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_9.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_8
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_8.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_3
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_3.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_2
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_2.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_1
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_1.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_7
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_7.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_6
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_6.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_5
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_5.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_4
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_4.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_13
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_13.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_12
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_12.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_11
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_11.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_10
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_10.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_17
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_17.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_16
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_16.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_15
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_15.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_14
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_14.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_20
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_20.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_18
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_18.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+frac_19
+ImageStim(autoLog=True, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, image='stimuli/grayscale/frac_19.png', interpolate=False, mask=None, maskParams=None, name='unnamed ImageStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([128, 128]), texRes=128, units='pix', win=Window(...))
+
+In [165]: for k, v in stim_dict.items():
+     ...:     print k
+     ...:     v.draw()
+     ...:     win.flip()
+     ...:     core.wait(.2)
+     ...:     
+frac_9
+frac_8
+frac_3
+frac_2
+frac_1
+frac_7
+frac_6
+frac_5
+frac_4
+frac_13
+frac_12
+frac_11
+frac_10
+frac_17
+frac_16
+frac_15
+frac_14
+frac_20
+frac_18
+frac_19
+
+In [166]: stim_dict = { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=wi
+     ...: n,
+     ...:      ... image=fn) for fn in glob.glob("stimuli/grayscale/*.png") }
+  File "<ipython-input-166-f4fb9dd4961d>", line 2
+    ... image=fn) for fn in glob.glob("stimuli/grayscale/*.png") }
+    ^
+SyntaxError: invalid syntax
+
+
+In [167]: stim_dict = { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=wi
+     ...: n,image=fn) for fn in glob.glob("stimuli/grayscale/*.png") }
+
+In [168]: stim_dict
+Out[168]: 
+{'frac_1': <psychopy.visual.image.ImageStim at 0x182e026350>,
+ 'frac_10': <psychopy.visual.image.ImageStim at 0x182e026c10>,
+ 'frac_11': <psychopy.visual.image.ImageStim at 0x182e026210>,
+ 'frac_12': <psychopy.visual.image.ImageStim at 0x182e026710>,
+ 'frac_13': <psychopy.visual.image.ImageStim at 0x182e026490>,
+ 'frac_14': <psychopy.visual.image.ImageStim at 0x182ee14310>,
+ 'frac_15': <psychopy.visual.image.ImageStim at 0x182ee14490>,
+ 'frac_16': <psychopy.visual.image.ImageStim at 0x182e0268d0>,
+ 'frac_17': <psychopy.visual.image.ImageStim at 0x182ee14990>,
+ 'frac_18': <psychopy.visual.image.ImageStim at 0x1827da3750>,
+ 'frac_19': <psychopy.visual.image.ImageStim at 0x182e026b90>,
+ 'frac_2': <psychopy.visual.image.ImageStim at 0x182e026550>,
+ 'frac_20': <psychopy.visual.image.ImageStim at 0x182e026910>,
+ 'frac_3': <psychopy.visual.image.ImageStim at 0x182e026ad0>,
+ 'frac_4': <psychopy.visual.image.ImageStim at 0x182e026c50>,
+ 'frac_5': <psychopy.visual.image.ImageStim at 0x182e026f10>,
+ 'frac_6': <psychopy.visual.image.ImageStim at 0x182ee14190>,
+ 'frac_7': <psychopy.visual.image.ImageStim at 0x182ee14710>,
+ 'frac_8': <psychopy.visual.image.ImageStim at 0x182ee144d0>,
+ 'frac_9': <psychopy.visual.image.ImageStim at 0x182ee14450>}
+
+In [169]: 

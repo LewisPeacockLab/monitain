@@ -17,11 +17,13 @@ import sys
 import pprint 
 import argparse
 import requests
-#import cv2
+import glob
+import cv2
 from psychopy import visual, event, core, iohub, monitors
 from itertools import product, compress
 from sklearn.utils import shuffle
 from collections import OrderedDict
+from PIL import Image
 
 
 ## Thank yoooouuu Remy
@@ -103,6 +105,7 @@ color_gray = [0,0,0]
 color_cyan = [0,1,1]
 color_green = [0,1,0]
 color_red = [1,0,0]
+color_blue = [0,0,1]
 
 # Timings
 event_times = OrderedDict([
@@ -110,6 +113,30 @@ event_times = OrderedDict([
 	('sec_delay',	1),  
 	('sec_probe',	2),  
 	('sec_iti', 	1)])
+
+# Import fractals
+x_data = []
+files = glob.glob("stimuli/grayscale/*.png") 
+for myFile in files: 
+	image = cv2.imread(myFile)
+	x_data.append(image)
+
+img_list = glob.glob("stimuli/grayscale/*.png")
+
+stim_dict = { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=win,
+     ... image=fn) for fn in glob.glob("stimuli/grayscale/*.png") }
+
+for imagename in os.listdir("stimuli/grayscale/"): 
+	if imagename.endswith(".png"): 
+		imagename[-6:-4] = Image.open(imagename)
+
+df['topFracFname'] = [ img_list[]]
+imgStims = {
+	'top': visual.ImageStim(win, pos = [0, +10]), 
+	'mid': visual.ImageStim(win, pos = [0, 0]),
+	'bot': visual.ImageStim(win, pos = [0, -10])
+}
+# Call by imgStims['top'], etc
 
 # Debugging mode
 if debug == True: 
@@ -683,7 +710,7 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 
 
 def resetTrial(): 
-	text.color = color_black
+	text.color = color_blue
 	text.size = 40.0
 	grating_top.color = color_white
 	grating_mid.color = color_white
@@ -845,7 +872,7 @@ def iti():
 	text = visual.TextStim(
 		win=win, 
 		text="+", 
-		color=color_black, 
+		color=color_blue, 
 		height = 40.0)
 	clear()
 	duration = event_times['sec_iti']
