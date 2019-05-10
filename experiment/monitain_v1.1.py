@@ -115,27 +115,24 @@ event_times = OrderedDict([
 	('sec_iti', 	1)])
 
 # Import fractals
-x_data = []
-files = glob.glob("stimuli/grayscale/*.png") 
-for myFile in files: 
-	image = cv2.imread(myFile)
-	x_data.append(image)
+# x_data = []
+# files = glob.glob("stimuli/grayscale/*.png") 
+# for myFile in files: 
+# 	image = cv2.imread(myFile)
+# 	x_data.append(image)
 
-img_list = glob.glob("stimuli/grayscale/*.png")
 
-stim_dict = { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=win,
-     ... image=fn) for fn in glob.glob("stimuli/grayscale/*.png") }
 
-for imagename in os.listdir("stimuli/grayscale/"): 
-	if imagename.endswith(".png"): 
-		imagename[-6:-4] = Image.open(imagename)
+# for imagename in os.listdir("stimuli/grayscale/"): 
+# 	if imagename.endswith(".png"): 
+# 		imagename[-6:-4] = Image.open(imagename)
 
-df['topFracFname'] = [ img_list[]]
-imgStims = {
-	'top': visual.ImageStim(win, pos = [0, +10]), 
-	'mid': visual.ImageStim(win, pos = [0, 0]),
-	'bot': visual.ImageStim(win, pos = [0, -10])
-}
+# df['topFracFname'] = [ img_list[]]
+# imgStims = {
+# 	'top': visual.ImageStim(win, pos = [0, +10]), 
+# 	'mid': visual.ImageStim(win, pos = [0, 0]),
+# 	'bot': visual.ImageStim(win, pos = [0, -10])
+# }
 # Call by imgStims['top'], etc
 
 # Debugging mode
@@ -238,8 +235,10 @@ possible_thetas = np.linspace(0,180, 18, endpoint=False) # Possible orientations
 
 #possible_thetas = possible_thetas[~np.isin(possible_thetas[0,90])]
 
-possible_thetas = np.array([10, 20, 30, 40, 50, 60, 70, 80,
-	100, 110, 120, 130, 140, 150, 160, 170])
+# possible_thetas = np.array([10, 20, 30, 40, 50, 60, 70, 80,
+# 	100, 110, 120, 130, 140, 150, 160, 170])
+
+possible_thetas = np.array(range(1,21))
 
 np.random.choice(possible_thetas)
 
@@ -250,12 +249,12 @@ def pickTheta(x):
 
 df['targTheta'] = df.targTheta.apply(pickTheta)
 
-possible_thetas = np.linspace(0,180, 18, endpoint=False)
+# possible_thetas = np.linspace(0,180, 18, endpoint=False)
 
-possible_thetas = [10, 20, 30, 40, 50, 60, 70, 80, 
-	100, 110, 120, 130, 140, 150, 160, 170]
+# possible_thetas = [10, 20, 30, 40, 50, 60, 70, 80, 
+# 	100, 110, 120, 130, 140, 150, 160, 170]
 
-np.random.choice(possible_thetas)
+# np.random.choice(possible_thetas)
 
 catch_range = range(LOWER_CATCH_TRIAL, UPPER_CATCH_TRIAL+ 1)
 
@@ -430,50 +429,87 @@ instructImage = visual.ImageStim(
 	)
 
 # Shared grating parameters
-grating_size = [150, 150]
-grating_sf = 5.0 / 80.0
-grating_contrast = 1.0
+# grating_size = [150, 150]
+# grating_sf = 5.0 / 80.0
+# grating_contrast = 1.0
 
-# Grating set up 
-grating_top = visual.GratingStim(
-	win = win,
-	mask = "circle",
-	units="pix", 
-	pos = [0, 150],
-	size=grating_size, 
-	sf = 5.0 / 80.0,
-	contrast = grating_contrast
-	) 
+# # Grating set up 
+# grating_top = visual.GratingStim(
+# 	win = win,
+# 	mask = "circle",
+# 	units="pix", 
+# 	pos = [0, 150],
+# 	size=grating_size, 
+# 	sf = 5.0 / 80.0,
+# 	contrast = grating_contrast
+# 	) 
 
-grating_mid = visual.GratingStim(
-	win = win,
-	mask = "circle",
-	units="pix", 
-	pos = [0, 0],
-	size=grating_size, 
-	sf = grating_sf,
-	contrast = grating_contrast
-	) 
+# grating_mid = visual.GratingStim(
+# 	win = win,
+# 	mask = "circle",
+# 	units="pix", 
+# 	pos = [0, 0],
+# 	size=grating_size, 
+# 	sf = grating_sf,
+# 	contrast = grating_contrast
+# 	) 
 
-grating_bot = visual.GratingStim(
-	win = win,
-	mask = "circle",
-	units="pix", 
-	pos = [0,-150],
-	size=grating_size, 
-	sf = grating_sf,
-	contrast = grating_contrast
-	) 
+# grating_bot = visual.GratingStim(
+# 	win = win,
+# 	mask = "circle",
+# 	units="pix", 
+# 	pos = [0,-150],
+# 	size=grating_size, 
+# 	sf = grating_sf,
+# 	contrast = grating_contrast
+# 	) 
 
-grating_ypos = [-150, 150]  ## need to change
+# grating_ypos = [-150, 150]  ## need to change
+
+fractal_size = [128, 128] #default that they came at 
+
+fractal_top = visual.ImageStim(
+	win = win, 
+	#image = ,  
+	mask = "circle", 
+	units = "pix", 
+	pos = [0, 150], 
+	size = fractal_size
+	)
+
+fractal_mid = visual.ImageStim(
+	win = win, 
+	mask = "circle", 
+	units = "pix", 
+	pos = [0, 0], 
+	size = fractal_size)
+
+fractal_bot = visual.ImageStim(
+	win = win, 
+	mask = "circle", 
+	units = "pix", 
+	pos = [0, -150], 
+	size = fractal_size)
 
 # Text set up 
 text = visual.TextStim(
 	win=win, 
-	color=color_black, 
+	color=color_blue, 
 	height=40.0, 
 	font = 'Calibri'
 	)
+
+# Import images
+img_list = glob.glob("stimuli/grayscale/*.png")
+
+stim_dict = { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=win, image=fn)\
+	for fn in glob.glob("stimuli/grayscale/*.png") }
+
+# Set image to draw
+fractal_top.image = stim_dict['frac_15'].image
+fractal_top.draw()
+win.flip()
+
 
 
 
@@ -495,6 +531,17 @@ def twoGratings(trial_i, probe_n):
 	grating_bot.ori = df.iloc[trial_i, df.columns.get_loc('botTheta{:d}'.format(probe_n))]
 	print 'gratingBot', grating_bot.ori
 	grating_bot.draw()
+
+def twoFractals(trial_i, probe_n): 
+	topLoc = 'frac_{:d}'.format(df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))])
+	fractal_top.image = stim_dict[topLoc].image
+	print 'fractalTop', fractal_top.image
+	fractal_top.draw()
+
+	botLoc = 'frac_{:d}'.format(df.iloc[trial_i, df.columns.get_loc('botTheta{:d}'.format(probe_n))])
+	fractal_bot.image = stim_dict[botLoc].image
+	print 'fractalBot', fractal_bot.image
+	fractal_bot.draw()	
 
 
 def clear(): 

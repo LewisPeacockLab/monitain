@@ -1,4 +1,4 @@
-Last login: Thu May  9 11:26:37 on ttys001
+stLast login: Thu May  9 11:26:37 on ttys001
 dhcp-128-83-192-116:~ krh2382$ cd monitain/experiment
 dhcp-128-83-192-116:experiment krh2382$ ipython
 Python 2.7.14 |Anaconda, Inc.| (default, Dec  7 2017, 11:07:58) 
