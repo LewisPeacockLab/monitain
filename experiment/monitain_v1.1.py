@@ -99,13 +99,13 @@ SLACK = dict(
 	)
 
 # Colors
-color_white = [1,1,1]
-color_black = [-1,-1,-1]
-color_gray = [0,0,0]
-color_cyan = [0,1,1]
-color_green = [0,1,0]
-color_red = [1,0,0]
-color_blue = [0,0,1]
+color_white = [255,255, 255] #[1,1,1]
+color_black = [0,0,0] #[-1,-1,-1]
+color_gray = [128,128,128] #[0,0,0]
+color_cyan = [0,255,255] #[0,1,1]
+color_green = [0,255,0] #[0,1,0]
+color_red = [255,0,0] #[1,0,0]
+color_blue = [0,0,255]
 
 # Timings
 event_times = OrderedDict([
@@ -114,7 +114,7 @@ event_times = OrderedDict([
 	('sec_probe',	2),  
 	('sec_iti', 	1)])
 
-# Import fractals
+# Import stims
 # x_data = []
 # files = glob.glob("stimuli/grayscale/*.png") 
 # for myFile in files: 
@@ -414,6 +414,7 @@ mon.setSizePix(SCREENS[scrn]['pixel_dims'])
 # Window set up
 win = visual.Window(
 	monitor=mon,
+	colorSpace = 'rgb255', 
 	#size=[1024,576], #Small size of screen for testing it out
 	units="pix", 
 	fullscr=False, #set to True when running for real
@@ -428,47 +429,47 @@ instructImage = visual.ImageStim(
 	size = win.size/2 
 	)
 
-# Shared grating parameters
-# grating_size = [150, 150]
-# grating_sf = 5.0 / 80.0
-# grating_contrast = 1.0
+# Shared stims parameters
+# stims_size = [150, 150]
+# stims_sf = 5.0 / 80.0
+# stims_contrast = 1.0
 
-# # Grating set up 
-# grating_top = visual.GratingStim(
+# # stims set up 
+# stim_top = visual.stimsStim(
 # 	win = win,
 # 	mask = "circle",
 # 	units="pix", 
 # 	pos = [0, 150],
-# 	size=grating_size, 
+# 	size=stims_size, 
 # 	sf = 5.0 / 80.0,
-# 	contrast = grating_contrast
+# 	contrast = stims_contrast
 # 	) 
 
-# grating_mid = visual.GratingStim(
+# stim_mid = visual.stimsStim(
 # 	win = win,
 # 	mask = "circle",
 # 	units="pix", 
 # 	pos = [0, 0],
-# 	size=grating_size, 
-# 	sf = grating_sf,
-# 	contrast = grating_contrast
+# 	size=stims_size, 
+# 	sf = stims_sf,
+# 	contrast = stims_contrast
 # 	) 
 
-# grating_bot = visual.GratingStim(
+# stim_bot = visual.stimsStim(
 # 	win = win,
 # 	mask = "circle",
 # 	units="pix", 
 # 	pos = [0,-150],
-# 	size=grating_size, 
-# 	sf = grating_sf,
-# 	contrast = grating_contrast
+# 	size=stims_size, 
+# 	sf = stims_sf,
+# 	contrast = stims_contrast
 # 	) 
 
-# grating_ypos = [-150, 150]  ## need to change
+# stims_ypos = [-150, 150]  ## need to change
 
 fractal_size = [128, 128] #default that they came at 
 
-fractal_top = visual.ImageStim(
+stim_top = visual.ImageStim(
 	win = win, 
 	#image = ,  
 	mask = "circle", 
@@ -477,14 +478,14 @@ fractal_top = visual.ImageStim(
 	size = fractal_size
 	)
 
-fractal_mid = visual.ImageStim(
+stim_mid = visual.ImageStim(
 	win = win, 
 	mask = "circle", 
 	units = "pix", 
 	pos = [0, 0], 
 	size = fractal_size)
 
-fractal_bot = visual.ImageStim(
+stim_bot = visual.ImageStim(
 	win = win, 
 	mask = "circle", 
 	units = "pix", 
@@ -505,12 +506,6 @@ img_list = glob.glob("stimuli/grayscale/*.png")
 stim_dict = { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=win, image=fn)\
 	for fn in glob.glob("stimuli/grayscale/*.png") }
 
-# Set image to draw
-fractal_top.image = stim_dict['frac_15'].image
-fractal_top.draw()
-win.flip()
-
-
 
 
 ####################################
@@ -524,24 +519,24 @@ def wordOrNonword(trial_i, probe_n):
 		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
 
 
-def twoGratings(trial_i, probe_n): 
-	grating_top.ori = df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))]
-	print 'gratingTop', grating_top.ori
-	grating_top.draw()
-	grating_bot.ori = df.iloc[trial_i, df.columns.get_loc('botTheta{:d}'.format(probe_n))]
-	print 'gratingBot', grating_bot.ori
-	grating_bot.draw()
+# def twoGratings(trial_i, probe_n): 
+# 	stim_top.ori = df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))]
+# 	print 'stimsTop', stim_top.ori
+# 	stim_top.draw()
+# 	stim_bot.ori = df.iloc[trial_i, df.columns.get_loc('botTheta{:d}'.format(probe_n))]
+# 	print 'stimsBot', stim_bot.ori
+# 	stim_bot.draw()
 
-def twoFractals(trial_i, probe_n): 
+def twoStims(trial_i, probe_n): 
 	topLoc = 'frac_{:d}'.format(df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))])
-	fractal_top.image = stim_dict[topLoc].image
-	print 'fractalTop', fractal_top.image
-	fractal_top.draw()
+	stim_top.image = stim_dict[topLoc].image
+	print 'fractalTop', stim_top.image
+	stim_top.draw()
 
 	botLoc = 'frac_{:d}'.format(df.iloc[trial_i, df.columns.get_loc('botTheta{:d}'.format(probe_n))])
-	fractal_bot.image = stim_dict[botLoc].image
-	print 'fractalBot', fractal_bot.image
-	fractal_bot.draw()	
+	stim_bot.image = stim_dict[botLoc].image
+	print 'fractalBot', stim_bot.image
+	stim_bot.draw()	
 
 
 def clear(): 
@@ -561,7 +556,7 @@ def pressSpace():
 				return 
 			
 
-def getResp(trial_i, probe_n, block, gratingDraw): 
+def getResp(trial_i, probe_n, block, stimDraw): 
 	allResp = []
 	responded = False
 	duration = event_times['sec_probe']
@@ -572,12 +567,12 @@ def getResp(trial_i, probe_n, block, gratingDraw):
 	#accPos = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
 
 	while clock.getTime() < duration: 
-		if gratingDraw == True: 
-			grating_top.autoDraw = True
-			grating_bot.autoDraw = True
+		if stimDraw == True: 
+			stim_top.autoDraw = True
+			stim_bot.autoDraw = True
 		else: 
-			grating_top.autoDraw = False
-			grating_top.autoDraw = False
+			stim_top.autoDraw = False
+			stim_top.autoDraw = False
 
 		if responded == False : 
 			for key, rt in event.getKeys(timeStamped=clock):
@@ -617,9 +612,9 @@ def getResp(trial_i, probe_n, block, gratingDraw):
 
 				elif (firstKey == '3') and ((block != 2) and (block != 3)): 
 					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
-					grating_top.color = color_red
-					grating_bot.color = color_red
-					twoGratings(trial_i, probe_n)
+					stim_top.color = color_red
+					stim_bot.color = color_red
+					twoStims(trial_i, probe_n)
 					text.draw()
 					win.flip()
 
@@ -633,16 +628,16 @@ def getResp(trial_i, probe_n, block, gratingDraw):
 				df.at[trial_i, 'rtProbe{:d}'.format(probe_n)] = allResp[1] #first rt
 				print df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))], 'acc'
 	else: 
-		grating_top.autoDraw = False
-		grating_bot.autoDraw = False
+		stim_top.autoDraw = False
+		stim_bot.autoDraw = False
 		lastProbe = False
 
 	#print 'accPos', accPos, 'probe_n', probe_n
 	#print ''
-	#grating.autoDraw = False #change to false after done
+	#stims.autoDraw = False #change to false after done
 
 
-def getResp_targ(trial_i, probe_n, block, gratingDraw): 	
+def getResp_targ(trial_i, probe_n, block, stimDraw): 	
 	allResp = []
 	responded = False
 	duration = event_times['sec_probe']
@@ -651,12 +646,12 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 		responded = True
 
 	while clock.getTime() < duration: 
-		if gratingDraw == True: 
-			grating_top.autoDraw = True
-			grating_bot.autoDraw = True
+		if stimDraw == True: 
+			stim_top.autoDraw = True
+			stim_bot.autoDraw = True
 		else: 
-			grating_top.autoDraw = False
-			grating_top.autoDraw = False
+			stim_top.autoDraw = False
+			stim_top.autoDraw = False
 
 		if (block == 2) or (block == 3): 
 			keysPossible = (keyList_target + keyList_nontarget)
@@ -676,17 +671,17 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 				firstKey = allResp[0]
 				if firstKey in keysPossible: 
 					text.draw()
-					#grating_top.color = color_cyan
-					#grating_bot.color = color_cyan
-					#twoGratings(trial_i, probe_n)
+					#stim_top.color = color_cyan
+					#stim_bot.color = color_cyan
+					#twoStims(trial_i, probe_n)
 					#win.flip()
 					if (firstKey == '3'): 
 						if ((((block == 2) or (block == 3)) and (targNoTarg == 1)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))): 
 							#picked target, correct
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
-							grating_top.color = color_green
-							grating_bot.color = color_green
-							twoGratings(trial_i, probe_n)
+							stim_top.color = color_green
+							stim_bot.color = color_green
+							twoStims(trial_i, probe_n)
 							win.flip()						
 							#print 'correct, target present'
 							#text.color = color_green
@@ -696,9 +691,9 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 						elif ((((block == 2) or (block == 3)) and (targNoTarg == 0)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))): #picked target, correct
 							#picked target, incorrect
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
-							grating_top.color = color_red
-							grating_bot.color = color_red
-							twoGratings(trial_i, probe_n)
+							stim_top.color = color_red
+							stim_bot.color = color_red
+							twoStims(trial_i, probe_n)
 							win.flip()							
 							#print 'incorrect, target not present'
 							#text.color = color_red
@@ -710,9 +705,9 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 						if ((((block == 2) or (block == 3)) and (targNoTarg == 0)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))):
 							#picked no target, correct
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
-							grating_top.color = color_green
-							grating_bot.color = color_green
-							twoGratings(trial_i, probe_n)
+							stim_top.color = color_green
+							stim_bot.color = color_green
+							twoStims(trial_i, probe_n)
 							win.flip()							
 							#print 'correct, target not present'
 							#text.color = color_green
@@ -722,9 +717,9 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 						elif ((((block == 2) or (block == 3)) and (targNoTarg == 1)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))):
 							#picked no target, incorrect
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
-							grating_top.color = color_red
-							grating_bot.color = color_red
-							twoGratings(trial_i, probe_n)
+							stim_top.color = color_red
+							stim_bot.color = color_red
+							twoStims(trial_i, probe_n)
 							win.flip()				
 							#print 'incorrect, target present'
 							#text.color = color_red
@@ -750,18 +745,18 @@ def getResp_targ(trial_i, probe_n, block, gratingDraw):
 				print df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))], 'acc'
 				df.iloc[trial_i, df.columns.get_loc('pm_acc')] = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
 	else: 
-		grating_top.autoDraw = False
-		grating_bot.autoDraw = False
+		stim_top.autoDraw = False
+		stim_bot.autoDraw = False
 
-	#grating.autoDraw = False #change to false after done
+	#stims.autoDraw = False #change to false after done
 
 
 def resetTrial(): 
 	text.color = color_blue
 	text.size = 40.0
-	grating_top.color = color_white
-	grating_mid.color = color_white
-	grating_bot.color = color_white
+	stim_top.color = color_white
+	stim_mid.color = color_white
+	stim_bot.color = color_white
 
 
 def breakMessage(block):
@@ -857,19 +852,19 @@ def ogOnly(trial_i, probe_n):
 	text.draw()
 	win.flip()
 	clear()
-	getResp(trial_i, probe_n, block, gratingDraw = False)
+	getResp(trial_i, probe_n, block, stimDraw = False)
 	resetTrial()
 
 
 def target(trial_i):
 	win.color = color_white
 	win.flip()	
-	grating_mid.pos = [0.0,0.0] 
-	grating_mid.ori = df.iloc[trial_i, df.columns.get_loc('targTheta')] ## Change everytime
-	print grating_mid.ori 
-	#grating_mid.sf = 5.0 / 80.0
-	#grating_mid.contrast = 1.0
-	grating_mid.draw()
+	stim_mid.pos = [0.0,0.0] 
+	stim_mid.ori = df.iloc[trial_i, df.columns.get_loc('targTheta')] ## Change everytime
+	print stim_mid.ori 
+	#stim_mid.sf = 5.0 / 80.0
+	#stim_mid.contrast = 1.0
+	stim_mid.draw()
 	win.flip() 
 	core.wait(event_times['sec_target'])
 
@@ -885,11 +880,11 @@ def OGnPMprobe(trial_i, probe_n):
 	win.color = color_gray
 	wordOrNonword(trial_i, probe_n)
 	text.draw()
-	grating_top.draw()
-	grating_bot.draw()
+	stim_top.draw()
+	stim_bot.draw()
 	win.flip()
 	clear()
-	getResp(trial_i, probe_n, block, gratingDraw = True)
+	getResp(trial_i, probe_n, block, stimDraw = True)
 	resetTrial()
 
 
@@ -901,20 +896,20 @@ def targetProbe(trial_i, probe_n, block, lastProbe):
 	if (block == 2) or (block == 3): 
 		text.text = ''	
 	text.draw()
-	twoGratings(trial_i, probe_n)
+	twoStims(trial_i, probe_n)
 	win.flip()
 	clear()
 	if lastProbe == True: 
-		getResp_targ(trial_i, probe_n, block, gratingDraw = True)
+		getResp_targ(trial_i, probe_n, block, stimDraw = True)
 	elif lastProbe == False: 
-		getResp(trial_i, probe_n, block, gratingDraw = True)
+		getResp(trial_i, probe_n, block, stimDraw = True)
 	lastProbe = False
 	resetTrial()
 
 
 def iti(): 
-	grating_top.autoDraw = False
-	grating_bot.autoDraw = False
+	stim_top.autoDraw = False
+	stim_bot.autoDraw = False
 	win.flip()
 	text = visual.TextStim(
 		win=win, 
