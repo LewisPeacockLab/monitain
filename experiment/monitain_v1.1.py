@@ -420,6 +420,7 @@ win = visual.Window(
 	fullscr=False, #set to True when running for real
 	)
 
+
 # Images for instructions
 
 windowSize = win.size
