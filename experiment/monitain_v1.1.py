@@ -869,7 +869,7 @@ def target(trial_i):
 	win.color = color_white
 	win.flip()	
 	stim_mid.pos = [0.0,0.0] 
-	stim_mid.ori = df.iloc[trial_i, df.columns.get_loc('targTheta')] ## Change everytime
+	stim_mid.image = stim_dict['frac_{:d}'.format(df.iloc[trial_i, df.columns.get_loc('targTheta')])].image ## Change everytime
 	print stim_mid.ori 
 	#stim_mid.sf = 5.0 / 80.0
 	#stim_mid.contrast = 1.0
@@ -923,7 +923,7 @@ def iti():
 	text = visual.TextStim(
 		win=win, 
 		text="+", 
-		color=color_blue, 
+		color=color_black, 
 		height = 40.0)
 	clear()
 	duration = event_times['sec_iti']
@@ -968,23 +968,24 @@ for trial_i in range(N_TOTAL_TRIALS):
 		df.to_csv(full_filename)
 
 	##BASELINE
-	if block == 1: 
-		#print 'baseline1', trial_i
-	 	probe_n = 0
-	 	#ogOnly(trial_i, probe_n)
-	 	targetProbe(trial_i, probe_n, block, lastProbe = False)
-	 	targetProbe
-	 	resetTrial()
+	# if block == 1: 
+	# 	#print 'baseline1', trial_i
+	#  	probe_n = 0
+	#  	#ogOnly(trial_i, probe_n)
+	#  	targetProbe(trial_i, probe_n, block, lastProbe = False)
+	#  	targetProbe
+	#  	resetTrial()
 
 	##MAINTAIN
-	elif block == 2: 
+	if block == 2: 
 		#print 'maintain1',trial_i
 		target(trial_i)
 		delay()
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 		for probe_n in range(probeInTrial-1): ## Change to maintain block length 
 			#print 'probe',probe_n
-			ogOnly(trial_i, probe_n)
+			#ogOnly(trial_i, probe_n)
+			targetProbe(trial_i, probe_n, block, lastProbe = False)
 		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
 		iti()
 		resetTrial()
