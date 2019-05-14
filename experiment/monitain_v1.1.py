@@ -101,7 +101,7 @@ SLACK = dict(
 # Colors
 color_white = [255,255, 255] #[1,1,1]
 color_black = [0,0,0] #[-1,-1,-1]
-color_gray = [128,128,128] #[0,0,0]
+color_gray = [112,128,144] #[0,0,0]
 color_cyan = [0,255,255] #[0,1,1]
 color_green = [0,255,0] #[0,1,0]
 color_red = [255,0,0] #[1,0,0]
@@ -475,7 +475,6 @@ fractal_size = [128, 128] #default that they came at
 
 stim_top = visual.ImageStim(
 	win = win, 
-	#image = , 
 	colorSpace = 'rgb255', 
 	mask = "circle", 
 	units = "pix", 
@@ -489,7 +488,8 @@ stim_mid = visual.ImageStim(
 	mask = "circle", 
 	units = "pix", 
 	pos = [0, 0], 
-	size = fractal_size)
+	size = fractal_size
+	)
 
 stim_bot = visual.ImageStim(
 	win = win, 
@@ -497,7 +497,8 @@ stim_bot = visual.ImageStim(
 	mask = "circle", 
 	units = "pix", 
 	pos = [0, -150], 
-	size = fractal_size)
+	size = fractal_size
+	)
 
 # Text set up 
 text = visual.TextStim(
@@ -946,6 +947,8 @@ win.flip()
 for start_slide in range(1,6): ##change later based on slides
 	presentSlides(start_slide)
 
+win.color = color_gray
+win.flip()
 
 for trial_i in range(N_TOTAL_TRIALS): 
 
@@ -968,7 +971,9 @@ for trial_i in range(N_TOTAL_TRIALS):
 	if block == 1: 
 		#print 'baseline1', trial_i
 	 	probe_n = 0
-	 	ogOnly(trial_i, probe_n)
+	 	#ogOnly(trial_i, probe_n)
+	 	targetProbe(trial_i, probe_n, block, lastProbe = False)
+	 	targetProbe
 	 	resetTrial()
 
 	##MAINTAIN
