@@ -581,7 +581,7 @@ def getResp(trial_i, probe_n, block, stimDraw):
 				allResp += key, rt				
 				#responded = True 
 				#print df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))]
-				firstKey = allResp[0]
+				firstKey = allResp[0] 
 				if firstKey in keyList_word: 
 					#text.color = color_cyan #flip text to blue if input taken
 					#text.draw()
@@ -589,34 +589,30 @@ def getResp(trial_i, probe_n, block, stimDraw):
 			
 					if (firstKey == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'word'): #picked word, correct
 						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
-						text.color = color_cyan
+						text.color = color_green
 						text.draw()
 						win.flip()
-						print text.color
 						print 'correct'
 					elif (firstKey == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'word'): #picked word, incorrect
 						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 						text.color = color_red
 						text.draw()
 						win.flip()
-						print text.color
 						print 'incorrect'
 					elif (firstKey == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword'): #picked nonword, correct
 						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
 						text.color = color_green
 						text.draw()
 						win.flip()
-						print text.color
 						print 'correct'
 					elif (firstKey == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'nonword'): #picked nonword, incorrect
 						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 						text.color = color_red
 						text.draw()
 						win.flip()
-						print text.color
 						print 'incorrect'
 
-				elif (firstKey == '3') and ((block != 2) and (block != 3)): 
+				elif (firstKey == '3') and ((block != 1) and (block != 8) and (block != 2) and (block != 3)): 
 					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 					stim_top.color = color_red
 					stim_bot.color = color_red
