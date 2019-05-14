@@ -378,8 +378,11 @@ for i in range(N_TOTAL_TRIALS):
 						top_theta = np.random.choice(possible_thetas_minusTarg)
 						bot_theta = memTarg
 				elif (currentBlock == 1) or (currentBlock == 8): #baseline
-						top_theta = np.nan
-						bot_theta = np.nan
+						top_theta = np.random.choice(possible_thetas)
+						bot_theta = np.random.choice(possible_thetas)
+
+						#top_theta = np.nan
+						#bot_theta = np.nan
 				else: 
 					raise Warning('uh oh')
 		else: 
@@ -520,7 +523,6 @@ def wordOrNonword(trial_i, probe_n):
 	elif df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword': 
 		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
 
-
 # def twoGratings(trial_i, probe_n): 
 # 	stim_top.ori = df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))]
 # 	print 'stimsTop', stim_top.ori
@@ -530,13 +532,13 @@ def wordOrNonword(trial_i, probe_n):
 # 	stim_bot.draw()
 
 def twoStims(trial_i, probe_n): 
-	topLoc = 'frac_{:d}'.format(df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))])
-	stim_top.image = stim_dict[topLoc].image
+	topLoc = int(df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))])
+	stim_top.image = stim_dict['frac_{:d}'.format(topLoc)].image
 	print 'fractalTop', stim_top.image
 	stim_top.draw()
 
-	botLoc = 'frac_{:d}'.format(df.iloc[trial_i, df.columns.get_loc('botTheta{:d}'.format(probe_n))])
-	stim_bot.image = stim_dict[botLoc].image
+	botLoc = int(df.iloc[trial_i, df.columns.get_loc('botTheta{:d}'.format(probe_n))])
+	stim_bot.image = stim_dict['frac_{:d}'.format(botLoc)].image
 	print 'fractalBot', stim_bot.image
 	stim_bot.draw()	
 
@@ -852,6 +854,7 @@ def ogOnly(trial_i, probe_n):
 	win.color = color_gray
 	wordOrNonword(trial_i, probe_n)
 	text.draw()
+	twoStims(trial_i, probe_n)
 	win.flip()
 	clear()
 	getResp(trial_i, probe_n, block, stimDraw = False)
