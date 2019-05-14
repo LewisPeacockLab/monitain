@@ -475,7 +475,8 @@ fractal_size = [128, 128] #default that they came at
 
 stim_top = visual.ImageStim(
 	win = win, 
-	#image = ,  
+	#image = , 
+	colorSpace = 'rgb255', 
 	mask = "circle", 
 	units = "pix", 
 	pos = [0, 150], 
@@ -484,6 +485,7 @@ stim_top = visual.ImageStim(
 
 stim_mid = visual.ImageStim(
 	win = win, 
+	colorSpace = 'rgb255', 
 	mask = "circle", 
 	units = "pix", 
 	pos = [0, 0], 
@@ -491,6 +493,7 @@ stim_mid = visual.ImageStim(
 
 stim_bot = visual.ImageStim(
 	win = win, 
+	colorSpace = 'rgb255', 
 	mask = "circle", 
 	units = "pix", 
 	pos = [0, -150], 
