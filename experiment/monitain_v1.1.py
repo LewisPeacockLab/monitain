@@ -101,7 +101,7 @@ SLACK = dict(
 # Colors
 color_white = [255,255, 255] #[1,1,1]
 color_black = [0,0,0] #[-1,-1,-1]
-color_gray = [112,128,144] #[0,0,0]
+color_gray = [85,85,85] #[0,0,0]
 color_cyan = [0,255,255] #[0,1,1]
 color_green = [0,255,0] #[0,1,0]
 color_red = [255,0,0] #[1,0,0]
