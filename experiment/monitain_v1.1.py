@@ -902,8 +902,8 @@ def targetProbe(trial_i, probe_n, block, lastProbe):
 	win.flip()
 	win.color = color_gray
 	wordOrNonword(trial_i, probe_n)
-	if (block == 2) or (block == 3): 
-		text.text = ''	
+	#if (block == 2) or (block == 3): 
+	#	text.text = ''	
 	text.draw()
 	twoStims(trial_i, probe_n)
 	win.flip()
@@ -922,6 +922,7 @@ def iti():
 	win.flip()
 	text = visual.TextStim(
 		win=win, 
+		colorSpace = 'rgb255',
 		text="+", 
 		color=color_black, 
 		height = 40.0)
