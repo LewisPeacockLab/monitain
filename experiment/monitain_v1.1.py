@@ -517,7 +517,7 @@ circle_bot = visual.Circle(
 # Text set up 
 text = visual.TextStim(
 	win=win, 
-	color=color_blue, 
+	color=color_cyan, 
 	colorSpace = 'rgb255',
 	height=40.0, 
 	font = 'Calibri'
@@ -752,7 +752,7 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 
 				elif (firstKey == '1') or (firstKey == '2'): 
 					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
-					text.color = color_cyan
+					text.color = color_blue
 					text.draw()
 					win.flip()
 
@@ -779,7 +779,7 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 
 
 def resetTrial(): 
-	text.color = color_blue
+	text.color = color_cyan
 	text.size = 40.0
 	#stim_top.color = color_white
 	#stim_mid.color = color_white
