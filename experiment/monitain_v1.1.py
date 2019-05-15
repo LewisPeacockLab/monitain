@@ -964,13 +964,13 @@ slack_msg = 'Starting experiment'
 slackMessage(1, slack_msg)
 
 # Starting instruction slides
-# win.color = color_black
-# win.flip()
-# for start_slide in range(1,6): ##change later based on slides
-# 	presentSlides(start_slide)
+win.color = color_black
+win.flip()
+for start_slide in range(1,6): ##change later based on slides
+	presentSlides(start_slide)
 
-# win.color = color_gray
-# win.flip()
+win.color = color_gray
+win.flip()
 
 for trial_i in range(N_TOTAL_TRIALS): 
 
