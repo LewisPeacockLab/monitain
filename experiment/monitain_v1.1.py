@@ -636,6 +636,10 @@ def getResp(trial_i, probe_n, block, stimDraw):
 					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 					#stim_top.color = color_red
 					#stim_bot.color = color_red
+					circle_top.color = 'red'
+					circle_bot.color = 'red'
+					circle_top.draw()
+					circle_bot.draw()
 					twoStims(trial_i, probe_n)
 					text.draw()
 					win.flip()
@@ -985,17 +989,17 @@ for trial_i in range(N_TOTAL_TRIALS):
 		slackMessage(block, slack_msg)
 		df.to_csv(full_filename)
 
-	# ## BASELINE
-	# if block == 1: 
-	# 	#print 'baseline1', trial_i
-	#  	probe_n = 0
-	#  	#ogOnly(trial_i, probe_n)
-	#  	targetProbe(trial_i, probe_n, block, lastProbe = False)
-	#  	targetProbe
-	#  	resetTrial()
+	## BASELINE
+	if block == 1: 
+		#print 'baseline1', trial_i
+	 	probe_n = 0
+	 	#ogOnly(trial_i, probe_n)
+	 	targetProbe(trial_i, probe_n, block, lastProbe = False)
+	 	#targetProbe
+	 	resetTrial()
 
 	## MAINTAIN
-	if block == 2: 
+	elif block == 2: 
 		#print 'maintain1',trial_i
 		target(trial_i)
 		delay()
@@ -1072,6 +1076,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		#print 'baseline 2', trial_i
 		probe_n = 0
 		ogOnly(trial_i, probe_n)
+		targetProbe(trial_i, probe_n, block, lastProbe = False)
 
 	#else: 
 	#	raise Warning('yikes, part 2')
