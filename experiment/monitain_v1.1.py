@@ -778,7 +778,9 @@ def breakMessage(block):
 
 	text.text = breakText
 	text.height=40.0
+	text.color = color_white
 	text.draw()
+	win.color = color_black
 	win.flip()
 
 	pressContinue = False
@@ -973,65 +975,65 @@ for trial_i in range(N_TOTAL_TRIALS):
 		slackMessage(block, slack_msg)
 		df.to_csv(full_filename)
 
-	##BASELINE
-	# if block == 1: 
-	# 	#print 'baseline1', trial_i
-	#  	probe_n = 0
-	#  	#ogOnly(trial_i, probe_n)
-	#  	targetProbe(trial_i, probe_n, block, lastProbe = False)
-	#  	targetProbe
-	#  	resetTrial()
+	## BASELINE
+	if block == 1: 
+		#print 'baseline1', trial_i
+	 	probe_n = 0
+	 	#ogOnly(trial_i, probe_n)
+	 	targetProbe(trial_i, probe_n, block, lastProbe = False)
+	 	targetProbe
+	 	resetTrial()
 
-	# ##MAINTAIN
-	# elif block == 2: 
-	# 	#print 'maintain1',trial_i
-	# 	target(trial_i)
-	# 	delay()
-	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-	# 	for probe_n in range(probeInTrial-1): ## Change to maintain block length 
-	# 		#print 'probe',probe_n
-	# 		#ogOnly(trial_i, probe_n)
-	# 		targetProbe(trial_i, probe_n, block, lastProbe = False)
-	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
-	# 	iti()
-	# 	resetTrial()
+	## MAINTAIN
+	elif block == 2: 
+		#print 'maintain1',trial_i
+		target(trial_i)
+		delay()
+		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+		for probe_n in range(probeInTrial-1): ## Change to maintain block length 
+			#print 'probe',probe_n
+			#ogOnly(trial_i, probe_n)
+			targetProbe(trial_i, probe_n, block, lastProbe = False)
+		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
+		iti()
+		resetTrial()
 
-	# elif block == 3: 
-	# 	#print 'maintain2',trial_i
-	# 	target(trial_i)
-	# 	delay()
-	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-	# 	for probe_n in range(probeInTrial-1): ## Change to maintain block length 
-	# 		#print 'probe',probe_n
-	# 		#ogOnly(trial_i, probe_n)
-	# 		targetProbe(trial_i, probe_n, block, lastProbe = False)
-	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
-	# 	iti()
-	# 	resetTrial()
+	elif block == 3: 
+		#print 'maintain2',trial_i
+		target(trial_i)
+		delay()
+		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+		for probe_n in range(probeInTrial-1): ## Change to maintain block length 
+			#print 'probe',probe_n
+			#ogOnly(trial_i, probe_n)
+			targetProbe(trial_i, probe_n, block, lastProbe = False)
+		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
+		iti()
+		resetTrial()
 
-	# MONITOR
-	# elif block == 4: 
-	# 	#print 'monitor1',trial_i 
-	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-	# 	for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-	# 		#print 'probe', probe_n
-	# 		targetProbe(trial_i, probe_n, block, lastProbe = False)
-	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
-	# 	iti()
-	# 	resetTrial()
+	## MONITOR
+	elif block == 4: 
+		#print 'monitor1',trial_i 
+		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
+			#print 'probe', probe_n
+			targetProbe(trial_i, probe_n, block, lastProbe = False)
+		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
+		iti()
+		resetTrial()
 
-	# elif block == 5: 
-	# 	#print 'monitor2',trial_i
-	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-	# 	for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-	# 		#print 'probe', probe_n
-	# 		targetProbe(trial_i, probe_n, block, lastProbe = False)
-	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
-	# 	iti()
-	# 	resetTrial()
+	elif block == 5: 
+		#print 'monitor2',trial_i
+		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
+			#print 'probe', probe_n
+			targetProbe(trial_i, probe_n, block, lastProbe = False)
+		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
+		iti()
+		resetTrial()
 
 	## MAINTAIN & MONITOR
-	if block == 6: 
+	elif block == 6: 
 		#print 'mnm1',trial_i
 		target(trial_i)
 		delay()
