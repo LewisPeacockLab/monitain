@@ -475,16 +475,16 @@ fractal_size = [128, 128] #default that they came at
 
 stim_top = visual.ImageStim(
 	win = win, 
-	colorSpace = 'rgb255', 
+	#colorSpace = 'rgb255', 
 	mask = "circle", 
 	units = "pix", 
 	pos = [0, 150], 
-	size = fractal_size
+	size = fractal_size, 
 	)
 
 stim_mid = visual.ImageStim(
 	win = win, 
-	colorSpace = 'rgb255', 
+	#colorSpace = 'rgb255', 
 	mask = "circle", 
 	units = "pix", 
 	pos = [0, 0], 
@@ -493,12 +493,26 @@ stim_mid = visual.ImageStim(
 
 stim_bot = visual.ImageStim(
 	win = win, 
-	colorSpace = 'rgb255', 
+	#colorSpace = 'rgb255', 
 	mask = "circle", 
 	units = "pix", 
 	pos = [0, -150], 
 	size = fractal_size
 	)
+
+circle_top = visual.Circle(
+	win = win, 
+	units = "pix", 
+	radius = 70,
+	pos = [0, 150], 
+	colorSpace = 'rgb255')
+
+circle_bot = visual.Circle(
+	win = win, 
+	units = "pix", 
+	radius = 70,
+	pos = [0, -150], 
+	colorSpace = 'rgb255')
 
 # Text set up 
 text = visual.TextStim(
@@ -620,8 +634,8 @@ def getResp(trial_i, probe_n, block, stimDraw):
 
 				elif (firstKey == '3') and ((block != 1) and (block != 8) and (block != 2) and (block != 3)): 
 					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
-					stim_top.color = color_red
-					stim_bot.color = color_red
+					#stim_top.color = color_red
+					#stim_bot.color = color_red
 					twoStims(trial_i, probe_n)
 					text.draw()
 					win.flip()
@@ -683,57 +697,51 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 					#stim_bot.color = color_cyan
 					#twoStims(trial_i, probe_n)
 					#win.flip()
+
 					if (firstKey == '3'): 
 						if ((((block == 2) or (block == 3)) and (targNoTarg == 1)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))): 
 							#picked target, correct
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
-							stim_top.color = color_green
-							stim_bot.color = color_green
+							circle_top.color = 'green'
+							circle_bot.color = 'green'
+							circle_top.draw()
+							circle_bot.draw()
 							twoStims(trial_i, probe_n)
 							win.flip()						
-							#print 'correct, target present'
-							#text.color = color_green
-							#text.draw()
-							#win.flip()
-							print 'correct yay'
+							print 'correct, target present'
 						elif ((((block == 2) or (block == 3)) and (targNoTarg == 0)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))): #picked target, correct
 							#picked target, incorrect
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
-							stim_top.color = color_red
-							stim_bot.color = color_red
+							circle_top.color = 'red'
+							circle_bot.color = 'red'
+							circle_top.draw()
+							circle_bot.draw()
 							twoStims(trial_i, probe_n)
 							win.flip()							
-							print 'incorrect, target not present'
-							#text.color = color_red
-							#text.draw()
-							#win.flip()
-							#print 'incorrect'							
+							print 'incorrect, target not present'					
 		
 					elif (firstKey == '4'): 
 						if ((((block == 2) or (block == 3)) and (targNoTarg == 0)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))):
 							#picked no target, correct
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
-							stim_top.color = color_green
-							stim_bot.color = color_green
+							circle_top.color = 'green'
+							circle_bot.color = 'green'
+							circle_top.draw()
+							circle_bot.draw()
 							twoStims(trial_i, probe_n)
 							win.flip()							
 							print 'correct, target not present'
-							#text.color = color_green
-							#text.draw()
-							#win.flip()
-							#print 'correct'
+
 						elif ((((block == 2) or (block == 3)) and (targNoTarg == 1)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))):
 							#picked no target, incorrect
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
-							stim_top.color = color_red
-							stim_bot.color = color_red
+							circle_top.color = 'red'
+							circle_bot.color = 'red'
+							circle_top.draw()
+							circle_bot.draw()
 							twoStims(trial_i, probe_n)
 							win.flip()				
 							print 'incorrect, target present'
-							#text.color = color_red
-							#text.draw()
-							#win.flip()
-							#print 'incorrect'	
 						
 					else: 
 						print 'yikes'
@@ -746,8 +754,8 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 
 				else: #picked nothing or a key that wasn't 1 or 2
 					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0	
-					stim_top.color = color_red
-					stim_bot.color = color_red
+					#stim_top.color = color_red
+					#stim_bot.color = color_red
 					#twoStims(trial_i, probe_n)
 					win.flip()
 					print 'missed'
@@ -756,6 +764,8 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 				df.at[trial_i, 'rtProbe{:d}'.format(probe_n)] = allResp[1] #first rt
 
 				print df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))], 'acc'
+				#print stim_top.color
+				#print stim_bot.color
 				df.iloc[trial_i, df.columns.get_loc('pm_acc')] = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
 	else: 
 		stim_top.autoDraw = False
@@ -767,9 +777,9 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 def resetTrial(): 
 	text.color = color_blue
 	text.size = 40.0
-	stim_top.color = color_white
-	stim_mid.color = color_white
-	stim_bot.color = color_white
+	#stim_top.color = color_white
+	#stim_mid.color = color_white
+	#stim_bot.color = color_white
 
 
 def breakMessage(block):
@@ -909,8 +919,8 @@ def targetProbe(trial_i, probe_n, block, lastProbe):
 	win.flip()
 	win.color = color_gray
 	wordOrNonword(trial_i, probe_n)
-	#if (block == 2) or (block == 3): 
-	#	text.text = ''	
+	if ((block == 2) or (block == 3)) and (lastProbe == True): 
+		text.text = ''	
 	text.draw()
 	twoStims(trial_i, probe_n)
 	win.flip()
@@ -950,13 +960,13 @@ slack_msg = 'Starting experiment'
 slackMessage(1, slack_msg)
 
 # Starting instruction slides
-win.color = color_black
-win.flip()
-for start_slide in range(1,6): ##change later based on slides
-	presentSlides(start_slide)
+# win.color = color_black
+# win.flip()
+# for start_slide in range(1,6): ##change later based on slides
+# 	presentSlides(start_slide)
 
-win.color = color_gray
-win.flip()
+# win.color = color_gray
+# win.flip()
 
 for trial_i in range(N_TOTAL_TRIALS): 
 
@@ -975,17 +985,17 @@ for trial_i in range(N_TOTAL_TRIALS):
 		slackMessage(block, slack_msg)
 		df.to_csv(full_filename)
 
-	## BASELINE
-	if block == 1: 
-		#print 'baseline1', trial_i
-	 	probe_n = 0
-	 	#ogOnly(trial_i, probe_n)
-	 	targetProbe(trial_i, probe_n, block, lastProbe = False)
-	 	targetProbe
-	 	resetTrial()
+	# ## BASELINE
+	# if block == 1: 
+	# 	#print 'baseline1', trial_i
+	#  	probe_n = 0
+	#  	#ogOnly(trial_i, probe_n)
+	#  	targetProbe(trial_i, probe_n, block, lastProbe = False)
+	#  	targetProbe
+	#  	resetTrial()
 
 	## MAINTAIN
-	elif block == 2: 
+	if block == 2: 
 		#print 'maintain1',trial_i
 		target(trial_i)
 		delay()
