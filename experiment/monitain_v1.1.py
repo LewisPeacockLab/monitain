@@ -351,10 +351,10 @@ for i in range(N_TOTAL_TRIALS):
 		if j+1 != n_probes: 
 			top_theta = np.random.choice(possible_thetas_minusTarg)
 			bot_theta = np.random.choice(possible_thetas_minusTarg)
-			if (currentBlock == 4) or (currentBlock == 5): 
-				if top_theta == bot_theta: 
-					newBotTheta_minusTop = list(compress(possible_thetas_minusTarg, (possible_thetas_minusTarg != top_theta)))
-					bot_theta = np.random.choice(newBotTheta_minusTop)
+			#if (currentBlock == 4) or (currentBlock == 5): 
+			if top_theta == bot_theta: 
+				newBotTheta_minusTop = list(compress(possible_thetas_minusTarg, (possible_thetas_minusTarg != top_theta)))
+				bot_theta = np.random.choice(newBotTheta_minusTop)
 		elif j+1 == n_probes: 
 			if targOrNah == 0: #target not present for MAINTAIN
 				top_theta = np.random.choice(possible_thetas_minusTarg)
@@ -695,7 +695,7 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 							#text.color = color_green
 							#text.draw()
 							#win.flip()
-							#print 'correct'
+							print 'correct yay'
 						elif ((((block == 2) or (block == 3)) and (targNoTarg == 0)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))): #picked target, correct
 							#picked target, incorrect
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
@@ -703,7 +703,7 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 							stim_bot.color = color_red
 							twoStims(trial_i, probe_n)
 							win.flip()							
-							#print 'incorrect, target not present'
+							print 'incorrect, target not present'
 							#text.color = color_red
 							#text.draw()
 							#win.flip()
@@ -717,7 +717,7 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 							stim_bot.color = color_green
 							twoStims(trial_i, probe_n)
 							win.flip()							
-							#print 'correct, target not present'
+							print 'correct, target not present'
 							#text.color = color_green
 							#text.draw()
 							#win.flip()
@@ -729,7 +729,7 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 							stim_bot.color = color_red
 							twoStims(trial_i, probe_n)
 							win.flip()				
-							#print 'incorrect, target present'
+							print 'incorrect, target present'
 							#text.color = color_red
 							#text.draw()
 							#win.flip()
@@ -746,6 +746,11 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 
 				else: #picked nothing or a key that wasn't 1 or 2
 					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0	
+					stim_top.color = color_red
+					stim_bot.color = color_red
+					#twoStims(trial_i, probe_n)
+					win.flip()
+					print 'missed'
 
 				df.at[trial_i, 'respProbe{:d}'.format(probe_n)] = allResp #first key
 				df.at[trial_i, 'rtProbe{:d}'.format(probe_n)] = allResp[1] #first rt
@@ -977,34 +982,35 @@ for trial_i in range(N_TOTAL_TRIALS):
 	#  	targetProbe
 	#  	resetTrial()
 
-	##MAINTAIN
-	if block == 2: 
-		#print 'maintain1',trial_i
-		target(trial_i)
-		delay()
-		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for probe_n in range(probeInTrial-1): ## Change to maintain block length 
-			#print 'probe',probe_n
-			#ogOnly(trial_i, probe_n)
-			targetProbe(trial_i, probe_n, block, lastProbe = False)
-		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
-		iti()
-		resetTrial()
+	# ##MAINTAIN
+	# elif block == 2: 
+	# 	#print 'maintain1',trial_i
+	# 	target(trial_i)
+	# 	delay()
+	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+	# 	for probe_n in range(probeInTrial-1): ## Change to maintain block length 
+	# 		#print 'probe',probe_n
+	# 		#ogOnly(trial_i, probe_n)
+	# 		targetProbe(trial_i, probe_n, block, lastProbe = False)
+	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
+	# 	iti()
+	# 	resetTrial()
 
-	elif block == 3: 
-		#print 'maintain2',trial_i
-		target(trial_i)
-		delay()
-		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for probe_n in range(probeInTrial-1): ## Change to maintain block length 
-			#print 'probe',probe_n
-			ogOnly(trial_i, probe_n)
-		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
-		iti()
-		resetTrial()
+	# elif block == 3: 
+	# 	#print 'maintain2',trial_i
+	# 	target(trial_i)
+	# 	delay()
+	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+	# 	for probe_n in range(probeInTrial-1): ## Change to maintain block length 
+	# 		#print 'probe',probe_n
+	# 		#ogOnly(trial_i, probe_n)
+	# 		targetProbe(trial_i, probe_n, block, lastProbe = False)
+	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
+	# 	iti()
+	# 	resetTrial()
 
 	# MONITOR
-	elif block == 4: 
+	if block == 4: 
 		#print 'monitor1',trial_i 
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
