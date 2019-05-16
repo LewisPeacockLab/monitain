@@ -818,7 +818,9 @@ def presentSlides(slide):
 
 
 def instructionSlides(trial_i): 
-	if trial_i == block_starts[0]: #before maintaining
+	if trial_i == (block_starts[0] or block_starts[3]): #before maintaining
+		if trial_i == block_starts[3]:
+			presentSlides(19)
 		for slide in range(6,11): ##change later based on slides
 			presentSlides(slide)
 		win.color = color_gray
@@ -828,7 +830,7 @@ def instructionSlides(trial_i):
 		win.flip()
 		pressSpace()
 		
-	elif trial_i == block_starts[2]: #before monitoring
+	elif trial_i == (block_starts[1] or block_starts[4]): #before monitoring
 		for slide in range(11,14): ##change later based on slides
 			presentSlides(slide)
 		win.color = color_gray
@@ -838,7 +840,7 @@ def instructionSlides(trial_i):
 		win.flip()
 		pressSpace()
 
-	elif trial_i == block_starts[4]: #before mnm
+	elif trial_i == (block_starts[2] or block_starts[5]): #before mnm
 		for slide in range(14,19): ##change later based on slides
 			presentSlides(slide)
 		win.color = color_gray
@@ -848,8 +850,8 @@ def instructionSlides(trial_i):
 		win.flip()
 		pressSpace()
 
-	elif trial_i == block_starts[6]: #before baseline
-		for slide in range(19,21): ##change later based on slides
+	elif trial_i == block_starts[6]: #before last baseline
+		for slide in range(20,22): ##change later based on slides
 			presentSlides(slide)
 		win.color = color_gray
 		win.flip()
