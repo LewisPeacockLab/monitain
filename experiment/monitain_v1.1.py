@@ -811,7 +811,7 @@ def breakMessage(block):
 	win.flip()
 
 def presentSlides(slide): 
-	instructImage.image = 'exptInstruct/exptInstruct.{:d}.png'.format(slide)
+	instructImage.image = 'exptInstruct_v1.1/exptInstruct.{:d}.png'.format(slide)
 	instructImage.draw()
 	win.flip()
 	pressSpace()
