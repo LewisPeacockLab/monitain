@@ -199,14 +199,14 @@ df['subj'] = subj
 ## 6 and 7 = M&M, trials 542-561, 562-581
 
 # Set block values
-df.iloc[0:106, df.columns.get_loc('block')] = 1 #blocks 1&8 are length 106
-df.iloc[106:126, df.columns.get_loc('block')] = 2 #blocks 2-7 are length 20
-df.iloc[126:146, df.columns.get_loc('block')] = 3
-df.iloc[146:166, df.columns.get_loc('block')] = 4
-df.iloc[166:186, df.columns.get_loc('block')] = 5
-df.iloc[186:206, df.columns.get_loc('block')] = 6
-df.iloc[206:226, df.columns.get_loc('block')] = 7
-df.iloc[226:332, df.columns.get_loc('block')] = 8
+df.iloc[0:106, df.columns.get_loc('block')] = 1 #blocks 1&8 are length 106, baseline1
+df.iloc[106:126, df.columns.get_loc('block')] = 2 #blocks 2-7 are length 20, maintain1
+df.iloc[126:146, df.columns.get_loc('block')] = 3 #maintain2
+df.iloc[146:166, df.columns.get_loc('block')] = 4 #monitor1
+df.iloc[166:186, df.columns.get_loc('block')] = 5 #monitor2
+df.iloc[186:206, df.columns.get_loc('block')] = 6 #mnm1
+df.iloc[206:226, df.columns.get_loc('block')] = 7 #mnm2
+df.iloc[226:332, df.columns.get_loc('block')] = 8 #baseline2
 
 df.iloc[0:106, df.columns.get_loc('targOrNoTarg')] = np.nan
 df.iloc[146:332, df.columns.get_loc('targOrNoTarg')] = np.nan
@@ -787,8 +787,24 @@ def resetTrial():
 
 
 def breakMessage(block):
+	if block == 1: 
+		block_new = 1
+	elif block == 2:
+		block_new = 2
+	elif block == 3: 
+		block_new = 4
+	elif block == 4: 
+		block_new == 6
+	elif block == 5: 
+		block_new = 3
+	elif block == 6: 
+		block_new = 5
+	elif block == 7: 
+		block_new = 7
+	elif block == 8: 
+		block_new = 8
 	breakText = "This is the end of block {:d}. \
-	\nPlease hold down the space bar to move onto the next block.".format(block-1)
+	\nPlease hold down the space bar to move onto the next block.".format(block_new-1)
 
 	text.text = breakText
 	text.height=40.0
@@ -1015,7 +1031,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		resetTrial()
 
 	## MONITOR
-	elif block == 3: 
+	elif block == 4: 
 		#print 'monitor1',trial_i 
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
@@ -1026,7 +1042,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		resetTrial()
 
 	## MAINTAIN & MONITOR
-	elif block == 4: 
+	elif block == 6: 
 		#print 'mnm1',trial_i
 		target(trial_i)
 		delay()
@@ -1039,7 +1055,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		resetTrial()
 
 	## MAINTAIN
-	elif block == 5: 
+	elif block == 3: 
 		#print 'maintain2',trial_i
 		target(trial_i)
 		delay()
@@ -1053,7 +1069,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		resetTrial()
 
 	## MONITOR
-	elif block == 6: 
+	elif block == 5: 
 		#print 'monitor2',trial_i
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
