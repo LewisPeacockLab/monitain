@@ -176,7 +176,7 @@ botTheta_cols = ['botTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
 
 columns = ['subj', #subject id 
 	'block', #block 
-	'block_type', #block type for v1.1, interleaved design
+	#'block_type', #block type for v1.1, interleaved design
 	'targTheta', #angle for memory target
 	'n_probes',  #num of probes in trial 
 	'probeTheta_loc', #where target probe is on last probe
@@ -188,8 +188,6 @@ columns = ['subj', #subject id
 df_columns = columns + word_cols + wordCond_cols + topTheta_cols + botTheta_cols
 df_index = range(N_TOTAL_TRIALS)
 df = pd.DataFrame(columns = df_columns, index = df_index)
-
-
 
 df['subj'] = subj
 
@@ -205,34 +203,65 @@ blockDict = OrderedDict([
 	('maintain1', 2), 
 	('monitor1', 3), 
 	('mnm1', 4), 
-	('maintain1', 5), 
+	('maintain2', 5), 
 	('monitor2', 6),
 	('mnm2', 7), 
 	('base2', 8)
 	])
 
-index_block = ('block_type', 'block')
+for index, row in df.iterrows(): 
+	if index in range(0,106): 
+		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[0]
+	elif index in range(106,126): 
+		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[1]
+	elif index in range(126,146): 
+		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[2]
+	elif index in range(146,166): 
+		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[3]
+	elif index in range(166,186): 
+		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[4]
+	elif index in range(186,206): 
+		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[5]
+	elif index in range(206,226): 
+		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[6]
+	elif index in range(226,332): 
+		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[7]
 
-df.iloc[0:106, df.columns.get_loc('block')] = pd.Series(blockDict.items()[0], index = index_block)
-df.iloc[106:126, df.columns.get_loc('block')] = pd.Series(blockDict.items()[1], index = index_block)
-df.iloc[126:146, df.columns.get_loc('block')] = pd.Series(blockDict.items()[2], index = index_block)
-df.iloc[146:166, df.columns.get_loc('block')] = pd.Series(blockDict.items()[3], index = index_block)
-df.iloc[166:186, df.columns.get_loc('block')] = pd.Series(blockDict.items()[4], index = index_block)
-df.iloc[186:206, df.columns.get_loc('block')] = pd.Series(blockDict.items()[5], index = index_block)
-df.iloc[206:226, df.columns.get_loc('block')] = pd.Series(blockDict.items()[6], index = index_block)
-
+#df.block[x][0] gives block type
+#df.block[x][1] gives block num
 
 df.iloc[0:106, df.columns.get_loc('targOrNoTarg')] = np.nan
 df.iloc[226:332, df.columns.get_loc('targOrNoTarg')] = np.nan
 
 blockOther_len = len(df.iloc[106:126, df.columns.get_loc('block')])
 
+
+
+block1 = df['block']
+grouped_blocks = df.groupby('block')
+grouped_1 = grouped.get_group(blockDict.items()[0])
+grouped_2 = grouped.get_group(blockDict.items()[1])
+grouped_3 = grouped.get_group(blockDict.items()[2])
+grouped_4 = grouped.get_group(blockDict.items()[3])
+grouped_5 = grouped.get_group(blockDict.items()[4])
+grouped_6 = grouped.get_group(blockDict.items()[5])
+grouped_7 = grouped.get_group(blockDict.items()[6])
+grouped_8 = grouped.get_group(blockDict.items()[7])
+
 ## MAINTAIN 
 # Set target present for half of maintain, not present for other half of maintain
 targProb_other = np.repeat([0,1], blockOther_len/2)
 for block_other in range(2): 
 	np.random.shuffle(targProb_other)
+
+	for index, row in df.iterrows(): 
+		if df['block'][index][0] == 'maintain1':
+			df[index]['targOrNoTarg'] 
+
+
 	if block_other == 0: #block 2
+		grouped_2['targOrNoTarg'] = targProb_other
+
 		df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targProb_other
 	elif block_other == 1: #block 3
 		df.iloc[166:186, df.columns.get_loc('targOrNoTarg')] = targProb_other
