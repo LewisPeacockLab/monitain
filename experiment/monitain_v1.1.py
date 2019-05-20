@@ -175,7 +175,8 @@ topTheta_cols = ['topTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
 botTheta_cols = ['botTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
 
 columns = ['subj', #subject id 
-	'block', #block num 
+	'block', #block num from v1.0, blocked design
+	'block_v1.1', #block num for v1.1, interleaved design
 	'targTheta', #angle for memory target
 	'n_probes',  #num of probes in trial 
 	'probeTheta_loc', #where target probe is on last probe
@@ -192,24 +193,34 @@ df = pd.DataFrame(columns = df_columns, index = df_index)
 
 df['subj'] = subj
 
-# Break up blocks
+# Break up blocks, v1.0
 ## 1 and 8 = Baseline, trials 0-105 and 582-687
 ## 2 and 3 = Maintain, trials 106-125, 126-145
 ## 4 and 5 = Monitor, trials 146-343, 344-541
 ## 6 and 7 = M&M, trials 542-561, 562-581
 
-# Set block values
+# Set block values, interleaved
+df.iloc[0:106, df.columns.get_loc('block_v1.1')] = 1 #blocks 1&8 are length 106, baseline1
+df.iloc[106:126, df.columns.get_loc('block_v1.1')] = 2 #blocks 2-7 are length 20, maintain1
+df.iloc[126:146, df.columns.get_loc('block_v1.1')] = 3 #monitor1
+df.iloc[146:166, df.columns.get_loc('block_v1.1')] = 4 #mnm1
+df.iloc[166:186, df.columns.get_loc('block_v1.1')] = 5 #maintain2 
+df.iloc[186:206, df.columns.get_loc('block_v1.1')] = 6 #monitor2 
+df.iloc[206:226, df.columns.get_loc('block_v1.1')] = 7 #mnm2
+df.iloc[226:332, df.columns.get_loc('block_v1.1')] = 8 #baseline2
+
+# Set block values, blocked
 df.iloc[0:106, df.columns.get_loc('block')] = 1 #blocks 1&8 are length 106, baseline1
 df.iloc[106:126, df.columns.get_loc('block')] = 2 #blocks 2-7 are length 20, maintain1
-df.iloc[126:146, df.columns.get_loc('block')] = 3 #maintain2
-df.iloc[146:166, df.columns.get_loc('block')] = 4 #monitor1
-df.iloc[166:186, df.columns.get_loc('block')] = 5 #monitor2
-df.iloc[186:206, df.columns.get_loc('block')] = 6 #mnm1
+df.iloc[126:146, df.columns.get_loc('block')] = 5 #maintain2
+df.iloc[146:166, df.columns.get_loc('block')] = 3 #monitor1  
+df.iloc[166:186, df.columns.get_loc('block')] = 6 #monitor2
+df.iloc[186:206, df.columns.get_loc('block')] = 4 #mnm1
 df.iloc[206:226, df.columns.get_loc('block')] = 7 #mnm2
 df.iloc[226:332, df.columns.get_loc('block')] = 8 #baseline2
 
 df.iloc[0:106, df.columns.get_loc('targOrNoTarg')] = np.nan
-df.iloc[146:332, df.columns.get_loc('targOrNoTarg')] = np.nan
+df.iloc[226:332, df.columns.get_loc('targOrNoTarg')] = np.nan
 
 blockOther_len = len(df.iloc[106:126, df.columns.get_loc('block')])
 
@@ -221,7 +232,7 @@ for block_other in range(2):
 	if block_other == 0: #block 2
 		df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targProb_other
 	elif block_other == 1: #block 3
-		df.iloc[126:146, df.columns.get_loc('targOrNoTarg')] = targProb_other
+		df.iloc[166:186, df.columns.get_loc('targOrNoTarg')] = targProb_other
 
 # Double check that half are ones and half are zeros
 # pd.value_counts(df['targOrNoTarg'].values, sort=False) 
@@ -505,14 +516,14 @@ circle_top = visual.Circle(
 	units = "pix", 
 	radius = 70,
 	pos = [0, 150], 
-	colorSpace = 'rgb255')
+	#colorSpace = 'rgb255')
 
 circle_bot = visual.Circle(
 	win = win, 
 	units = "pix", 
 	radius = 70,
 	pos = [0, -150], 
-	colorSpace = 'rgb255')
+	#colorSpace = 'rgb255')
 
 # Text set up 
 text = visual.TextStim(
@@ -526,8 +537,7 @@ text = visual.TextStim(
 # Import images
 img_list = glob.glob("stimuli/grayscale/*.png")
 
-stim_dict = { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=win, image=fn)\
-	for fn in glob.glob("stimuli/grayscale/*.png") }
+stim_dict = { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=win, image=fn)for fn in glob.glob("stimuli/grayscale/*.png") }
 
 
 
@@ -786,25 +796,10 @@ def resetTrial():
 	#stim_bot.color = color_white
 
 
-def breakMessage(block):
-	if block == 1: 
-		block_new = 1
-	elif block == 2:
-		block_new = 2
-	elif block == 3: 
-		block_new = 4
-	elif block == 4: 
-		block_new == 6
-	elif block == 5: 
-		block_new = 3
-	elif block == 6: 
-		block_new = 5
-	elif block == 7: 
-		block_new = 7
-	elif block == 8: 
-		block_new = 8
+def breakMessage(block_v1):
+
 	breakText = "This is the end of block {:d}. \
-	\nPlease hold down the space bar to move onto the next block.".format(block_new-1)
+	\nPlease hold down the space bar to move onto the next block.".format(block_v1-1)
 
 	text.text = breakText
 	text.height=40.0
@@ -977,6 +972,8 @@ def iti():
 ############ Experiment ############
 ####################################
 
+
+
 # Let Slack know experiment is starting
 slack_msg = 'Starting experiment'
 slackMessage(1, slack_msg)
@@ -992,19 +989,33 @@ win.flip()
 
 for trial_i in range(N_TOTAL_TRIALS): 
 
+	 
+
+
 	block_starts = [106, 126, 146, 166, 186, 206, 226]
 
 	block = df.iloc[trial_i, df.columns.get_loc('block')]
+	block_v1 = df.iloc[trial_i, df.columns.get_loc('block_v1.1')]
+
+	## Interleaved blocks
+	if block == 3:
+		block = 4
+	elif block == 4: 
+		block = 6
+	elif block == 5: 
+		block = 3
+	elif block == 6: 
+		block = 5
 
 	if trial_i in block_starts: 
 		# Break before moving on 
-		breakMessage(block)
+		breakMessage(block_v1)
 		# Save output at the end
 		df.to_csv(full_filename)
 		instructionSlides(trial_i)
 
 		slack_msg = 'Starting block {:d}'.format(block)
-		slackMessage(block, slack_msg)
+		slackMessage(block_v1, slack_msg)
 		df.to_csv(full_filename)
 
 	## BASELINE
@@ -1031,7 +1042,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		resetTrial()
 
 	## MONITOR
-	elif block == 4: 
+	elif block == 3: 
 		#print 'monitor1',trial_i 
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
@@ -1042,7 +1053,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		resetTrial()
 
 	## MAINTAIN & MONITOR
-	elif block == 6: 
+	elif block == 4: 
 		#print 'mnm1',trial_i
 		target(trial_i)
 		delay()
@@ -1055,7 +1066,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		resetTrial()
 
 	## MAINTAIN
-	elif block == 3: 
+	elif block == 5: 
 		#print 'maintain2',trial_i
 		target(trial_i)
 		delay()
@@ -1069,7 +1080,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		resetTrial()
 
 	## MONITOR
-	elif block == 5: 
+	elif block == 6: 
 		#print 'monitor2',trial_i
 		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
@@ -1096,7 +1107,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 	elif block == 8: 
 		#print 'baseline 2', trial_i
 		probe_n = 0
-		ogOnly(trial_i, probe_n)
+		#ogOnly(trial_i, probe_n)
 		targetProbe(trial_i, probe_n, block, lastProbe = False)
 
 	#else: 
@@ -1106,7 +1117,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 presentSlides(21)
 
 slack_msg = 'Experiment finished'
-slackMessage(block, slack_msg)
+slackMessage(block_v1, slack_msg)
 
 # Save output at the end
 df.to_csv(full_filename)
