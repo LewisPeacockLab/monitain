@@ -175,8 +175,8 @@ topTheta_cols = ['topTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
 botTheta_cols = ['botTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
 
 columns = ['subj', #subject id 
-	'block', #block num from v1.0, blocked design
-	'block_v1.1', #block num for v1.1, interleaved design
+	'block', #block 
+	'block_type', #block type for v1.1, interleaved design
 	'targTheta', #angle for memory target
 	'n_probes',  #num of probes in trial 
 	'probeTheta_loc', #where target probe is on last probe
@@ -199,25 +199,28 @@ df['subj'] = subj
 ## 4 and 5 = Monitor, trials 146-343, 344-541
 ## 6 and 7 = M&M, trials 542-561, 562-581
 
-# Set block values, interleaved
-df.iloc[0:106, df.columns.get_loc('block_v1.1')] = 1 #blocks 1&8 are length 106, baseline1
-df.iloc[106:126, df.columns.get_loc('block_v1.1')] = 2 #blocks 2-7 are length 20, maintain1
-df.iloc[126:146, df.columns.get_loc('block_v1.1')] = 3 #monitor1
-df.iloc[146:166, df.columns.get_loc('block_v1.1')] = 4 #mnm1
-df.iloc[166:186, df.columns.get_loc('block_v1.1')] = 5 #maintain2 
-df.iloc[186:206, df.columns.get_loc('block_v1.1')] = 6 #monitor2 
-df.iloc[206:226, df.columns.get_loc('block_v1.1')] = 7 #mnm2
-df.iloc[226:332, df.columns.get_loc('block_v1.1')] = 8 #baseline2
+#Set blocks
+blockDict = OrderedDict([
+	('base1', 1), 
+	('maintain1', 2), 
+	('monitor1', 3), 
+	('mnm1', 4), 
+	('maintain1', 5), 
+	('monitor2', 6),
+	('mnm2', 7), 
+	('base2', 8)
+	])
 
-# Set block values, blocked
-df.iloc[0:106, df.columns.get_loc('block')] = 1 #blocks 1&8 are length 106, baseline1
-df.iloc[106:126, df.columns.get_loc('block')] = 2 #blocks 2-7 are length 20, maintain1
-df.iloc[126:146, df.columns.get_loc('block')] = 5 #maintain2
-df.iloc[146:166, df.columns.get_loc('block')] = 3 #monitor1  
-df.iloc[166:186, df.columns.get_loc('block')] = 6 #monitor2
-df.iloc[186:206, df.columns.get_loc('block')] = 4 #mnm1
-df.iloc[206:226, df.columns.get_loc('block')] = 7 #mnm2
-df.iloc[226:332, df.columns.get_loc('block')] = 8 #baseline2
+index_block = ('block_type', 'block')
+
+df.iloc[0:106, df.columns.get_loc('block')] = pd.Series(blockDict.items()[0], index = index_block)
+df.iloc[106:126, df.columns.get_loc('block')] = pd.Series(blockDict.items()[1], index = index_block)
+df.iloc[126:146, df.columns.get_loc('block')] = pd.Series(blockDict.items()[2], index = index_block)
+df.iloc[146:166, df.columns.get_loc('block')] = pd.Series(blockDict.items()[3], index = index_block)
+df.iloc[166:186, df.columns.get_loc('block')] = pd.Series(blockDict.items()[4], index = index_block)
+df.iloc[186:206, df.columns.get_loc('block')] = pd.Series(blockDict.items()[5], index = index_block)
+df.iloc[206:226, df.columns.get_loc('block')] = pd.Series(blockDict.items()[6], index = index_block)
+
 
 df.iloc[0:106, df.columns.get_loc('targOrNoTarg')] = np.nan
 df.iloc[226:332, df.columns.get_loc('targOrNoTarg')] = np.nan
@@ -328,6 +331,7 @@ word_list = list(words_df['stimuli'])
 nonword_list = list(nonwords_df['stimuli'])
 
 for i in range(N_TOTAL_TRIALS): 
+	print i, 'trial'
 	n_probes = df.loc[i, 'n_probes']
 	probe_loc = df.loc[i, 'probeTheta_loc']
 	memTarg = df.loc[i, 'targTheta']
@@ -336,6 +340,7 @@ for i in range(N_TOTAL_TRIALS):
 	possible_thetas_minusTarg = list(compress(possible_thetas, (possible_thetas != memTarg)))
 
 	for j in range(n_probes): 
+		print j, 'probe'
 
 		# Assign words #
 		cond = np.random.choice(['word', 'nonword'])
@@ -395,9 +400,11 @@ for i in range(N_TOTAL_TRIALS):
 						#top_theta = np.nan
 						#bot_theta = np.nan
 				else: 
+					print n_probes, 'n_probes'
 					raise Warning('uh oh')
 		else: 
 			raise Warning('Nooooooo')	
+
 
 		df.loc[i, thetaTop_col] = top_theta
 		df.loc[i, thetaBot_col] = bot_theta
@@ -517,6 +524,7 @@ circle_top = visual.Circle(
 	radius = 70,
 	pos = [0, 150], 
 	#colorSpace = 'rgb255')
+	)
 
 circle_bot = visual.Circle(
 	win = win, 
@@ -524,6 +532,7 @@ circle_bot = visual.Circle(
 	radius = 70,
 	pos = [0, -150], 
 	#colorSpace = 'rgb255')
+	)
 
 # Text set up 
 text = visual.TextStim(
