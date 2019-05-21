@@ -42,7 +42,7 @@ SCREENS = {
 parser = argparse.ArgumentParser(description="Monitain experimental display")
 parser.add_argument('--subj', default='s999', type=str, help='sXXX format')
 parser.add_argument('--scrn', default='misspiggy_main', type=str, choices=SCREENS.keys(), help = 'computer used for experiment')
-parser.add_argument('--blockStruct', default='interleaved', type = str, help='interleaved or blocked')
+parser.add_argument('--blockStruct', default='interleaved', type = str, choices=['interleaved', 'blocked'], help='interleaved or blocked')
 
 args = parser.parse_args()
 
@@ -898,7 +898,6 @@ def presentSlides(slide):
 
 
 def instructionSlides(block_type): 
-	print block_type
 	if (block_type is 'maintain1') or (block_type is 'maintain2'):
 	#if trial_i == (block_starts[0] or block_starts[3]): #before maintaining
 		if block_type == 'maintain2':
@@ -911,13 +910,11 @@ def instructionSlides(block_type):
 		text.draw()
 		win.flip()
 		pressSpace()
-		print 'maintainnnnn'
 	
 	elif (block_type is 'monitor1') or (block_type is 'monitor2'):
 	#elif trial_i == (block_starts[1] or block_starts[4]): #before monitoring
 		for slide in range(11,14): ##change later based on slides
 			presentSlides(slide)
-			print slide
 		win.color = color_gray
 		win.flip()
 		text.text = "Press space to begin"
@@ -1060,8 +1057,52 @@ def iti():
 # for start_slide in range(1,6): ##change later based on slides
 # 	presentSlides(start_slide)
 
-# win.color = color_gray
-# win.flip()
+win.color = color_gray
+win.flip()
+
+def baseline(trial_i, block): 
+	probe_n = 0
+ 	#ogOnly(trial_i, probe_n)
+ 	targetProbe(trial_i, probe_n, block, lastProbe = False)
+ 	#targetProbe
+ 	resetTrial()
+
+def maintain(trial_i, block): 
+ 	target(trial_i)
+	delay()
+	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+	for probe_n in range(probeInTrial-1): ## Change to maintain block length 
+		#print 'probe',probe_n
+		#ogOnly(trial_i, probe_n)
+		targetProbe(trial_i, probe_n, block, lastProbe = False)
+	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
+	iti()
+	resetTrial()
+
+def monitor(trial_i, block): 
+ 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+	for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
+		#print 'probe', probe_n
+		targetProbe(trial_i, probe_n, block, lastProbe = False)
+	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
+	iti()
+	resetTrial()
+
+def mnm(trial_i, block): 
+ 	target(trial_i)
+	delay()
+	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+	for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
+		#print 'probe', probe_n
+		targetProbe(trial_i, probe_n, block, lastProbe = False)
+	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
+	iti()
+	resetTrial()
+
+
+
+
+
 
 for trial_i in range(N_TOTAL_TRIALS): 
 	print trial_i
@@ -1069,6 +1110,11 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	block_type = df.block[trial_i][0] 
 	block = df.block[trial_i][1] 
+
+
+
+
+
 
 	if trial_i in block_starts: 
 		# Break before moving on 
@@ -1082,97 +1128,50 @@ for trial_i in range(N_TOTAL_TRIALS):
 		slackMessage(block, slack_msg)
 		df.to_csv(full_filename)
 
+
+
+
+
 	## BASELINE
-	# if block == 1: 
-	# 	#print 'baseline1', trial_i
-	#  	probe_n = 0
-	#  	#ogOnly(trial_i, probe_n)
-	#  	targetProbe(trial_i, probe_n, block, lastProbe = False)
-	#  	#targetProbe
-	#  	resetTrial()
+	if block == 1: 
+		baseline(trial_i, block)
 
-	# ## MAINTAIN
-	# elif block == 2: 
-	# 	#print 'maintain1',trial_i
-	# 	target(trial_i)
-	# 	delay()
-	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-	# 	for probe_n in range(probeInTrial-1): ## Change to maintain block length 
-	# 		#print 'probe',probe_n
-	# 		#ogOnly(trial_i, probe_n)
-	# 		targetProbe(trial_i, probe_n, block, lastProbe = False)
-	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
-	# 	iti()
-	# 	resetTrial()
+	## MAINTAIN
+	elif block == 2: 
+		#print 'maintain1',trial_i
+		maintain(trial_i, block)
 
-	# ## MONITOR
-	# if block == 3: 
-	# 	#print 'monitor1',trial_i 
-	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-	# 	for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-	# 		#print 'probe', probe_n
-	# 		targetProbe(trial_i, probe_n, block, lastProbe = False)
-	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
-	# 	iti()
-	# 	resetTrial()
 
-	# ## MAINTAIN & MONITOR
-	# elif block == 4: 
-	# 	#print 'mnm1',trial_i
-	# 	target(trial_i)
-	# 	delay()
-	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-	# 	for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-	# 		#print 'probe', probe_n
-	# 		targetProbe(trial_i, probe_n, block, lastProbe = False)
-	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
-	# 	iti()
-	# 	resetTrial()
+	## MONITOR
+	if block == 3: 
+		#print 'monitor1',trial_i 
+		monitor(trial_i, block)
+
+
+	## MAINTAIN & MONITOR
+	elif block == 4: 
+		#print 'mnm1',trial_i
+		mnm(trial_i, block)
 
 	## MAINTAIN
 	elif block == 5: 
 		#print 'maintain2',trial_i
-		target(trial_i)
-		delay()
-		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for probe_n in range(probeInTrial-1): ## Change to maintain block length 
-			#print 'probe',probe_n
-			#ogOnly(trial_i, probe_n)
-			targetProbe(trial_i, probe_n, block, lastProbe = False)
-		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
-		iti()
-		resetTrial()
+		maintain(trial_i, block)
 
 	## MONITOR
 	elif block == 6: 
 		#print 'monitor2',trial_i
-		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-			#print 'probe', probe_n
-			targetProbe(trial_i, probe_n, block, lastProbe = False)
-		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
-		iti()
-		resetTrial()
+		monitor(trial_i, block)
 
 	## MAINTAIN & MONITOR
 	elif block == 7: 
 		#print 'mnm2',trial_i
-		target(trial_i)
-		delay()
-		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-			#print 'probe', probe_n
-			targetProbe(trial_i, probe_n, block, lastProbe = False)
-		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
-		iti()
-		resetTrial()
+		mnm(trial_i, block)
 
 	# BASELINE
 	elif block == 8: 
 		#print 'baseline 2', trial_i
-		probe_n = 0
-		#ogOnly(trial_i, probe_n)
-		targetProbe(trial_i, probe_n, block, lastProbe = False)
+		baseline(trial_i, block)
 
 	#else: 
 	#	raise Warning('yikes, part 2')
