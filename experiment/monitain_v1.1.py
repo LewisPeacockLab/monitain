@@ -42,6 +42,7 @@ SCREENS = {
 parser = argparse.ArgumentParser(description="Monitain experimental display")
 parser.add_argument('--subj', default='s999', type=str, help='sXXX format')
 parser.add_argument('--scrn', default='misspiggy_main', type=str, choices=SCREENS.keys(), help = 'computer used for experiment')
+parser.add_argument('--blockStruct', default='interleaved', type = str, help='interleaved or blocked')
 
 args = parser.parse_args()
 
@@ -50,9 +51,12 @@ args = parser.parse_args()
 
 subj = args.subj
 scrn = args.scrn
+blckstr = args.blckstr
 
 global debug 
 debug = subj in ['debug']
+
+global blckstr
 
 # Put .txt files into dataframes
 words_df = pd.read_table("words.csv", header=-1)
@@ -198,55 +202,76 @@ df['subj'] = subj
 ## 6 and 7 = M&M, trials 542-561, 562-581
 
 #Set blocks
-blockDict = OrderedDict([
-	('base1', 1), 
-	('maintain1', 2), 
-	('monitor1', 3), 
-	('mnm1', 4), 
-	('maintain2', 5), 
-	('monitor2', 6),
-	('mnm2', 7), 
-	('base2', 8)
-	])
+
+if blckstr == 'interleaved': 
+	blockDict = OrderedDict([
+		('base1', 1), 
+		('maintain1', 2), 
+		('monitor1', 3), 
+		('mnm1', 4), 
+		('maintain2', 5), 
+		('monitor2', 6),
+		('mnm2', 7), 
+		('base2', 8)
+		])
+
+	maintain1 = 2
+	maintain2 = 5
+	monitor1 = 3
+	monitor2 = 6
+	mnm1 = 4
+	mnm2 = 7
+
+elif blckstr == 'blocked': 
+	blockDict = OrderedDict([
+		('base1', 1), 
+		('maintain1', 2), 
+		('maintain2', 3), 
+		('monitor1', 4), 
+		('monitor2', 5), 
+		('mnm1', 6),
+		('mnm2', 7), 
+		('base2', 8)
+		])
+
+	maintain1 = 2
+	maintain2 = 3
+	monitor1 = 4
+	monitor2 = 5
+	mnm1 = 6
+	mnm2 = 7
+
+else: 
+	raise Warning('Invalid block structure entered')	
 
 for index, row in df.iterrows(): 
 	if index in range(0,106): 
-		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[0]
+		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[0] 
 	elif index in range(106,126): 
-		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[1]
+		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[1] 
 	elif index in range(126,146): 
-		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[2]
+		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[2] 
 	elif index in range(146,166): 
-		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[3]
+		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[3] 
 	elif index in range(166,186): 
-		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[4]
+		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[4] 
 	elif index in range(186,206): 
-		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[5]
+		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[5] 
 	elif index in range(206,226): 
-		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[6]
+		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[6] 
 	elif index in range(226,332): 
-		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[7]
+		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[7] 
 
 #df.block[x][0] gives block type
 #df.block[x][1] gives block num
 
-df.iloc[0:106, df.columns.get_loc('targOrNoTarg')] = np.nan
-df.iloc[226:332, df.columns.get_loc('targOrNoTarg')] = np.nan
+#df.iloc[0:106, df.columns.get_loc('targOrNoTarg')] = np.nan
+#df.iloc[226:332, df.columns.get_loc('targOrNoTarg')] = np.nan
+df['targOrNoTarg'] = np.nan
+
 
 blockOther_len = len(df.iloc[106:126, df.columns.get_loc('block')])
 
-
-
-block1 = df['block']
-grouped_blocks = df.groupby('block')
-grouped_1 = grouped.get_group(blockDict.items()[0])
-grouped_2 = grouped.get_group(blockDict.items()[1])
-grouped_3 = grouped.get_group(blockDict.items()[2])
-grouped_4 = grouped.get_group(blockDict.items()[3])
-grouped_5 = grouped.get_group(blockDict.items()[4])
-grouped_6 = grouped.get_group(blockDict.items()[5])
-grouped_7 = grouped.get_group(blockDict.items()[6])
-grouped_8 = grouped.get_group(blockDict.items()[7])
 
 ## MAINTAIN 
 # Set target present for half of maintain, not present for other half of maintain
@@ -254,17 +279,16 @@ targProb_other = np.repeat([0,1], blockOther_len/2)
 for block_other in range(2): 
 	np.random.shuffle(targProb_other)
 
-	for index, row in df.iterrows(): 
-		if df['block'][index][0] == 'maintain1':
-			df[index]['targOrNoTarg'] 
-
-
-	if block_other == 0: #block 2
-		grouped_2['targOrNoTarg'] = targProb_other
-
-		df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targProb_other
-	elif block_other == 1: #block 3
-		df.iloc[166:186, df.columns.get_loc('targOrNoTarg')] = targProb_other
+	if blckstr == 'interleaved': 
+		if block_other == 0: #block 2
+			df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targProb_other
+		elif block_other == 1: #block 5
+			df.iloc[166:186, df.columns.get_loc('targOrNoTarg')] = targProb_other
+	elif blockstr == 'blocked': 
+		if block_other == 0: #block2 
+			df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targProb_other
+		elif block_other == 1: #block 3
+			df.iloc[126:146, df.columns.get_loc('targOrNoTarg')] = targProb_other
 
 # Double check that half are ones and half are zeros
 # pd.value_counts(df['targOrNoTarg'].values, sort=False) 
@@ -276,10 +300,6 @@ df['probeTheta_loc'] = all_targetTheta_locs
 
 possible_thetas = np.linspace(0,180, 18, endpoint=False) # Possible orientations presented
 
-#possible_thetas = possible_thetas[~np.isin(possible_thetas[0,90])]
-
-# possible_thetas = np.array([10, 20, 30, 40, 50, 60, 70, 80,
-# 	100, 110, 120, 130, 140, 150, 160, 170])
 
 possible_thetas = np.array(range(1,21))
 
@@ -291,13 +311,6 @@ def pickTheta(x):
 
 
 df['targTheta'] = df.targTheta.apply(pickTheta)
-
-# possible_thetas = np.linspace(0,180, 18, endpoint=False)
-
-# possible_thetas = [10, 20, 30, 40, 50, 60, 70, 80, 
-# 	100, 110, 120, 130, 140, 150, 160, 170]
-
-# np.random.choice(possible_thetas)
 
 catch_range = range(LOWER_CATCH_TRIAL, UPPER_CATCH_TRIAL+ 1)
 
@@ -312,11 +325,9 @@ N_BLOCKS_MAINTAIN = 2
 N_BLOCKS_MON = 2
 N_BLOCKS_MnM = 2
 
-#Baseline 1 probe num
-baseline_probe_range = np.repeat([1],106)
-df.iloc[0:106, df.columns.get_loc('n_probes')] = baseline_probe_range
 
-#Maintain probe num 
+
+#MAINTAIN probe num 
 probe_count_list_main = []
 for i in range(N_BLOCKS_MAINTAIN): 
 	catch_subset_main = np.random.choice(catch_range, size = N_CATCH_PER_BLOCK)
@@ -324,11 +335,9 @@ for i in range(N_BLOCKS_MAINTAIN):
 	np.random.shuffle(probe_set_main)
 	probe_count_list_main.append(probe_set_main)
 
-np.ravel(probe_count_list_main).size 
-#df['n_probes'] = np.ravel(probe_count_list)
-df.iloc[106:146, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_main) ## need to change this so it's not just setting subset in middle
+probe_main_size=np.ravel(probe_count_list_main).size 
 
-#Monitor probe num 
+#MONITOR probe num 
 probe_count_list_mon = []
 for i in range(N_BLOCKS_MON): 
 	catch_subset_mon = np.random.choice(catch_range, size = N_CATCH_PER_BLOCK)
@@ -336,11 +345,10 @@ for i in range(N_BLOCKS_MON):
 	np.random.shuffle(probe_set_mon)
 	probe_count_list_mon.append(probe_set_mon)
 
-np.ravel(probe_count_list_mon).size #should equal 160 for hnow
+probe_mon_size = np.ravel(probe_count_list_mon).size #should equal 160 for now
 #df['n_probes'] = np.ravel(probe_count_list)
-df.iloc[146:186, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mon)
 
-#Maintain&monitor probe num 
+#MNM probe num 
 probe_count_list_mnm = []
 for i in range(N_BLOCKS_MnM): 
 	catch_subset_mnm = np.random.choice(catch_range, size = N_CATCH_PER_BLOCK)
@@ -348,12 +356,37 @@ for i in range(N_BLOCKS_MnM):
 	np.random.shuffle(probe_set_mnm)
 	probe_count_list_mnm.append(probe_set_mnm)
 
-np.ravel(probe_count_list_mnm).size #should equal 160 for hnow
+probe_mnm_size = np.ravel(probe_count_list_mnm).size #should equal 160 for now
 #df['n_probes'] = np.ravel(probe_count_list)
-df.iloc[186:226, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mnm)
 
-#Baseline 2 probe num
+
+# Set probe nums 
+#BASELINE 1 probe num
+baseline_probe_range = np.repeat([1],106)
+df.iloc[0:106, df.columns.get_loc('n_probes')] = baseline_probe_range
+
+if blckstr == 'interleaved': 
+	df.iloc[106:126, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_main)[:probe_main_size/2]
+	df.iloc[166:186, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_main)[probe_main_size/2:]
+
+	df.iloc[126:146, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mon)[:probe_mon_size/2]
+	df.iloc[186:206, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mon)[probe_mon_size/2:]
+
+	df.iloc[146:166, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mnm)[:probe_mnm_size/2]
+	df.iloc[186:206, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mnm)[probe_mnm_size/2:]
+
+elif blckstr == 'blocked': 
+	df.iloc[106:146, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_main) ## need to change this so it's not just setting subset in middle
+
+	df.iloc[146:186, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mon)
+
+	df.iloc[186:226, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mnm)
+
+
+#BASELINE 2 probe num
 df.iloc[226:332, df.columns.get_loc('n_probes')] = baseline_probe_range
+
+
 
 # Add word and nonword stims to dataframe
 word_list = list(words_df['stimuli'])
@@ -412,10 +445,10 @@ for i in range(N_TOTAL_TRIALS):
 					top_theta = np.random.choice(possible_thetas_minusTarg)
 					bot_theta = memTarg
 			else: #targOrNah = np.nan
-				if (currentBlock == 4) or (currentBlock == 5): #monitor 
+				if (currentBlock == monitor1) or (currentBlock == monitor2): #monitor 
 					top_theta = memTarg #looking for watch so top or bot probe doesn't matter
 					bot_theta = memTarg
-				elif (currentBlock == 6) or (currentBlock == 7): #m&m 
+				elif (currentBlock == mnm1) or (currentBlock == mnm2): #m&m 
 					if probe_loc == 'top': 
 						top_theta = memTarg
 						bot_theta = np.random.choice(possible_thetas_minusTarg)
@@ -589,14 +622,6 @@ def wordOrNonword(trial_i, probe_n):
 	elif df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword': 
 		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
 
-# def twoGratings(trial_i, probe_n): 
-# 	stim_top.ori = df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))]
-# 	print 'stimsTop', stim_top.ori
-# 	stim_top.draw()
-# 	stim_bot.ori = df.iloc[trial_i, df.columns.get_loc('botTheta{:d}'.format(probe_n))]
-# 	print 'stimsBot', stim_bot.ori
-# 	stim_bot.draw()
-
 def twoStims(trial_i, probe_n): 
 	topLoc = int(df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))])
 	stim_top.image = stim_dict['frac_{:d}'.format(topLoc)].image
@@ -607,7 +632,6 @@ def twoStims(trial_i, probe_n):
 	stim_bot.image = stim_dict['frac_{:d}'.format(botLoc)].image
 	print 'fractalBot', stim_bot.image
 	stim_bot.draw()	
-
 
 def clear(): 
 	clock.reset()
@@ -680,7 +704,7 @@ def getResp(trial_i, probe_n, block, stimDraw):
 						win.flip()
 						print 'incorrect'
 
-				elif (firstKey == '3') and ((block != 1) and (block != 8) and (block != 2) and (block != 3)): 
+				elif (firstKey == '3') and ((block != 1) and (block != 8) and (block != maintain1) and (block != maintain2)): 
 					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 					#stim_top.color = color_red
 					#stim_bot.color = color_red
@@ -751,7 +775,7 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 					#win.flip()
 
 					if (firstKey == '3'): 
-						if ((((block == 2) or (block == 3)) and (targNoTarg == 1)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))): 
+						if ((((block == maintain1) or (block == maintain2)) and (targNoTarg == 1)) or ((block == monitor1) or (block == monitor2) or (block == mnm1) or (block == mnm2))): 
 							#picked target, correct
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
 							circle_top.color = 'green'
@@ -761,7 +785,7 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 							twoStims(trial_i, probe_n)
 							win.flip()						
 							print 'correct, target present'
-						elif ((((block == 2) or (block == 3)) and (targNoTarg == 0)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))): #picked target, correct
+						elif ((((block == maintain1) or (block == maintain2)) and (targNoTarg == 0)) or ((block == monitor1) or (block == monitor2) or (block == mnm1) or (block == mnm2))): #picked target, correct
 							#picked target, incorrect
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 							circle_top.color = 'red'
@@ -773,7 +797,7 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 							print 'incorrect, target not present'					
 		
 					elif (firstKey == '4'): 
-						if ((((block == 2) or (block == 3)) and (targNoTarg == 0)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))):
+						if ((((block == maintain1) or (block == maintain2)) and (targNoTarg == 0)) or ((block == monitor1) or (block == monitor2) or (block == mnm1) or (block == mnm2))):
 							#picked no target, correct
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
 							circle_top.color = 'green'
@@ -784,7 +808,7 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 							win.flip()							
 							print 'correct, target not present'
 
-						elif ((((block == 2) or (block == 3)) and (targNoTarg == 1)) or ((block == 4) or (block == 5) or (block == 6) or (block == 7))):
+						elif ((((block == maintain1) or (block == maintain2)) and (targNoTarg == 1)) or ((block == monitor1) or (block == monitor2) or (block == mnm1) or (block == mnm2))):
 							#picked no target, incorrect
 							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 							circle_top.color = 'red'
@@ -834,10 +858,10 @@ def resetTrial():
 	#stim_bot.color = color_white
 
 
-def breakMessage(block_v1):
+def breakMessage(block):
 
 	breakText = "This is the end of block {:d}. \
-	\nPlease hold down the space bar to move onto the next block.".format(block_v1-1)
+	\nPlease hold down the space bar to move onto the next block.".format(block-1)
 
 	text.text = breakText
 	text.height=40.0
@@ -1027,23 +1051,9 @@ win.flip()
 
 for trial_i in range(N_TOTAL_TRIALS): 
 
-	 
-
-
 	block_starts = [106, 126, 146, 166, 186, 206, 226]
 
-	block = df.iloc[trial_i, df.columns.get_loc('block')]
-	block_v1 = df.iloc[trial_i, df.columns.get_loc('block_v1.1')]
-
-	## Interleaved blocks
-	if block == 3:
-		block = 4
-	elif block == 4: 
-		block = 6
-	elif block == 5: 
-		block = 3
-	elif block == 6: 
-		block = 5
+	block = df.block[trial_i][1] 
 
 	if trial_i in block_starts: 
 		# Break before moving on 
