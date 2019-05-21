@@ -196,6 +196,10 @@ df = pd.DataFrame(columns = df_columns, index = df_index)
 
 df['subj'] = subj
 
+
+
+#Copy to make practice df
+
 # Break up blocks, v1.0
 ## 1 and 8 = Baseline, trials 0-105 and 582-687
 ## 2 and 3 = Maintain, trials 106-125, 126-145
@@ -203,6 +207,8 @@ df['subj'] = subj
 ## 6 and 7 = M&M, trials 542-561, 562-581
 
 #Set blocks
+
+
 
 if blckstr == 'interleaved': 
 	blockDict = OrderedDict([
@@ -249,6 +255,17 @@ elif blckstr == 'blocked':
 else: 
 	raise Warning('Invalid block structure entered')	
 
+
+
+practDict = OrderedDict([
+	('base1_prac', base1), 
+	('maintain1_prac', maintain1), 
+	('monitor1_prac', monitor1), 
+	('mnm1_prac', mnm1)
+	])
+
+
+
 for index, row in df.iterrows(): 
 	if index in range(0,106): 
 		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[0] 
@@ -275,12 +292,24 @@ for index, row in df.iterrows():
 df['targOrNoTarg'] = np.nan
 
 
+
 blockOther_len = len(df.iloc[106:126, df.columns.get_loc('block')])
+
+
+pract_df = df.copy
+prac_len = 5 #5 trials of practice for each condition 
+targProb_other_prac = np.repeat([0,1], prac_len/2)
+prac_df.iloc[5:10, prac_df.columns.get_loc('targOrNoTarg')] = targProb_other_prac
+
+
+
 
 
 ## MAINTAIN 
 # Set target present for half of maintain, not present for other half of maintain
 targProb_other = np.repeat([0,1], blockOther_len/2)
+
+
 for block_other in range(2): 
 	np.random.shuffle(targProb_other)
 
