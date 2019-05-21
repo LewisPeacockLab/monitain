@@ -51,12 +51,13 @@ args = parser.parse_args()
 
 subj = args.subj
 scrn = args.scrn
-blckstr = args.blckstr
+blockStruct = args.blockStruct
 
 global debug 
 debug = subj in ['debug']
 
 global blckstr
+blckstr = blockStruct
 
 # Put .txt files into dataframes
 words_df = pd.read_table("words.csv", header=-1)
@@ -377,7 +378,7 @@ if blckstr == 'interleaved':
 	df.iloc[186:206, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mon)[probe_mon_size/2:]
 
 	df.iloc[146:166, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mnm)[:probe_mnm_size/2]
-	df.iloc[186:206, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mnm)[probe_mnm_size/2:]
+	df.iloc[206:226, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mnm)[probe_mnm_size/2:]
 
 elif blckstr == 'blocked': 
 	df.iloc[106:146, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_main) ## need to change this so it's not just setting subset in middle
@@ -399,14 +400,16 @@ nonword_list = list(nonwords_df['stimuli'])
 for i in range(N_TOTAL_TRIALS): 
 	print i, 'trial'
 	n_probes = df.loc[i, 'n_probes']
+	print n_probes, 'n_probes'
 	probe_loc = df.loc[i, 'probeTheta_loc']
 	memTarg = df.loc[i, 'targTheta']
-	currentBlock = df.loc[i, 'block']
+	currentBlock = df.block[i][1]
 	#possible_thetas_minusTarg = possible_thetas[possible_thetas!=memTarg]
 	possible_thetas_minusTarg = list(compress(possible_thetas, (possible_thetas != memTarg)))
 
 	for j in range(n_probes): 
 		print j, 'probe'
+
 
 		# Assign words #
 		cond = np.random.choice(['word', 'nonword'])
@@ -755,9 +758,9 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 			stim_top.autoDraw = False
 			stim_top.autoDraw = False
 
-		if (block == 2) or (block == 3): 
+		if (block == maintain1) or (block == maintain2): 
 			keysPossible = (keyList_target + keyList_nontarget)
-		elif (block == 4) or (block == 5) or (block == 6) or (block == 7): 
+		elif (block == monitor1) or (block == monitor2) or (block == mnm1) or (block == mnm2): 
 			keysPossible = (keyList_target)
 		else: 
 			print 'not good here'
@@ -837,7 +840,7 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 					#stim_top.color = color_red
 					#stim_bot.color = color_red
 					#twoStims(trial_i, probe_n)
-					win.flip()
+					#win.flip()
 					print 'missed'
 
 				df.at[trial_i, 'respProbe{:d}'.format(probe_n)] = allResp #first key
@@ -895,7 +898,8 @@ def presentSlides(slide):
 
 
 def instructionSlides(block_type): 
-	if block_type == 'maintain1' or 'maintain2'
+	print block_type
+	if (block_type is 'maintain1') or (block_type is 'maintain2'):
 	#if trial_i == (block_starts[0] or block_starts[3]): #before maintaining
 		if block_type == 'maintain2':
 			presentSlides(19)
@@ -907,11 +911,13 @@ def instructionSlides(block_type):
 		text.draw()
 		win.flip()
 		pressSpace()
+		print 'maintainnnnn'
 	
-	elif block_type == 'monitor1' or 'monitor2'	
+	elif (block_type is 'monitor1') or (block_type is 'monitor2'):
 	#elif trial_i == (block_starts[1] or block_starts[4]): #before monitoring
 		for slide in range(11,14): ##change later based on slides
 			presentSlides(slide)
+			print slide
 		win.color = color_gray
 		win.flip()
 		text.text = "Press space to begin"
@@ -919,7 +925,7 @@ def instructionSlides(block_type):
 		win.flip()
 		pressSpace()
 
-	elif block_type == 'mnm1' or 'mnm2'
+	elif (block_type is 'mnm1') or (block_type is 'mnm2'):
 	#elif trial_i == (block_starts[2] or block_starts[5]): #before mnm
 		for slide in range(14,19): ##change later based on slides
 			presentSlides(slide)
@@ -930,7 +936,7 @@ def instructionSlides(block_type):
 		win.flip()
 		pressSpace()
 
-	elif block_type == 'base2': 
+	elif (block_type is 'base2'): 
 	#elif trial_i == block_starts[6]: #before last baseline
 		for slide in range(20,22): ##change later based on slides
 			presentSlides(slide)
@@ -1006,7 +1012,7 @@ def targetProbe(trial_i, probe_n, block, lastProbe):
 	win.flip()
 	win.color = color_gray
 	wordOrNonword(trial_i, probe_n)
-	if ((block == 2) or (block == 3)) and (lastProbe == True): 
+	if ((block == maintain1) or (block == maintain2)) and (lastProbe == True): 
 		text.text = ''	
 	text.draw()
 	twoStims(trial_i, probe_n)
@@ -1044,21 +1050,21 @@ def iti():
 
 
 
-# Let Slack know experiment is starting
-slack_msg = 'Starting experiment'
-slackMessage(1, slack_msg)
+# # Let Slack know experiment is starting
+# slack_msg = 'Starting experiment'
+# slackMessage(1, slack_msg)
 
-# Starting instruction slides
-win.color = color_black
-win.flip()
-for start_slide in range(1,6): ##change later based on slides
-	presentSlides(start_slide)
+# # Starting instruction slides
+# win.color = color_black
+# win.flip()
+# for start_slide in range(1,6): ##change later based on slides
+# 	presentSlides(start_slide)
 
-win.color = color_gray
-win.flip()
+# win.color = color_gray
+# win.flip()
 
 for trial_i in range(N_TOTAL_TRIALS): 
-
+	print trial_i
 	block_starts = [106, 126, 146, 166, 186, 206, 226]
 
 	block_type = df.block[trial_i][0] 
@@ -1069,6 +1075,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		breakMessage(block)
 		# Save output at the end
 		df.to_csv(full_filename)
+		print block_type, 'block_type'
 		instructionSlides(block_type)
 
 		slack_msg = 'Starting block {:d}'.format(block)
@@ -1076,51 +1083,51 @@ for trial_i in range(N_TOTAL_TRIALS):
 		df.to_csv(full_filename)
 
 	## BASELINE
-	if block == 1: 
-		#print 'baseline1', trial_i
-	 	probe_n = 0
-	 	#ogOnly(trial_i, probe_n)
-	 	targetProbe(trial_i, probe_n, block, lastProbe = False)
-	 	#targetProbe
-	 	resetTrial()
+	# if block == 1: 
+	# 	#print 'baseline1', trial_i
+	#  	probe_n = 0
+	#  	#ogOnly(trial_i, probe_n)
+	#  	targetProbe(trial_i, probe_n, block, lastProbe = False)
+	#  	#targetProbe
+	#  	resetTrial()
 
-	## MAINTAIN
-	elif block == 2: 
-		#print 'maintain1',trial_i
-		target(trial_i)
-		delay()
-		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for probe_n in range(probeInTrial-1): ## Change to maintain block length 
-			#print 'probe',probe_n
-			#ogOnly(trial_i, probe_n)
-			targetProbe(trial_i, probe_n, block, lastProbe = False)
-		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
-		iti()
-		resetTrial()
+	# ## MAINTAIN
+	# elif block == 2: 
+	# 	#print 'maintain1',trial_i
+	# 	target(trial_i)
+	# 	delay()
+	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+	# 	for probe_n in range(probeInTrial-1): ## Change to maintain block length 
+	# 		#print 'probe',probe_n
+	# 		#ogOnly(trial_i, probe_n)
+	# 		targetProbe(trial_i, probe_n, block, lastProbe = False)
+	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
+	# 	iti()
+	# 	resetTrial()
 
-	## MONITOR
-	elif block == 3: 
-		#print 'monitor1',trial_i 
-		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-			#print 'probe', probe_n
-			targetProbe(trial_i, probe_n, block, lastProbe = False)
-		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
-		iti()
-		resetTrial()
+	# ## MONITOR
+	# if block == 3: 
+	# 	#print 'monitor1',trial_i 
+	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+	# 	for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
+	# 		#print 'probe', probe_n
+	# 		targetProbe(trial_i, probe_n, block, lastProbe = False)
+	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
+	# 	iti()
+	# 	resetTrial()
 
-	## MAINTAIN & MONITOR
-	elif block == 4: 
-		#print 'mnm1',trial_i
-		target(trial_i)
-		delay()
-		probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-		for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-			#print 'probe', probe_n
-			targetProbe(trial_i, probe_n, block, lastProbe = False)
-		targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
-		iti()
-		resetTrial()
+	# ## MAINTAIN & MONITOR
+	# elif block == 4: 
+	# 	#print 'mnm1',trial_i
+	# 	target(trial_i)
+	# 	delay()
+	# 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+	# 	for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
+	# 		#print 'probe', probe_n
+	# 		targetProbe(trial_i, probe_n, block, lastProbe = False)
+	# 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
+	# 	iti()
+	# 	resetTrial()
 
 	## MAINTAIN
 	elif block == 5: 
