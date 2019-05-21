@@ -215,12 +215,14 @@ if blckstr == 'interleaved':
 		('base2', 8)
 		])
 
+	base1 = 1
 	maintain1 = 2
 	maintain2 = 5
 	monitor1 = 3
 	monitor2 = 6
 	mnm1 = 4
 	mnm2 = 7
+	base2 = 8
 
 elif blckstr == 'blocked': 
 	blockDict = OrderedDict([
@@ -234,12 +236,14 @@ elif blckstr == 'blocked':
 		('base2', 8)
 		])
 
+	base1 = 1
 	maintain1 = 2
 	maintain2 = 3
 	monitor1 = 4
 	monitor2 = 5
 	mnm1 = 6
 	mnm2 = 7
+	base2 = 8 
 
 else: 
 	raise Warning('Invalid block structure entered')	
@@ -455,7 +459,7 @@ for i in range(N_TOTAL_TRIALS):
 					elif probe_loc == 'bot': 
 						top_theta = np.random.choice(possible_thetas_minusTarg)
 						bot_theta = memTarg
-				elif (currentBlock == 1) or (currentBlock == 8): #baseline
+				elif (currentBlock == base1) or (currentBlock == base2): #baseline
 						top_theta = np.random.choice(possible_thetas)
 						bot_theta = np.random.choice(possible_thetas)
 
@@ -704,7 +708,7 @@ def getResp(trial_i, probe_n, block, stimDraw):
 						win.flip()
 						print 'incorrect'
 
-				elif (firstKey == '3') and ((block != 1) and (block != 8) and (block != maintain1) and (block != maintain2)): 
+				elif (firstKey == '3') and ((block != base1) and (block != base2) and (block != maintain1) and (block != maintain2)): 
 					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 					#stim_top.color = color_red
 					#stim_bot.color = color_red
@@ -890,9 +894,10 @@ def presentSlides(slide):
 	pressSpace()
 
 
-def instructionSlides(trial_i): 
-	if trial_i == (block_starts[0] or block_starts[3]): #before maintaining
-		if trial_i == block_starts[3]:
+def instructionSlides(block_type): 
+	if block_type == 'maintain1' or 'maintain2'
+	#if trial_i == (block_starts[0] or block_starts[3]): #before maintaining
+		if block_type == 'maintain2':
 			presentSlides(19)
 		for slide in range(6,11): ##change later based on slides
 			presentSlides(slide)
@@ -902,8 +907,9 @@ def instructionSlides(trial_i):
 		text.draw()
 		win.flip()
 		pressSpace()
-		
-	elif trial_i == (block_starts[1] or block_starts[4]): #before monitoring
+	
+	elif block_type == 'monitor1' or 'monitor2'	
+	#elif trial_i == (block_starts[1] or block_starts[4]): #before monitoring
 		for slide in range(11,14): ##change later based on slides
 			presentSlides(slide)
 		win.color = color_gray
@@ -913,7 +919,8 @@ def instructionSlides(trial_i):
 		win.flip()
 		pressSpace()
 
-	elif trial_i == (block_starts[2] or block_starts[5]): #before mnm
+	elif block_type == 'mnm1' or 'mnm2'
+	#elif trial_i == (block_starts[2] or block_starts[5]): #before mnm
 		for slide in range(14,19): ##change later based on slides
 			presentSlides(slide)
 		win.color = color_gray
@@ -923,7 +930,8 @@ def instructionSlides(trial_i):
 		win.flip()
 		pressSpace()
 
-	elif trial_i == block_starts[6]: #before last baseline
+	elif block_type == 'base2': 
+	#elif trial_i == block_starts[6]: #before last baseline
 		for slide in range(20,22): ##change later based on slides
 			presentSlides(slide)
 		win.color = color_gray
@@ -1053,17 +1061,18 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	block_starts = [106, 126, 146, 166, 186, 206, 226]
 
+	block_type = df.block[trial_i][0] 
 	block = df.block[trial_i][1] 
 
 	if trial_i in block_starts: 
 		# Break before moving on 
-		breakMessage(block_v1)
+		breakMessage(block)
 		# Save output at the end
 		df.to_csv(full_filename)
-		instructionSlides(trial_i)
+		instructionSlides(block_type)
 
 		slack_msg = 'Starting block {:d}'.format(block)
-		slackMessage(block_v1, slack_msg)
+		slackMessage(block, slack_msg)
 		df.to_csv(full_filename)
 
 	## BASELINE
@@ -1165,7 +1174,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 presentSlides(21)
 
 slack_msg = 'Experiment finished'
-slackMessage(block_v1, slack_msg)
+slackMessage(block, slack_msg)
 
 # Save output at the end
 df.to_csv(full_filename)
