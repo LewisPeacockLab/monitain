@@ -26,6 +26,11 @@ from collections import OrderedDict
 from PIL import Image
 
 
+####################################
+###########  PARAMETERS  ###########
+####################################
+
+
 ## Thank yoooouuu Remy
 SCREENS = {
     'animal':          dict(distance_cm= 60,width_cm=47.3,pixel_dims=[1920,1080]),
@@ -43,48 +48,25 @@ parser = argparse.ArgumentParser(description="Monitain experimental display")
 parser.add_argument('--subj', default='s999', type=str, help='sXXX format')
 parser.add_argument('--scrn', default='misspiggy_main', type=str, choices=SCREENS.keys(), help = 'computer used for experiment')
 parser.add_argument('--blockStruct', default='interleaved', type = str, choices=['interleaved', 'blocked'], help='interleaved or blocked')
-
 args = parser.parse_args()
 
 #io = iohub.launchHubServer(); io.clearEvents('all')
 #keyboard = io.devices.keyboard
 
-subj = args.subj
-scrn = args.scrn
-blockStruct = args.blockStruct
+SUBJ = args.subj
+SCRN = args.scrn
+BLOCKSTRUCT = args.blockStruct
 
-global debug 
-debug = subj in ['debug']
+global DEBUG 
+DEBUG = SUBJ in ['debug']
 
-global blckstr
-blckstr = blockStruct
-
-# Put .txt files into dataframes
-words_df = pd.read_table("words.csv", header=-1)
-words_df = words_df.rename(columns={0:'stimuli'})
-words_df['type'] = 1
-
-words_df = shuffle(words_df)
-
-nonwords_df = pd.read_table("nonwords.csv", header=-1)
-nonwords_df = nonwords_df.rename(columns={0:'stimuli'})
-nonwords_df['type'] = 2
-
-nonwords_df = shuffle(nonwords_df)
-
-#stimCombine = [words_df, nonwords_df]
-#ogStims_df = pd.concat(stimCombine, ignore_index=True) # change name later when bigger set 
-#ogStims_df = shuffle(ogStims_df)
-#ogStims_df = ogStims_df.reset_index(drop=True)
+global BLCKSTR
+BLCKSTR = BLOCKSTRUCT
 
 
-
-####################################
-############ Parameters ############
-####################################
 
 ## Check to see if file exists
-data_path = "monitain_v1_" + str(subj)
+data_path = "monitain_v1_" + str(SUBJ)
 data_path_exists = os.path.exists(data_path)
 
 filename = data_path + ".csv"
@@ -98,7 +80,7 @@ full_filename = filename
 ## Set up Slack notificaitons
 SLACK = dict(
 	channel = '#katieshooks', 
-	botname = '{:s}'.format(subj), 
+	botname = '{:s}'.format(SUBJ), 
 	emoji = ':person_climbing:', 
 	url = 'https://hooks.slack.com/services/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'
 	)
@@ -119,29 +101,8 @@ event_times = OrderedDict([
 	('sec_probe',	2),  
 	('sec_iti', 	1)])
 
-# Import stims
-# x_data = []
-# files = glob.glob("stimuli/grayscale/*.png") 
-# for myFile in files: 
-# 	image = cv2.imread(myFile)
-# 	x_data.append(image)
-
-
-
-# for imagename in os.listdir("stimuli/grayscale/"): 
-# 	if imagename.endswith(".png"): 
-# 		imagename[-6:-4] = Image.open(imagename)
-
-# df['topFracFname'] = [ img_list[]]
-# imgStims = {
-# 	'top': visual.ImageStim(win, pos = [0, +10]), 
-# 	'mid': visual.ImageStim(win, pos = [0, 0]),
-# 	'bot': visual.ImageStim(win, pos = [0, -10])
-# }
-# Call by imgStims['top'], etc
-
 # Debugging mode
-if debug == True: 
+if DEBUG == True: 
 	event_times = OrderedDict([	(event, secs/50.) for event, secs in event_times.iteritems() ])
 
 
@@ -170,47 +131,9 @@ monitorTrials = 20
 mnmTrials = 20
 
 N_TOTAL_TRIALS = (baselineTrials*2) + (maintainTrials*2) + (monitorTrials*2) + (mnmTrials*2)
+N_TOTAL_TRIALS_PRACT = 5 * 3 #5 for each maintain, monitor, mnm
 
-
-# Create dataframe
-word_cols = ['word{:d}'.format(i) for i in range(N_MAX_PROBES)]
-wordCond_cols = ['word{:d}_cond'.format(i) for i in range(N_MAX_PROBES)]
-
-topTheta_cols = ['topTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
-botTheta_cols = ['botTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
-
-columns = ['subj', #subject id 
-	'block', #block 
-	#'block_type', #block type for v1.1, interleaved design
-	'targTheta', #angle for memory target
-	'n_probes',  #num of probes in trial 
-	'probeTheta_loc', #where target probe is on last probe
-	'targOrNoTarg', #is target present on final probe?
-	'acc', #acc for target probe for trial
-	'pm_acc' #pm acc for trial based on target probe
-	]
-
-df_columns = columns + word_cols + wordCond_cols + topTheta_cols + botTheta_cols
-df_index = range(N_TOTAL_TRIALS)
-df = pd.DataFrame(columns = df_columns, index = df_index)
-
-df['subj'] = subj
-
-
-
-#Copy to make practice df
-
-# Break up blocks, v1.0
-## 1 and 8 = Baseline, trials 0-105 and 582-687
-## 2 and 3 = Maintain, trials 106-125, 126-145
-## 4 and 5 = Monitor, trials 146-343, 344-541
-## 6 and 7 = M&M, trials 542-561, 562-581
-
-#Set blocks
-
-
-
-if blckstr == 'interleaved': 
+if BLCKSTR == 'interleaved': 
 	blockDict = OrderedDict([
 		('base1', 1), 
 		('maintain1', 2), 
@@ -231,7 +154,7 @@ if blckstr == 'interleaved':
 	mnm2 = 7
 	base2 = 8
 
-elif blckstr == 'blocked': 
+elif BLCKSTR == 'blocked': 
 	blockDict = OrderedDict([
 		('base1', 1), 
 		('maintain1', 2), 
@@ -265,6 +188,57 @@ practDict = OrderedDict([
 	])
 
 
+####################################
+############  STIMULI  #############
+####################################
+
+
+# Put .txt files into dataframes
+words_df = pd.read_table("words.csv", header=-1)
+words_df = words_df.rename(columns={0:'stimuli'})
+words_df['type'] = 1
+words_df = shuffle(words_df)
+
+nonwords_df = pd.read_table("nonwords.csv", header=-1)
+nonwords_df = nonwords_df.rename(columns={0:'stimuli'})
+nonwords_df['type'] = 2
+nonwords_df = shuffle(nonwords_df)
+
+
+
+
+####################################
+###########  DATAFRAME  ############
+####################################
+
+columns = ['subj', #subject id 
+	'block', #block 
+	'targTheta', #angle for memory target
+	'n_probes',  #num of probes in trial 
+	'probeTheta_loc', #where target probe is on last probe
+	'targOrNoTarg', #is target present on final probe?
+	'acc', #acc for target probe for trial
+	'pm_acc' #pm acc for trial based on target probe
+	]
+
+word_cols = ['word{:d}'.format(i) for i in range(N_MAX_PROBES)]
+wordCond_cols = ['word{:d}_cond'.format(i) for i in range(N_MAX_PROBES)]
+
+topTheta_cols = ['topTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
+botTheta_cols = ['botTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
+
+df_columns = columns + word_cols + wordCond_cols + topTheta_cols + botTheta_cols
+df_index = range(N_TOTAL_TRIALS)
+df = pd.DataFrame(columns = df_columns, index = df_index)
+
+df['subj'] = SUBJ
+
+
+## Practice df 
+pract_df_index = range(N_TOTAL_TRIALS_PRACT)
+pract_df = pd.DataFrame(columns = df_columns, index = pract_df_index
+
+
 
 for index, row in df.iterrows(): 
 	if index in range(0,106): 
@@ -296,8 +270,8 @@ df['targOrNoTarg'] = np.nan
 blockOther_len = len(df.iloc[106:126, df.columns.get_loc('block')])
 
 
-pract_df = df.copy
-prac_len = 5 #5 trials of practice for each condition 
+#pract_df = df.copy
+#prac_len = 5 #5 trials of practice for each condition 
 targProb_other_prac = np.repeat([0,1], prac_len/2)
 prac_df.iloc[5:10, prac_df.columns.get_loc('targOrNoTarg')] = targProb_other_prac
 
@@ -313,7 +287,7 @@ targProb_other = np.repeat([0,1], blockOther_len/2)
 for block_other in range(2): 
 	np.random.shuffle(targProb_other)
 
-	if blckstr == 'interleaved': 
+	if BLCKSTR == 'interleaved': 
 		if block_other == 0: #block 2
 			df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targProb_other
 		elif block_other == 1: #block 5
@@ -399,7 +373,7 @@ probe_mnm_size = np.ravel(probe_count_list_mnm).size #should equal 160 for now
 baseline_probe_range = np.repeat([1],106)
 df.iloc[0:106, df.columns.get_loc('n_probes')] = baseline_probe_range
 
-if blckstr == 'interleaved': 
+if BLCKSTR == 'interleaved': 
 	df.iloc[106:126, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_main)[:probe_main_size/2]
 	df.iloc[166:186, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_main)[probe_main_size/2:]
 
@@ -409,7 +383,7 @@ if blckstr == 'interleaved':
 	df.iloc[146:166, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mnm)[:probe_mnm_size/2]
 	df.iloc[206:226, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mnm)[probe_mnm_size/2:]
 
-elif blckstr == 'blocked': 
+elif BLCKSTR == 'blocked': 
 	df.iloc[106:146, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_main) ## need to change this so it's not just setting subset in middle
 
 	df.iloc[146:186, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mon)
@@ -527,8 +501,8 @@ df = df.astype('object')
 clock = core.Clock()
 
 mon = monitors.Monitor('testMonitor')
-mon.setWidth(SCREENS[scrn]['width_cm'])
-mon.setSizePix(SCREENS[scrn]['pixel_dims'])
+mon.setWidth(SCREENS[SCRN]['width_cm'])
+mon.setSizePix(SCREENS[SCRN]['pixel_dims'])
 
 # Window set up
 win = visual.Window(
@@ -671,11 +645,11 @@ def twoStims(trial_i, probe_n):
 
 def clear(): 
 	clock.reset()
-	if debug == False: 
+	if DEBUG == False: 
 		event.clearEvents()	
 
 def pressSpace(): 
-	if debug == True: 
+	if DEBUG == True: 
 		return 
 	while 1: 
 		for key in event.getKeys(): 			
@@ -692,7 +666,7 @@ def getResp(trial_i, probe_n, block, stimDraw):
 	duration = event_times['sec_probe']
 
 	#Skip responses if debugging
-	if debug == True: 
+	if DEBUG == True: 
 		responded = True
 	#accPos = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
 
@@ -776,7 +750,7 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 	responded = False
 	duration = event_times['sec_probe']
 
-	if debug == True: 
+	if DEBUG == True: 
 		responded = True
 
 	while clock.getTime() < duration: 
@@ -908,7 +882,7 @@ def breakMessage(block):
 
 	pressContinue = False
 	while pressContinue == False: 
-		if debug == False:
+		if DEBUG == False:
 			keyPress = event.waitKeys()
 
 			if keyPress == ['space']: 
