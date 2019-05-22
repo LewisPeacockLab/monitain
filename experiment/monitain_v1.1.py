@@ -120,7 +120,10 @@ LOWER_CATCH_TRIAL = 1
 UPPER_CATCH_TRIAL = 7
 
 N_BLOCKS = 8
-probe_count_list = [] 
+
+N_BLOCKS_MAINTAIN = 2
+N_BLOCKS_MON = 2
+N_BLOCKS_MnM = 2
 
 trials = range(N_MIN_PROBES, N_MAX_PROBES+1)
 
@@ -231,95 +234,56 @@ df_columns = columns + word_cols + wordCond_cols + topTheta_cols + botTheta_cols
 df_index = range(N_TOTAL_TRIALS)
 df = pd.DataFrame(columns = df_columns, index = df_index)
 
+## Practice df 
+#pract_df_index = range(N_TOTAL_TRIALS_PRACT)
+pract_df = pd.DataFrame(columns = df_columns, index = df_index)
+
+## DF - Subject 
 df['subj'] = SUBJ
 
-
-## Practice df 
-pract_df_index = range(N_TOTAL_TRIALS_PRACT)
-pract_df = pd.DataFrame(columns = df_columns, index = pract_df_index
-
-
-
+## DF - Block
 for index, row in df.iterrows(): 
 	if index in range(0,106): 
 		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[0] 
+		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[0] 
 	elif index in range(106,126): 
 		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[1] 
+		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[1]
 	elif index in range(126,146): 
 		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[2] 
+		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[2]
 	elif index in range(146,166): 
 		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[3] 
+		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[3]
 	elif index in range(166,186): 
 		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[4] 
+		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[4]
 	elif index in range(186,206): 
 		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[5] 
+		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[5]
 	elif index in range(206,226): 
 		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[6] 
+		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[6]
 	elif index in range(226,332): 
 		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[7] 
+		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[7]
 
 #df.block[x][0] gives block type
 #df.block[x][1] gives block num
 
 #df.iloc[0:106, df.columns.get_loc('targOrNoTarg')] = np.nan
 #df.iloc[226:332, df.columns.get_loc('targOrNoTarg')] = np.nan
-df['targOrNoTarg'] = np.nan
 
-
-
-blockOther_len = len(df.iloc[106:126, df.columns.get_loc('block')])
-
-
-#pract_df = df.copy
-#prac_len = 5 #5 trials of practice for each condition 
-targProb_other_prac = np.repeat([0,1], prac_len/2)
-prac_df.iloc[5:10, prac_df.columns.get_loc('targOrNoTarg')] = targProb_other_prac
-
-
-
-
-
-## MAINTAIN 
-# Set target present for half of maintain, not present for other half of maintain
-targProb_other = np.repeat([0,1], blockOther_len/2)
-
-
-for block_other in range(2): 
-	np.random.shuffle(targProb_other)
-
-	if BLCKSTR == 'interleaved': 
-		if block_other == 0: #block 2
-			df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targProb_other
-		elif block_other == 1: #block 5
-			df.iloc[166:186, df.columns.get_loc('targOrNoTarg')] = targProb_other
-	elif blockstr == 'blocked': 
-		if block_other == 0: #block2 
-			df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targProb_other
-		elif block_other == 1: #block 3
-			df.iloc[126:146, df.columns.get_loc('targOrNoTarg')] = targProb_other
-
-# Double check that half are ones and half are zeros
-# pd.value_counts(df['targOrNoTarg'].values, sort=False) 
-
-# Will the top or bottom be probed?
-all_targetTheta_locs = np.repeat(['top', 'bot'], N_TOTAL_TRIALS/2)
-np.random.shuffle(all_targetTheta_locs)
-df['probeTheta_loc'] = all_targetTheta_locs 
-
-possible_thetas = np.linspace(0,180, 18, endpoint=False) # Possible orientations presented
-
-
+## DF - Target fractal/theta
 possible_thetas = np.array(range(1,21))
-
 np.random.choice(possible_thetas)
-
 
 def pickTheta(x): 
 	return np.random.choice(possible_thetas)
 
-
 df['targTheta'] = df.targTheta.apply(pickTheta)
 
+## DF - Number of probes
 catch_range = range(LOWER_CATCH_TRIAL, UPPER_CATCH_TRIAL+ 1)
 
 probes = range(N_MIN_PROBES, N_MAX_PROBES+1)
@@ -329,70 +293,114 @@ N_CATCH_PER_BLOCK = N_PROBES_PER_BLOCK - probe_range.size
 
 new_range = np.append(catch_range, probe_range)
 
-N_BLOCKS_MAINTAIN = 2
-N_BLOCKS_MON = 2
-N_BLOCKS_MnM = 2
 
 
+def pickProbes(n_blocks, catch_range, N_CATCH_PER_BLOCK):
+	probe_count_list = []
+	for i in range(n_blocks): 
+		catch_subset = np.random.choice(catch_range, size = N_CATCH_PER_BLOCK)
+		probe_set = np.append(catch_subset, probe_range)
+		np.random.shuffle(probe_set)
+		probe_count_list.append(probe_set)
+	probe_size = np.ravel(probe_count_list).size
+	probe_ravel_1 = np.ravel(probe_count_list)[:probe_size/2]
+	probe_ravel_2 = np.ravel(probe_count_list)[probe_size/2:]
+	return (probe_ravel_1, probe_ravel_2)
 
-#MAINTAIN probe num 
-probe_count_list_main = []
-for i in range(N_BLOCKS_MAINTAIN): 
-	catch_subset_main = np.random.choice(catch_range, size = N_CATCH_PER_BLOCK)
-	probe_set_main = np.append(catch_subset_main, probe_range)
-	np.random.shuffle(probe_set_main)
-	probe_count_list_main.append(probe_set_main)
+# Practice probes
+practProbes = np.array(range(1,16))
+np.random.choice(practProbes)
+def pickProbes_pract(x): 
+	return np.random.choice(practProbes)
+pract_df['n_probes'] = pract_df.n_probes.apply(pickProbes_pract)
 
-probe_main_size=np.ravel(probe_count_list_main).size 
-
-#MONITOR probe num 
-probe_count_list_mon = []
-for i in range(N_BLOCKS_MON): 
-	catch_subset_mon = np.random.choice(catch_range, size = N_CATCH_PER_BLOCK)
-	probe_set_mon = np.append(catch_subset_mon, probe_range)
-	np.random.shuffle(probe_set_mon)
-	probe_count_list_mon.append(probe_set_mon)
-
-probe_mon_size = np.ravel(probe_count_list_mon).size #should equal 160 for now
-#df['n_probes'] = np.ravel(probe_count_list)
-
-#MNM probe num 
-probe_count_list_mnm = []
-for i in range(N_BLOCKS_MnM): 
-	catch_subset_mnm = np.random.choice(catch_range, size = N_CATCH_PER_BLOCK)
-	probe_set_mnm = np.append(catch_subset_mnm, probe_range)
-	np.random.shuffle(probe_set_mnm)
-	probe_count_list_mnm.append(probe_set_mnm)
-
-probe_mnm_size = np.ravel(probe_count_list_mnm).size #should equal 160 for now
-#df['n_probes'] = np.ravel(probe_count_list)
-
-
-# Set probe nums 
-#BASELINE 1 probe num
+#BLOCK 1 probe num
 baseline_probe_range = np.repeat([1],106)
 df.iloc[0:106, df.columns.get_loc('n_probes')] = baseline_probe_range
 
+#BLOCK 8 probe num
+df.iloc[226:332, df.columns.get_loc('n_probes')] = baseline_probe_range
+
+#BLOCKS 2-7 probe num
+(maintainProbes1, maintainProbes2) = pickProbes(N_BLOCKS_MAINTAIN, catch_range, N_CATCH_PER_BLOCK)
+(monitorProbes1, monitorProbes2) = pickProbes(N_BLOCKS_MON, catch_range, N_CATCH_PER_BLOCK)
+(mnmProbes1, mnmProbes2) = pickProbes(N_BLOCKS_MnM, catch_range, N_CATCH_PER_BLOCK)
+
 if BLCKSTR == 'interleaved': 
-	df.iloc[106:126, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_main)[:probe_main_size/2]
-	df.iloc[166:186, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_main)[probe_main_size/2:]
 
-	df.iloc[126:146, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mon)[:probe_mon_size/2]
-	df.iloc[186:206, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mon)[probe_mon_size/2:]
+	df.iloc[106:126, df.columns.get_loc('n_probes')] = maintainProbes1
+	df.iloc[166:186, df.columns.get_loc('n_probes')] = maintainProbes2
 
-	df.iloc[146:166, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mnm)[:probe_mnm_size/2]
-	df.iloc[206:226, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mnm)[probe_mnm_size/2:]
+	df.iloc[126:146, df.columns.get_loc('n_probes')] = monitorProbes1
+	df.iloc[186:206, df.columns.get_loc('n_probes')] = monitorProbes2
+
+	df.iloc[146:166, df.columns.get_loc('n_probes')] = mnmProbes1
+	df.iloc[206:226, df.columns.get_loc('n_probes')] = mnmProbes2
 
 elif BLCKSTR == 'blocked': 
-	df.iloc[106:146, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_main) ## need to change this so it's not just setting subset in middle
 
-	df.iloc[146:186, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mon)
+	df.iloc[106:146, df.columns.get_loc('n_probes')] = np.concatenate((maintainProbes1, maintainProbes2)) 
 
-	df.iloc[186:226, df.columns.get_loc('n_probes')] = np.ravel(probe_count_list_mnm)
+	df.iloc[146:186, df.columns.get_loc('n_probes')] = np.concatenate((monitorProbes1, monitorProbes2))
+
+	df.iloc[186:226, df.columns.get_loc('n_probes')] = np.concatenate((mnmProbes1, mnmProbes2))
 
 
-#BASELINE 2 probe num
-df.iloc[226:332, df.columns.get_loc('n_probes')] = baseline_probe_range
+
+## DF - Probe fractal/theta location 
+
+
+
+
+
+
+
+df['targOrNoTarg'] = np.nan
+pract_df['targOrNoTarg'] = np.nan
+
+# Will the top or bottom be probed?
+all_targetTheta_locs = np.repeat(['top', 'bot'], N_TOTAL_TRIALS/2)
+np.random.shuffle(all_targetTheta_locs)
+df['probeTheta_loc'] = all_targetTheta_locs 
+
+
+blockOther_len = len(df.iloc[106:126, df.columns.get_loc('block')])
+pract_len = 5 #5 trials of practice for each condition 
+
+
+## MAINTAIN 
+# Set target present for half of maintain, not present for other half of maintain
+targProb_other = np.repeat([0,1], blockOther_len/2)
+pract_targProb_other = np.repeat([0,1], pract_len/2 + 1)
+
+for block_other in range(2): 
+	np.random.shuffle(targProb_other)
+	np.random.shuffle(pract_targProb_other)
+	pract_targProb_other = pract_targProb_other[:5]
+
+	if BLCKSTR == 'interleaved': 
+		if block_other == 0: #block 2
+			df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targProb_other
+			pract_df.iloc[106:126, pract_df.columns.get_loc('targOrNoTarg')] = pract_targProb_other
+		elif block_other == 1: #block 5
+			df.iloc[166:186, df.columns.get_loc('targOrNoTarg')] = targProb_other
+	elif blockstr == 'blocked': 
+		if block_other == 0: #block2 
+			df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targProb_other
+			pract_df.iloc[106:126, pract_df.columns.get_loc('targOrNoTarg')] = pract_targProb_other
+		elif block_other == 1: #block 3
+			df.iloc[126:146, df.columns.get_loc('targOrNoTarg')] = targProb_other
+
+# Double check that half are ones and half are zeros
+# pd.value_counts(df['targOrNoTarg'].values, sort=False) 
+
+
+
+
+
+
+
+
 
 
 
