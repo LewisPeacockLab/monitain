@@ -348,21 +348,20 @@ elif BLCKSTR == 'blocked':
 
 
 ## DF - Probe fractal/theta location 
+# Will the top or bottom be probed?
+
+def pickProbeLoc(x): 
+	all_targetTheta_locs = np.repeat(['top', 'bot'], N_TOTAL_TRIALS/2)
+	np.random.shuffle(all_targetTheta_locs)
+	np.ravel(all_targetTheta_locs)
+	return all_targetTheta_locs
+df['probeTheta_loc'] = pickProbeLoc(all_targetTheta_locs)
+pract_df['probeTheta_loc'] = pickProbeLoc(all_targetTheta_locs)
 
 
-
-
-
-
-
+## DF - Target or no target
 df['targOrNoTarg'] = np.nan
 pract_df['targOrNoTarg'] = np.nan
-
-# Will the top or bottom be probed?
-all_targetTheta_locs = np.repeat(['top', 'bot'], N_TOTAL_TRIALS/2)
-np.random.shuffle(all_targetTheta_locs)
-df['probeTheta_loc'] = all_targetTheta_locs 
-
 
 blockOther_len = len(df.iloc[106:126, df.columns.get_loc('block')])
 pract_len = 5 #5 trials of practice for each condition 
@@ -407,6 +406,9 @@ for block_other in range(2):
 # Add word and nonword stims to dataframe
 word_list = list(words_df['stimuli'])
 nonword_list = list(nonwords_df['stimuli'])
+
+prac_word_list = 
+prac_nonword_list = 
 
 for i in range(N_TOTAL_TRIALS): 
 	print i, 'trial'
