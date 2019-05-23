@@ -204,19 +204,17 @@ nonwords_df = shuffle(nonwords_df)
 
 # Practice stimuli 
 pract_words_df = pd.read_table("pract_words.csv", header=-1)
-pract_words_df = words.df.rename(columns={0:'stimuli'})
+pract_words_df = pract_words_df.rename(columns={0:'stimuli'})
 pract_words_df['type'] = 1
 pract_words_df = shuffle(pract_words_df)
 
 pract_nonwords_df = pd.read_table("pract_nonwords.csv", header=-1)
-pract_nonwords_df = words.df.rename(columns={0:'stimuli'})
+pract_nonwords_df = pract_nonwords_df.rename(columns={0:'stimuli'})
 pract_nonwords_df['type'] = 2
 pract_nonwords_df = shuffle(pract_nonwords_df)
 
 # Import images
 img_list = glob.glob("stimuli/grayscale/*.png")
-
-stim_dict = { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=win, image=fn)for fn in glob.glob("stimuli/grayscale/*.png") }
 
 
 
@@ -261,23 +259,19 @@ for index, row in df.iterrows():
 		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[1] 
 		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[1]
 	elif index in range(126,146): 
-		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[2] 
+		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[2] 		
 		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[2]
 	elif index in range(146,166): 
 		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[3] 
 		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[3]
 	elif index in range(166,186): 
 		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[4] 
-		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[4]
 	elif index in range(186,206): 
 		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[5] 
-		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[5]
 	elif index in range(206,226): 
 		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[6] 
-		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[6]
 	elif index in range(226,332): 
 		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[7] 
-		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[7]
 
 #df.block[x][0] gives block type
 #df.block[x][1] gives block num
@@ -359,10 +353,10 @@ elif BLCKSTR == 'blocked':
 # Will the top or bottom be probed?
 
 def pickProbeLoc(x): 
-	all_targetTheta_locs = np.repeat(['top', 'bot'], N_TOTAL_TRIALS/2)
 	np.random.shuffle(all_targetTheta_locs)
 	np.ravel(all_targetTheta_locs)
 	return all_targetTheta_locs
+all_targetTheta_locs = np.repeat(['top', 'bot'], N_TOTAL_TRIALS/2)
 df['probeTheta_loc'] = pickProbeLoc(all_targetTheta_locs)
 pract_df['probeTheta_loc'] = pickProbeLoc(all_targetTheta_locs)
 
@@ -387,13 +381,13 @@ for block_other in range(2):
 	if BLCKSTR == 'interleaved': 
 		if block_other == 0: #block 2
 			df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targProb_other
-			pract_df.iloc[106:126, pract_df.columns.get_loc('targOrNoTarg')] = pract_targProb_other
+			pract_df.iloc[106:111, pract_df.columns.get_loc('targOrNoTarg')] = pract_targProb_other
 		elif block_other == 1: #block 5
 			df.iloc[166:186, df.columns.get_loc('targOrNoTarg')] = targProb_other
 	elif blockstr == 'blocked': 
 		if block_other == 0: #block2 
 			df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targProb_other
-			pract_df.iloc[106:126, pract_df.columns.get_loc('targOrNoTarg')] = pract_targProb_other
+			pract_df.iloc[106:111, pract_df.columns.get_loc('targOrNoTarg')] = pract_targProb_other
 		elif block_other == 1: #block 3
 			df.iloc[126:146, df.columns.get_loc('targOrNoTarg')] = targProb_other
 
@@ -492,7 +486,7 @@ for i in range(N_TOTAL_TRIALS):
 
 #Might need to remove later
 df = df.astype('object')
-
+pract_df = pract_df.astype('object')
 
 
 ####################################
@@ -515,9 +509,12 @@ win = visual.Window(
 	fullscr=False, #set to True when running for real
 	)
 
-# Images for instructions
 windowSize = win.size
 
+stim_dict = { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=win, image=fn)for fn in glob.glob("stimuli/grayscale/*.png") }
+
+
+# Images for instructions
 instructImage = visual.ImageStim(
 	win = win, 
 	size = win.size/2 
@@ -525,6 +522,7 @@ instructImage = visual.ImageStim(
 
 fractal_size = [128, 128] #default that they came at 
 
+# Fractal positions - top, middle, bottom 
 stim_top = visual.ImageStim(
 	win = win, 
 	#colorSpace = 'rgb255', 
@@ -552,6 +550,7 @@ stim_bot = visual.ImageStim(
 	size = fractal_size
 	)
 
+# Feedback behind fractals
 circle_top = visual.Circle(
 	win = win, 
 	units = "pix", 
@@ -580,22 +579,23 @@ text = visual.TextStim(
 
 
 ####################################
-############## Set up ##############
+#######  UTILITY FUNCTIONS  ########
 ####################################
 
-def wordOrNonword(trial_i, probe_n): 
-	if df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'word': 
-		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
-	elif df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword': 
-		text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
 
-def twoStims(trial_i, probe_n): 
-	topLoc = int(df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))])
+def wordOrNonword(trial_i, probe_n, dframe): 
+	if dframe.iloc[trial_i, dframe.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'word': 
+		text.text = dframe.iloc[trial_i, dframe.columns.get_loc('word{:d}'.format(probe_n))]
+	elif dframe.iloc[trial_i, dframe.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword': 
+		text.text = dframe.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
+
+def twoStims(trial_i, probe_n, dframe): 
+	topLoc = int(dframe.iloc[trial_i, dframe.columns.get_loc('topTheta{:d}'.format(probe_n))])
 	stim_top.image = stim_dict['frac_{:d}'.format(topLoc)].image
 	print 'fractalTop', stim_top.image
 	stim_top.draw()
 
-	botLoc = int(df.iloc[trial_i, df.columns.get_loc('botTheta{:d}'.format(probe_n))])
+	botLoc = int(dframe.iloc[trial_i, dframe.columns.get_loc('botTheta{:d}'.format(probe_n))])
 	stim_bot.image = stim_dict['frac_{:d}'.format(botLoc)].image
 	print 'fractalBot', stim_bot.image
 	stim_bot.draw()	
@@ -613,10 +613,9 @@ def pressSpace():
 			if key == 'space': 
 				win.color = color_black
 				win.flip()
-				#win.flip()
 				return 
 			
-def getResp(trial_i, probe_n, block, stimDraw): 
+def getResp(trial_i, probe_n, block, stimDraw, dframe): 
 	allResp = []
 	responded = False
 	duration = event_times['sec_probe']
@@ -641,56 +640,53 @@ def getResp(trial_i, probe_n, block, stimDraw):
 				#print df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))]
 				firstKey = allResp[0] 
 				if firstKey in keyList_word: 
-					#text.color = color_cyan #flip text to blue if input taken
-					#text.draw()
-					#win.flip()
 			
-					if (firstKey == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'word'): #picked word, correct
-						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
+					if (firstKey == '1') and (dframe.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'word'): #picked word, correct
+						dframe.iloc[trial_i, dframe.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
 						text.color = color_green
 						text.draw()
 						win.flip()
 						print 'correct'
-					elif (firstKey == '1') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'word'): #picked word, incorrect
-						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
+					elif (firstKey == '1') and (dframe.iloc[trial_i, dframe.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'word'): #picked word, incorrect
+						dframe.iloc[trial_i, dframe.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 						text.color = color_red
 						text.draw()
 						win.flip()
 						print 'incorrect'
-					elif (firstKey == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword'): #picked nonword, correct
-						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
+					elif (firstKey == '2') and (dframe.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] == 'nonword'): #picked nonword, correct
+						dframe.iloc[trial_i, dframe.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
 						text.color = color_green
 						text.draw()
 						win.flip()
 						print 'correct'
-					elif (firstKey == '2') and (df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'nonword'): #picked nonword, incorrect
-						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
+					elif (firstKey == '2') and (dframe.iloc[trial_i, dframe.columns.get_loc('word{:d}_cond'.format(probe_n))] != 'nonword'): #picked nonword, incorrect
+						dframe.iloc[trial_i, dframe.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 						text.color = color_red
 						text.draw()
 						win.flip()
 						print 'incorrect'
 
 				elif (firstKey == '3') and ((block != base1) and (block != base2) and (block != maintain1) and (block != maintain2)): 
-					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
+					dframe.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 					#stim_top.color = color_red
 					#stim_bot.color = color_red
 					circle_top.color = 'red'
 					circle_bot.color = 'red'
 					circle_top.draw()
 					circle_bot.draw()
-					twoStims(trial_i, probe_n)
+					twoStims(trial_i, probe_n, dframe)
 					text.draw()
 					win.flip()
 
 				else: #picked nothing or a key that wasn't 1 or 2
-					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
+					dframe.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 
 				print 'allResp', allResp
 
-				df.at[trial_i, 'respProbe{:d}'.format(probe_n)] = allResp #first key
+				dframe.at[trial_i, 'respProbe{:d}'.format(probe_n)] = allResp #first key
 				#df.loc[trial_i, 'respProbe{:d}'.format(probe_n)]= pd.Series(allResp)
-				df.at[trial_i, 'rtProbe{:d}'.format(probe_n)] = allResp[1] #first rt
-				print df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))], 'acc'
+				dframe.at[trial_i, 'rtProbe{:d}'.format(probe_n)] = allResp[1] #first rt
+				print dframe.iloc[trial_i, dframe.columns.get_loc('probe{:d}_acc'.format(probe_n))], 'acc'
 	else: 
 		stim_top.autoDraw = False
 		stim_bot.autoDraw = False
@@ -701,7 +697,7 @@ def getResp(trial_i, probe_n, block, stimDraw):
 	#stims.autoDraw = False #change to false after done
 
 
-def getResp_targ(trial_i, probe_n, block, stimDraw): 	
+def getResp_targ(trial_i, probe_n, block, stimDraw, dframe): 	
 	allResp = []
 	responded = False
 	duration = event_times['sec_probe']
@@ -726,62 +722,58 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 
 		if responded == False : 
 			for key, rt in event.getKeys(timeStamped=clock):
-				allResp += key, rt
-				
+				allResp += key, rt			
 				#responded = True 
 				#print df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))]
-				targNoTarg = df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]
+				targNoTarg = dframe.iloc[trial_i, dframe.columns.get_loc('targOrNoTarg')]
 				#accPos = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
 				firstKey = allResp[0]
 				if firstKey in keysPossible: 
 					text.draw()
-					#stim_top.color = color_cyan
-					#stim_bot.color = color_cyan
-					#twoStims(trial_i, probe_n)
-					#win.flip()
 
 					if (firstKey == '3'): 
 						if ((((block == maintain1) or (block == maintain2)) and (targNoTarg == 1)) or ((block == monitor1) or (block == monitor2) or (block == mnm1) or (block == mnm2))): 
 							#picked target, correct
-							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
+							dframe.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
 							circle_top.color = 'green'
 							circle_bot.color = 'green'
 							circle_top.draw()
 							circle_bot.draw()
-							twoStims(trial_i, probe_n)
+							twoStims(trial_i, probe_n, dframe)
 							win.flip()						
 							print 'correct, target present'
+
 						elif ((((block == maintain1) or (block == maintain2)) and (targNoTarg == 0)) or ((block == monitor1) or (block == monitor2) or (block == mnm1) or (block == mnm2))): #picked target, correct
 							#picked target, incorrect
-							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
+							dframe.iloc[trial_i, dframe.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 							circle_top.color = 'red'
 							circle_bot.color = 'red'
 							circle_top.draw()
 							circle_bot.draw()
-							twoStims(trial_i, probe_n)
+							twoStims(trial_i, probe_n, dframe)
 							win.flip()							
 							print 'incorrect, target not present'					
 		
 					elif (firstKey == '4'): 
 						if ((((block == maintain1) or (block == maintain2)) and (targNoTarg == 0)) or ((block == monitor1) or (block == monitor2) or (block == mnm1) or (block == mnm2))):
 							#picked no target, correct
-							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
+							dframe.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
 							circle_top.color = 'green'
 							circle_bot.color = 'green'
 							circle_top.draw()
 							circle_bot.draw()
-							twoStims(trial_i, probe_n)
+							twoStims(trial_i, probe_n, dframe)
 							win.flip()							
 							print 'correct, target not present'
 
 						elif ((((block == maintain1) or (block == maintain2)) and (targNoTarg == 1)) or ((block == monitor1) or (block == monitor2) or (block == mnm1) or (block == mnm2))):
 							#picked no target, incorrect
-							df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
+							dframe.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 							circle_top.color = 'red'
 							circle_bot.color = 'red'
 							circle_top.draw()
 							circle_bot.draw()
-							twoStims(trial_i, probe_n)
+							twoStims(trial_i, probe_n, dframe)
 							win.flip()				
 							print 'incorrect, target present'
 						
@@ -789,32 +781,25 @@ def getResp_targ(trial_i, probe_n, block, stimDraw):
 						print 'yikes'
 
 				elif (firstKey == '1') or (firstKey == '2'): 
-					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
+					dframe.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 					text.color = color_blue
 					text.draw()
 					win.flip()
 
 				else: #picked nothing or a key that wasn't 1 or 2
-					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0	
-					#stim_top.color = color_red
-					#stim_bot.color = color_red
-					#twoStims(trial_i, probe_n)
-					#win.flip()
+					dframe.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0	
 					print 'missed'
 
-				df.at[trial_i, 'respProbe{:d}'.format(probe_n)] = allResp #first key
-				df.at[trial_i, 'rtProbe{:d}'.format(probe_n)] = allResp[1] #first rt
+				dframe.at[trial_i, 'respProbe{:d}'.format(probe_n)] = allResp #first key
+				dframe.at[trial_i, 'rtProbe{:d}'.format(probe_n)] = allResp[1] #first rt
 
-				print df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))], 'acc'
-				#print stim_top.color
-				#print stim_bot.color
-				df.iloc[trial_i, df.columns.get_loc('pm_acc')] = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
+				print dframe.iloc[trial_i, dframe.columns.get_loc('probe{:d}_acc'.format(probe_n))], 'acc'
+				dframe.iloc[trial_i, dframe.columns.get_loc('pm_acc')] = dframe.iloc[trial_i, dframe.columns.get_loc('probe{:d}_acc'.format(probe_n))]
 	else: 
 		stim_top.autoDraw = False
 		stim_bot.autoDraw = False
 
 	#stims.autoDraw = False #change to false after done
-
 
 def resetTrial(): 
 	text.color = color_cyan
@@ -869,7 +854,6 @@ def instructionSlides(block_type):
 		pressSpace()
 	
 	elif (block_type is 'monitor1') or (block_type is 'monitor2'):
-	#elif trial_i == (block_starts[1] or block_starts[4]): #before monitoring
 		for slide in range(11,14): ##change later based on slides
 			presentSlides(slide)
 		win.color = color_gray
@@ -880,7 +864,6 @@ def instructionSlides(block_type):
 		pressSpace()
 
 	elif (block_type is 'mnm1') or (block_type is 'mnm2'):
-	#elif trial_i == (block_starts[2] or block_starts[5]): #before mnm
 		for slide in range(14,19): ##change later based on slides
 			presentSlides(slide)
 		win.color = color_gray
@@ -891,7 +874,6 @@ def instructionSlides(block_type):
 		pressSpace()
 
 	elif (block_type is 'base2'): 
-	#elif trial_i == block_starts[6]: #before last baseline
 		for slide in range(20,22): ##change later based on slides
 			presentSlides(slide)
 		win.color = color_gray
@@ -908,29 +890,26 @@ def slackMessage(block, slack_msg): #thank you again, Remy
 		except ConnectionError: print('Slack messaging failed, no internet')
 
 
-
-####################################
-############## Events ##############
 ####################################
  
 
-def ogOnly(trial_i, probe_n): 
-	#print 'og probe', probe_n
-	win.flip()
-	win.color = color_gray
-	wordOrNonword(trial_i, probe_n)
-	text.draw()
-	twoStims(trial_i, probe_n)
-	win.flip()
-	clear()
-	getResp(trial_i, probe_n, block, stimDraw = False)
-	resetTrial()
+# def ogOnly(trial_i, probe_n, dframe): 
+# 	#print 'og probe', probe_n
+# 	win.flip()
+# 	win.color = color_gray
+# 	wordOrNonword(trial_i, probe_n, dframe)
+# 	text.draw()
+# 	twoStims(trial_i, probe_n, dframe)
+# 	win.flip()
+# 	clear()
+# 	getResp(trial_i, probe_n, block, dframe, stimDraw = False)
+# 	resetTrial()
 
-def target(trial_i):
+def target(trial_i, dframe):
 	win.color = color_white
 	win.flip()	
 	stim_mid.pos = [0.0,0.0] 
-	stim_mid.image = stim_dict['frac_{:d}'.format(df.iloc[trial_i, df.columns.get_loc('targTheta')])].image ## Change everytime
+	stim_mid.image = stim_dict['frac_{:d}'.format(dframe.iloc[trial_i, dframe.columns.get_loc('targTheta')])].image ## Change everytime
 	print stim_mid.ori 
 	#stim_mid.sf = 5.0 / 80.0
 	#stim_mid.contrast = 1.0
@@ -944,33 +923,33 @@ def delay():
 	win.flip()
 	core.wait(event_times['sec_delay'])	
 
-def OGnPMprobe(trial_i, probe_n): 
+def OGnPMprobe(trial_i, probe_n, dframe): 
 	win.flip()
 	win.color = color_gray
-	wordOrNonword(trial_i, probe_n)
+	wordOrNonword(trial_i, probe_n, dframe)
 	text.draw()
 	stim_top.draw()
 	stim_bot.draw()
 	win.flip()
 	clear()
-	getResp(trial_i, probe_n, block, stimDraw = True)
+	getResp(trial_i, probe_n, block, dframe, stimDraw = True)
 	resetTrial()
 
-def targetProbe(trial_i, probe_n, block, lastProbe): 
+def targetProbe(trial_i, probe_n, block, lastProbe, dframe): 
 	#print 'target probe',probe_n
 	win.flip()
 	win.color = color_gray
-	wordOrNonword(trial_i, probe_n)
+	wordOrNonword(trial_i, probe_n, dframe)
 	if ((block == maintain1) or (block == maintain2)) and (lastProbe == True): 
 		text.text = ''	
 	text.draw()
-	twoStims(trial_i, probe_n)
+	twoStims(trial_i, probe_n, dframe)
 	win.flip()
 	clear()
 	if lastProbe == True: 
-		getResp_targ(trial_i, probe_n, block, stimDraw = True)
+		getResp_targ(trial_i, probe_n, block, dframe, stimDraw = True)
 	elif lastProbe == False: 
-		getResp(trial_i, probe_n, block, stimDraw = True)
+		getResp(trial_i, probe_n, block, dframe, stimDraw = True)
 	lastProbe = False
 	resetTrial()
 
@@ -991,11 +970,49 @@ def iti():
 		win.flip()
 
 
+####################################
+########  EVENT FUNCTIONS  #########
+####################################
+
+
+def baseline(trial_i, block, dframe): 
+	probe_n = 0
+ 	targetProbe(trial_i, probe_n, block, dframe, lastProbe = False)
+ 	resetTrial()
+
+def maintain(trial_i, block, dframe): 
+ 	target(trial_i, dframe)
+	delay()
+	probeInTrial = dframe.iloc[trial_i, df.columns.get_loc('n_probes')]
+	for probe_n in range(probeInTrial-1): ## Change to maintain block length 
+		targetProbe(trial_i, probe_n, block, dframe, lastProbe = False)
+	targetProbe(trial_i, probeInTrial-1, block, dframe, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
+	iti()
+	resetTrial()
+
+def monitor(trial_i, block, dframe): 
+ 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
+	for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
+		targetProbe(trial_i, probe_n, block, dframe, lastProbe = False)
+	targetProbe(trial_i, probeInTrial-1, block, dframe, lastProbe = True)
+	iti()
+	resetTrial()
+
+def mnm(trial_i, block, dframe): 
+ 	target(trial_i, dframe)
+	delay()
+	probeInTrial = dframe.iloc[trial_i, dframe.columns.get_loc('n_probes')]
+	for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
+		targetProbe(trial_i, probe_n, block, dframe, lastProbe = False)
+	targetProbe(trial_i, probeInTrial-1, block, dframe, lastProbe = True)
+	iti()
+	resetTrial()
+
+
 
 ####################################
-############ Experiment ############
+###########  EXPERIMENT  ###########
 ####################################
-
 
 
 # Let Slack know experiment is starting
@@ -1010,41 +1027,6 @@ for start_slide in range(1,6): ##change later based on slides
 
 win.color = color_gray
 win.flip()
-
-def baseline(trial_i, block): 
-	probe_n = 0
- 	targetProbe(trial_i, probe_n, block, lastProbe = False)
- 	resetTrial()
-
-def maintain(trial_i, block): 
- 	target(trial_i)
-	delay()
-	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-	for probe_n in range(probeInTrial-1): ## Change to maintain block length 
-		targetProbe(trial_i, probe_n, block, lastProbe = False)
-	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
-	iti()
-	resetTrial()
-
-def monitor(trial_i, block): 
- 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-	for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-		targetProbe(trial_i, probe_n, block, lastProbe = False)
-	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
-	iti()
-	resetTrial()
-
-def mnm(trial_i, block): 
- 	target(trial_i)
-	delay()
-	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
-	for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-		targetProbe(trial_i, probe_n, block, lastProbe = False)
-	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
-	iti()
-	resetTrial()
-
-
 
 for trial_i in range(N_TOTAL_TRIALS): 
 	print trial_i
@@ -1062,45 +1044,44 @@ for trial_i in range(N_TOTAL_TRIALS):
 		slackMessage(block, slack_msg)
 		df.to_csv(full_filename)
 
-
 	## BASELINE
 	if block == 1: 
-		baseline(trial_i, block)
+		baseline(trial_i, block, dframe = df)
 
 	## MAINTAIN
 	elif block == 2: 
 		#print 'maintain1',trial_i
-		maintain(trial_i, block)
+		maintain(trial_i, block, dframe = df)
 
 	## MONITOR
 	if block == 3: 
 		#print 'monitor1',trial_i 
-		monitor(trial_i, block)
+		monitor(trial_i, block, dframe = df)
 
 	## MAINTAIN & MONITOR
 	elif block == 4: 
 		#print 'mnm1',trial_i
-		mnm(trial_i, block)
+		mnm(trial_i, block, dframe = df)
 
 	## MAINTAIN
 	elif block == 5: 
 		#print 'maintain2',trial_i
-		maintain(trial_i, block)
+		maintain(trial_i, block, dframe = df)
 
 	## MONITOR
 	elif block == 6: 
 		#print 'monitor2',trial_i
-		monitor(trial_i, block)
+		monitor(trial_i, block, dframe = df)
 
 	## MAINTAIN & MONITOR
 	elif block == 7: 
 		#print 'mnm2',trial_i
-		mnm(trial_i, block)
+		mnm(trial_i, block, dframe = df)
 
 	# BASELINE
 	elif block == 8: 
 		#print 'baseline 2', trial_i
-		baseline(trial_i, block)
+		baseline(trial_i, block, dframe = df)
 
 	#else: 
 	#	raise Warning('yikes, part 2')
