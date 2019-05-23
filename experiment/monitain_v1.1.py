@@ -6,8 +6,6 @@
 ##################################
 ##################################
 
-### Error? Try this
-#pip install opencv-python
 
 import random
 import numpy as np 
@@ -18,12 +16,11 @@ import pprint
 import argparse
 import requests
 import glob
-import cv2
 from psychopy import visual, event, core, iohub, monitors
 from itertools import product, compress
 from sklearn.utils import shuffle
 from collections import OrderedDict
-from PIL import Image
+
 
 
 ####################################
@@ -62,7 +59,6 @@ DEBUG = SUBJ in ['debug']
 
 global BLCKSTR
 BLCKSTR = BLOCKSTRUCT
-
 
 
 ## Check to see if file exists
@@ -181,14 +177,13 @@ elif BLCKSTR == 'blocked':
 else: 
 	raise Warning('Invalid block structure entered')	
 
-
-
 practDict = OrderedDict([
 	('base1_prac', base1), 
 	('maintain1_prac', maintain1), 
 	('monitor1_prac', monitor1), 
 	('mnm1_prac', mnm1)
 	])
+
 
 
 ####################################
@@ -207,12 +202,28 @@ nonwords_df = nonwords_df.rename(columns={0:'stimuli'})
 nonwords_df['type'] = 2
 nonwords_df = shuffle(nonwords_df)
 
+# Practice stimuli 
+pract_words_df = pd.read_table("pract_words.csv", header=-1)
+pract_words_df = words.df.rename(columns={0:'stimuli'})
+pract_words_df['type'] = 1
+pract_words_df = shuffle(pract_words_df)
+
+pract_nonwords_df = pd.read_table("pract_nonwords.csv", header=-1)
+pract_nonwords_df = words.df.rename(columns={0:'stimuli'})
+pract_nonwords_df['type'] = 2
+pract_nonwords_df = shuffle(pract_nonwords_df)
+
+# Import images
+img_list = glob.glob("stimuli/grayscale/*.png")
+
+stim_dict = { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=win, image=fn)for fn in glob.glob("stimuli/grayscale/*.png") }
 
 
 
 ####################################
 ###########  DATAFRAME  ############
 ####################################
+
 
 columns = ['subj', #subject id 
 	'block', #block 
@@ -293,8 +304,6 @@ N_CATCH_PER_BLOCK = N_PROBES_PER_BLOCK - probe_range.size
 
 new_range = np.append(catch_range, probe_range)
 
-
-
 def pickProbes(n_blocks, catch_range, N_CATCH_PER_BLOCK):
 	probe_count_list = []
 	for i in range(n_blocks): 
@@ -346,7 +355,6 @@ elif BLCKSTR == 'blocked':
 	df.iloc[186:226, df.columns.get_loc('n_probes')] = np.concatenate((mnmProbes1, mnmProbes2))
 
 
-
 ## DF - Probe fractal/theta location 
 # Will the top or bottom be probed?
 
@@ -367,7 +375,6 @@ blockOther_len = len(df.iloc[106:126, df.columns.get_loc('block')])
 pract_len = 5 #5 trials of practice for each condition 
 
 
-## MAINTAIN 
 # Set target present for half of maintain, not present for other half of maintain
 targProb_other = np.repeat([0,1], blockOther_len/2)
 pract_targProb_other = np.repeat([0,1], pract_len/2 + 1)
@@ -394,39 +401,25 @@ for block_other in range(2):
 # pd.value_counts(df['targOrNoTarg'].values, sort=False) 
 
 
-
-
-
-
-
-
-
-
+## Fill in dataframe with words/nonwords, fractals
 
 # Add word and nonword stims to dataframe
 word_list = list(words_df['stimuli'])
 nonword_list = list(nonwords_df['stimuli'])
 
-prac_word_list = 
-prac_nonword_list = 
+prac_word_list = list(pract_words_df['stimuli'])
+prac_nonword_list = list(pract_nonwords_df['stimuli'])
 
 for i in range(N_TOTAL_TRIALS): 
-	print i, 'trial'
 	n_probes = df.loc[i, 'n_probes']
-	print n_probes, 'n_probes'
 	probe_loc = df.loc[i, 'probeTheta_loc']
 	memTarg = df.loc[i, 'targTheta']
 	currentBlock = df.block[i][1]
-	#possible_thetas_minusTarg = possible_thetas[possible_thetas!=memTarg]
 	possible_thetas_minusTarg = list(compress(possible_thetas, (possible_thetas != memTarg)))
 
 	for j in range(n_probes): 
-		print j, 'probe'
-
-
-		# Assign words #
-		cond = np.random.choice(['word', 'nonword'])
 		
+		cond = np.random.choice(['word', 'nonword']) # Assign words 	
 		col_name = 'word{:d}'.format(j)
 		col_name_cond = 'word{:d}_cond'.format(j)
 
@@ -439,9 +432,8 @@ for i in range(N_TOTAL_TRIALS):
 
 		df.loc[i, col_name] = rand_word
 		df.loc[i, col_name_cond] = cond
-
-		# Assign thetas #
-		thetaTop_col = 'topTheta{:d}'.format(j)
+		
+		thetaTop_col = 'topTheta{:d}'.format(j) # Assign thetas #
 		thetaBot_col = 'botTheta{:d}'.format(j)
 
 		targOrNah = df.iloc[i, df.columns.get_loc('targOrNoTarg')]
@@ -478,9 +470,6 @@ for i in range(N_TOTAL_TRIALS):
 				elif (currentBlock == base1) or (currentBlock == base2): #baseline
 						top_theta = np.random.choice(possible_thetas)
 						bot_theta = np.random.choice(possible_thetas)
-
-						#top_theta = np.nan
-						#bot_theta = np.nan
 				else: 
 					print n_probes, 'n_probes'
 					raise Warning('uh oh')
@@ -504,9 +493,12 @@ for i in range(N_TOTAL_TRIALS):
 #Might need to remove later
 df = df.astype('object')
 
+
+
 ####################################
-############# Psychopy #############
+############  PSYCHOPY  ############
 ####################################
+
 
 clock = core.Clock()
 
@@ -523,53 +515,13 @@ win = visual.Window(
 	fullscr=False, #set to True when running for real
 	)
 
-
 # Images for instructions
-
 windowSize = win.size
 
 instructImage = visual.ImageStim(
 	win = win, 
 	size = win.size/2 
 	)
-
-# Shared stims parameters
-# stims_size = [150, 150]
-# stims_sf = 5.0 / 80.0
-# stims_contrast = 1.0
-
-# # stims set up 
-# stim_top = visual.stimsStim(
-# 	win = win,
-# 	mask = "circle",
-# 	units="pix", 
-# 	pos = [0, 150],
-# 	size=stims_size, 
-# 	sf = 5.0 / 80.0,
-# 	contrast = stims_contrast
-# 	) 
-
-# stim_mid = visual.stimsStim(
-# 	win = win,
-# 	mask = "circle",
-# 	units="pix", 
-# 	pos = [0, 0],
-# 	size=stims_size, 
-# 	sf = stims_sf,
-# 	contrast = stims_contrast
-# 	) 
-
-# stim_bot = visual.stimsStim(
-# 	win = win,
-# 	mask = "circle",
-# 	units="pix", 
-# 	pos = [0,-150],
-# 	size=stims_size, 
-# 	sf = stims_sf,
-# 	contrast = stims_contrast
-# 	) 
-
-# stims_ypos = [-150, 150]  ## need to change
 
 fractal_size = [128, 128] #default that they came at 
 
@@ -625,11 +577,6 @@ text = visual.TextStim(
 	font = 'Calibri'
 	)
 
-# Import images
-img_list = glob.glob("stimuli/grayscale/*.png")
-
-stim_dict = { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=win, image=fn)for fn in glob.glob("stimuli/grayscale/*.png") }
-
 
 
 ####################################
@@ -669,7 +616,6 @@ def pressSpace():
 				#win.flip()
 				return 
 			
-
 def getResp(trial_i, probe_n, block, stimDraw): 
 	allResp = []
 	responded = False
@@ -877,7 +823,6 @@ def resetTrial():
 	#stim_mid.color = color_white
 	#stim_bot.color = color_white
 
-
 def breakMessage(block):
 
 	breakText = "This is the end of block {:d}. \
@@ -908,7 +853,6 @@ def presentSlides(slide):
 	instructImage.draw()
 	win.flip()
 	pressSpace()
-
 
 def instructionSlides(block_type): 
 	if (block_type is 'maintain1') or (block_type is 'maintain2'):
@@ -955,9 +899,7 @@ def instructionSlides(block_type):
 		text.text = "Press space to begin"
 		text.draw()
 		win.flip()
-		pressSpace()
-
-		
+		pressSpace()		
 
 def slackMessage(block, slack_msg): #thank you again, Remy
 	if SLACK: 
@@ -984,7 +926,6 @@ def ogOnly(trial_i, probe_n):
 	getResp(trial_i, probe_n, block, stimDraw = False)
 	resetTrial()
 
-
 def target(trial_i):
 	win.color = color_white
 	win.flip()	
@@ -996,7 +937,6 @@ def target(trial_i):
 	stim_mid.draw()
 	win.flip() 
 	core.wait(event_times['sec_target'])
-
 
 def delay(): 
 	win.color = color_gray
@@ -1016,7 +956,6 @@ def OGnPMprobe(trial_i, probe_n):
 	getResp(trial_i, probe_n, block, stimDraw = True)
 	resetTrial()
 
-
 def targetProbe(trial_i, probe_n, block, lastProbe): 
 	#print 'target probe',probe_n
 	win.flip()
@@ -1034,7 +973,6 @@ def targetProbe(trial_i, probe_n, block, lastProbe):
 		getResp(trial_i, probe_n, block, stimDraw = True)
 	lastProbe = False
 	resetTrial()
-
 
 def iti(): 
 	stim_top.autoDraw = False
@@ -1060,24 +998,22 @@ def iti():
 
 
 
-# # Let Slack know experiment is starting
-# slack_msg = 'Starting experiment'
-# slackMessage(1, slack_msg)
+# Let Slack know experiment is starting
+slack_msg = 'Starting experiment'
+slackMessage(1, slack_msg)
 
-# # Starting instruction slides
-# win.color = color_black
-# win.flip()
-# for start_slide in range(1,6): ##change later based on slides
-# 	presentSlides(start_slide)
+# Starting instruction slides
+win.color = color_black
+win.flip()
+for start_slide in range(1,6): ##change later based on slides
+	presentSlides(start_slide)
 
 win.color = color_gray
 win.flip()
 
 def baseline(trial_i, block): 
 	probe_n = 0
- 	#ogOnly(trial_i, probe_n)
  	targetProbe(trial_i, probe_n, block, lastProbe = False)
- 	#targetProbe
  	resetTrial()
 
 def maintain(trial_i, block): 
@@ -1085,8 +1021,6 @@ def maintain(trial_i, block):
 	delay()
 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 	for probe_n in range(probeInTrial-1): ## Change to maintain block length 
-		#print 'probe',probe_n
-		#ogOnly(trial_i, probe_n)
 		targetProbe(trial_i, probe_n, block, lastProbe = False)
 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True) #probeInTrial is always 1 extra because starts at 1
 	iti()
@@ -1095,7 +1029,6 @@ def maintain(trial_i, block):
 def monitor(trial_i, block): 
  	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 	for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-		#print 'probe', probe_n
 		targetProbe(trial_i, probe_n, block, lastProbe = False)
 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
 	iti()
@@ -1106,14 +1039,10 @@ def mnm(trial_i, block):
 	delay()
 	probeInTrial = df.iloc[trial_i, df.columns.get_loc('n_probes')]
 	for probe_n in range(probeInTrial-1): ## not -1 because go through all probes as targetProbe
-		#print 'probe', probe_n
 		targetProbe(trial_i, probe_n, block, lastProbe = False)
 	targetProbe(trial_i, probeInTrial-1, block, lastProbe = True)
 	iti()
 	resetTrial()
-
-
-
 
 
 
@@ -1124,25 +1053,14 @@ for trial_i in range(N_TOTAL_TRIALS):
 	block_type = df.block[trial_i][0] 
 	block = df.block[trial_i][1] 
 
-
-
-
-
-
 	if trial_i in block_starts: 
-		# Break before moving on 
-		breakMessage(block)
-		# Save output at the end
-		df.to_csv(full_filename)
+		breakMessage(block) # Break before moving on
+		df.to_csv(full_filename) # Save output at the end
 		print block_type, 'block_type'
 		instructionSlides(block_type)
-
 		slack_msg = 'Starting block {:d}'.format(block)
 		slackMessage(block, slack_msg)
 		df.to_csv(full_filename)
-
-
-
 
 
 	## BASELINE
@@ -1154,12 +1072,10 @@ for trial_i in range(N_TOTAL_TRIALS):
 		#print 'maintain1',trial_i
 		maintain(trial_i, block)
 
-
 	## MONITOR
 	if block == 3: 
 		#print 'monitor1',trial_i 
 		monitor(trial_i, block)
-
 
 	## MAINTAIN & MONITOR
 	elif block == 4: 
