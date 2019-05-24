@@ -1175,7 +1175,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 	#	raise Warning('yikes, part 2')
 
 # End of expt instruction slide
-presentSlides(21)
+presentSlides(22)
 
 slack_msg = 'Experiment finished'
 slackMessage(block, slack_msg)
