@@ -836,7 +836,32 @@ def resetTrial():
 def breakMessage(block):
 
 	breakText = "This is the end of block {:d}. \
-	\nPlease hold down the space bar to move onto the next block.".format(block-1)
+	\nPlease hold down the space bar to move onto the next section.".format(block-1)
+
+	text.text = breakText
+	text.height=40.0
+	text.color = color_white
+	text.draw()
+	win.color = color_black
+	win.flip()
+
+	pressContinue = False
+	while pressContinue == False: 
+		if DEBUG == False:
+			keyPress = event.waitKeys()
+
+			if keyPress == ['space']: 
+				pressContinue = True
+				break 
+		else: 
+			break
+
+	win.flip()
+
+def practiceEnd(): 
+
+	practiceText = "This is the end of your practice trials. \
+	\nPlease hold down the space bar to start the next section."
 
 	text.text = breakText
 	text.height=40.0
@@ -873,7 +898,10 @@ def instructionSlides(block_type):
 			presentSlides(slide)
 		win.color = color_gray
 		win.flip()
-		text.text = "Press space to begin"
+		if block_type == 'maintain1': 
+			text.text = "Press space to begin practice trials"
+		elif block_type == 'maintain2': 
+			text.text = "Press space to begin"
 		text.draw()
 		win.flip()
 		pressSpace()
@@ -883,7 +911,10 @@ def instructionSlides(block_type):
 			presentSlides(slide)
 		win.color = color_gray
 		win.flip()
-		text.text = "Press space to begin"
+		if block_type == 'monitor1': 
+			text.text = "Press space to begin practice trials"
+		elif block_type == 'monitor2': 
+			text.text = "Press space to begin"
 		text.draw()
 		win.flip()
 		pressSpace()
@@ -893,7 +924,10 @@ def instructionSlides(block_type):
 			presentSlides(slide)
 		win.color = color_gray
 		win.flip()
-		text.text = "Press space to begin"
+		if block_type == 'mnm1': 
+			text.text = "Press space to begin practice trials"
+		elif block_type == 'mnm2': 
+			text.text = "Press space to begin"
 		text.draw()
 		win.flip()
 		pressSpace()
@@ -1070,31 +1104,41 @@ for trial_i in range(N_TOTAL_TRIALS):
 		slackMessage(block, slack_msg)
 		df.to_csv(full_filename)
 
-	elif trial_i in pract_starts: 
-
-
 	## BASELINE
 	if block == 1: 
 		baseline(trial_i, block, dframe = df)
 
 	## MAINTAIN
-	elif block == 2		#print 'maintain1',trial_i
+	elif block == 2:
+	#print 'maintain1',trial_i
 		if trial_i in pract_starts: 
 			for pract_trial in range(5):
 				current_trial = pract_trial + trial_i 
 				maintain(current_trial, block, dframe = pract_df)
-				print current_trial 
+				print current_trial, 'practice'
+			practiceEnd()
 		maintain(trial_i, block, dframe = df)
-		print trial_i
 
 	## MONITOR
 	if block == 3: 
 		#print 'monitor1',trial_i 
+		if trial_i in pract_starts: 
+			for pract_trial in range(5):
+				current_trial = pract_trial + trial_i 
+				monitor(current_trial, block, dframe = pract_df)
+				print current_trial, 'practice'
+			practiceEnd()
 		monitor(trial_i, block, dframe = df)
 
 	## MAINTAIN & MONITOR
 	elif block == 4: 
 		#print 'mnm1',trial_i
+		if trial_i in pract_starts: 
+			for pract_trial in range(5):
+				current_trial = pract_trial + trial_i 
+				mnm(current_trial, block, dframe = pract_df)
+				print current_trial, 'practice'
+			practiceEnd()
 		mnm(trial_i, block, dframe = df)
 
 	## MAINTAIN
