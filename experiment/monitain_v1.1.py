@@ -16,6 +16,7 @@ import pprint
 import argparse
 import requests
 import glob
+import itertools
 from psychopy import visual, event, core, iohub, monitors
 from itertools import product, compress
 from sklearn.utils import shuffle
@@ -287,6 +288,7 @@ def pickTheta(x):
 	return np.random.choice(possible_thetas)
 
 df['targTheta'] = df.targTheta.apply(pickTheta)
+pract_df['targTheta'] = df.targTheta.apply(pickTheta)
 
 ## DF - Number of probes
 catch_range = range(LOWER_CATCH_TRIAL, UPPER_CATCH_TRIAL+ 1)
@@ -401,87 +403,110 @@ for block_other in range(2):
 word_list = list(words_df['stimuli'])
 nonword_list = list(nonwords_df['stimuli'])
 
-prac_word_list = list(pract_words_df['stimuli'])
-prac_nonword_list = list(pract_nonwords_df['stimuli'])
+pract_word_list = list(pract_words_df['stimuli'])
+pract_nonword_list = list(pract_nonwords_df['stimuli'])
 
-for i in range(N_TOTAL_TRIALS): 
-	n_probes = df.loc[i, 'n_probes']
-	probe_loc = df.loc[i, 'probeTheta_loc']
-	memTarg = df.loc[i, 'targTheta']
-	currentBlock = df.block[i][1]
-	possible_thetas_minusTarg = list(compress(possible_thetas, (possible_thetas != memTarg)))
+pract_trials_maintain = list(range(106,111))
+pract_trials_monitor = list(range(126,131))
+pract_trials_mnm = list(range(146,151))
+pract_trial_list = list(itertools.chain(pract_trials_maintain, pract_trials_monitor, pract_trials_mnm))
 
-	for j in range(n_probes): 
-		
-		cond = np.random.choice(['word', 'nonword']) # Assign words 	
-		col_name = 'word{:d}'.format(j)
-		col_name_cond = 'word{:d}_cond'.format(j)
+# Fill in the rest of df and pract_df
+for dataf in range(2): 
+	if dataf == 0: 
+		dframe_make = df
+	elif dataf == 1: 
+		dframe_make = pract_df
 
-		if cond == 'word':
-			rand_word = word_list.pop(0)
-		elif cond == 'nonword':
-			rand_word = nonword_list.pop(0)
-		else: 
-			raise Warning('noooooooooooo')
+	for i in range(N_TOTAL_TRIALS):
+		#only set up for practice trials 
+		if dataf == 1: 
+			if i not in pract_trial_list: 
+				continue
 
-		df.loc[i, col_name] = rand_word
-		df.loc[i, col_name_cond] = cond
-		
-		thetaTop_col = 'topTheta{:d}'.format(j) # Assign thetas #
-		thetaBot_col = 'botTheta{:d}'.format(j)
+		n_probes = dframe_make.loc[i, 'n_probes']
+		probe_loc = dframe_make.loc[i, 'probeTheta_loc']
+		memTarg = dframe_make.loc[i, 'targTheta']
+		currentBlock = dframe_make.block[i][1]
+		possible_thetas_minusTarg = list(compress(possible_thetas, (possible_thetas != memTarg)))
 
-		targOrNah = df.iloc[i, df.columns.get_loc('targOrNoTarg')]
+		for j in range(n_probes): 
+			
+			cond = np.random.choice(['word', 'nonword']) # Assign words 	
+			col_name = 'word{:d}'.format(j)
+			col_name_cond = 'word{:d}_cond'.format(j)
 
-		if j+1 != n_probes: 
-			top_theta = np.random.choice(possible_thetas_minusTarg)
-			bot_theta = np.random.choice(possible_thetas_minusTarg)
-			#if (currentBlock == 4) or (currentBlock == 5): 
-			if top_theta == bot_theta: 
-				newBotTheta_minusTop = list(compress(possible_thetas_minusTarg, (possible_thetas_minusTarg != top_theta)))
-				bot_theta = np.random.choice(newBotTheta_minusTop)
-		elif j+1 == n_probes: 
-			if targOrNah == 0: #target not present for MAINTAIN
+			if cond == 'word':
+				if dataf == 0: 
+					rand_word = word_list.pop(0)
+				elif dataf == 1: 
+					rand_word = pract_word_list.pop(0)
+			elif cond == 'nonword':
+				if dataf == 0: 
+					rand_word = nonword_list.pop(0)
+				elif dataf == 1: 
+					rand_word = pract_nonword_list.pop(0)
+			else: 
+				raise Warning('noooooooooooo')
+
+			dframe_make.loc[i, col_name] = rand_word
+			dframe_make.loc[i, col_name_cond] = cond
+			
+			thetaTop_col = 'topTheta{:d}'.format(j) # Assign thetas #
+			thetaBot_col = 'botTheta{:d}'.format(j)
+
+			targOrNah = dframe_make.iloc[i, dframe_make.columns.get_loc('targOrNoTarg')]
+
+			if j+1 != n_probes: 
 				top_theta = np.random.choice(possible_thetas_minusTarg)
 				bot_theta = np.random.choice(possible_thetas_minusTarg)
-			elif targOrNah == 1: #target present for MAINTAIN
-				if probe_loc == 'top': 
-					top_theta = memTarg
-					bot_theta = np.random.choice(possible_thetas_minusTarg)
-				elif probe_loc == 'bot': 
+				#if (currentBlock == 4) or (currentBlock == 5): 
+				if top_theta == bot_theta: 
+					newBotTheta_minusTop = list(compress(possible_thetas_minusTarg, (possible_thetas_minusTarg != top_theta)))
+					bot_theta = np.random.choice(newBotTheta_minusTop)
+			elif j+1 == n_probes: 
+				if targOrNah == 0: #target not present for MAINTAIN
 					top_theta = np.random.choice(possible_thetas_minusTarg)
-					bot_theta = memTarg
-			else: #targOrNah = np.nan
-				if (currentBlock == monitor1) or (currentBlock == monitor2): #monitor 
-					top_theta = memTarg #looking for watch so top or bot probe doesn't matter
-					bot_theta = memTarg
-				elif (currentBlock == mnm1) or (currentBlock == mnm2): #m&m 
+					bot_theta = np.random.choice(possible_thetas_minusTarg)
+				elif targOrNah == 1: #target present for MAINTAIN
 					if probe_loc == 'top': 
 						top_theta = memTarg
 						bot_theta = np.random.choice(possible_thetas_minusTarg)
 					elif probe_loc == 'bot': 
 						top_theta = np.random.choice(possible_thetas_minusTarg)
 						bot_theta = memTarg
-				elif (currentBlock == base1) or (currentBlock == base2): #baseline
-						top_theta = np.random.choice(possible_thetas)
-						bot_theta = np.random.choice(possible_thetas)
-				else: 
-					print n_probes, 'n_probes'
-					raise Warning('uh oh')
-		else: 
-			raise Warning('Nooooooo')	
+				else: #targOrNah = np.nan
+					if (currentBlock == monitor1) or (currentBlock == monitor2): #monitor 
+						top_theta = memTarg #looking for watch so top or bot probe doesn't matter
+						bot_theta = memTarg
+					elif (currentBlock == mnm1) or (currentBlock == mnm2): #m&m 
+						if probe_loc == 'top': 
+							top_theta = memTarg
+							bot_theta = np.random.choice(possible_thetas_minusTarg)
+						elif probe_loc == 'bot': 
+							top_theta = np.random.choice(possible_thetas_minusTarg)
+							bot_theta = memTarg
+					elif (currentBlock == base1) or (currentBlock == base2): #baseline
+							top_theta = np.random.choice(possible_thetas)
+							bot_theta = np.random.choice(possible_thetas)
+					else: 
+						print n_probes, 'n_probes'
+						raise Warning('uh oh')
+			else: 
+				raise Warning('Nooooooo')	
 
 
-		df.loc[i, thetaTop_col] = top_theta
-		df.loc[i, thetaBot_col] = bot_theta
+			dframe_make.loc[i, thetaTop_col] = top_theta
+			dframe_make.loc[i, thetaBot_col] = bot_theta
 
-		# Set up resp, rt, acc columns #
-		resp_probe = 'respProbe{:d}'.format(j)
-		rt_probe = 'rtProbe{:d}'.format(j) # need to get it to take rt
-		acc_probe = 'probe{:d}_acc'.format(j)
+			# Set up resp, rt, acc columns #
+			resp_probe = 'respProbe{:d}'.format(j)
+			rt_probe = 'rtProbe{:d}'.format(j) # need to get it to take rt
+			acc_probe = 'probe{:d}_acc'.format(j)
 
-		df.loc[i, resp_probe] = np.nan
-		df.loc[i, rt_probe] = np.nan
-		df.loc[i, acc_probe] = np.nan
+			dframe_make.loc[i, resp_probe] = np.nan
+			dframe_make.loc[i, rt_probe] = np.nan
+			dframe_make.loc[i, acc_probe] = np.nan
 
 
 #Might need to remove later
@@ -1031,6 +1056,7 @@ win.flip()
 for trial_i in range(N_TOTAL_TRIALS): 
 	print trial_i
 	block_starts = [106, 126, 146, 166, 186, 206, 226]
+	pract_starts = [106, 126, 146] 
 
 	block_type = df.block[trial_i][0] 
 	block = df.block[trial_i][1] 
@@ -1044,14 +1070,22 @@ for trial_i in range(N_TOTAL_TRIALS):
 		slackMessage(block, slack_msg)
 		df.to_csv(full_filename)
 
+	elif trial_i in pract_starts: 
+
+
 	## BASELINE
 	if block == 1: 
 		baseline(trial_i, block, dframe = df)
 
 	## MAINTAIN
-	elif block == 2: 
-		#print 'maintain1',trial_i
+	elif block == 2		#print 'maintain1',trial_i
+		if trial_i in pract_starts: 
+			for pract_trial in range(5):
+				current_trial = pract_trial + trial_i 
+				maintain(current_trial, block, dframe = pract_df)
+				print current_trial 
 		maintain(trial_i, block, dframe = df)
+		print trial_i
 
 	## MONITOR
 	if block == 3: 
