@@ -863,7 +863,7 @@ def practiceEnd():
 	practiceText = "This is the end of your practice trials. \
 	\nPlease hold down the space bar to start the next section."
 
-	text.text = breakText
+	text.text = practiceText
 	text.height=40.0
 	text.color = color_white
 	text.draw()
@@ -890,7 +890,18 @@ def presentSlides(slide):
 	pressSpace()
 
 def instructionSlides(block_type): 
-	if (block_type is 'maintain1') or (block_type is 'maintain2'):
+	if (block_type is 'base1'): 
+		for slide in range(1,6): ##change later based on slides
+			presentSlides(slide)
+		win.color = color_gray
+		win.flip()
+		text.text = "Press space to begin"
+		text.color = color_white
+		text.draw()
+		win.flip()
+		pressSpace()
+
+	elif (block_type is 'maintain1') or (block_type is 'maintain2'):
 	#if trial_i == (block_starts[0] or block_starts[3]): #before maintaining
 		if block_type == 'maintain2':
 			presentSlides(19)
@@ -1078,31 +1089,30 @@ def mnm(trial_i, block, dframe):
 slack_msg = 'Starting experiment'
 slackMessage(1, slack_msg)
 
-# Starting instruction slides
-win.color = color_black
-win.flip()
-for start_slide in range(1,6): ##change later based on slides
-	presentSlides(start_slide)
-
-win.color = color_gray
-win.flip()
 
 for trial_i in range(N_TOTAL_TRIALS): 
 	print trial_i
-	block_starts = [106, 126, 146, 166, 186, 206, 226]
+	block_starts = [0, 106, 126, 146, 166, 186, 206, 226]
 	pract_starts = [106, 126, 146] 
 
 	block_type = df.block[trial_i][0] 
 	block = df.block[trial_i][1] 
 
+	
+
 	if trial_i in block_starts: 
-		breakMessage(block) # Break before moving on
+		if trial_i != 0: 
+			breakMessage(block) # Break before moving on
 		df.to_csv(full_filename) # Save output at the end
 		print block_type, 'block_type'
+		win.color = color_black
+		win.flip()
 		instructionSlides(block_type)
 		slack_msg = 'Starting block {:d}'.format(block)
 		slackMessage(block, slack_msg)
 		df.to_csv(full_filename)
+	win.color = color_gray
+	win.flip()
 
 	## BASELINE
 	if block == 1: 
@@ -1114,8 +1124,8 @@ for trial_i in range(N_TOTAL_TRIALS):
 		if trial_i in pract_starts: 
 			for pract_trial in range(5):
 				current_trial = pract_trial + trial_i 
-				maintain(current_trial, block, dframe = pract_df)
 				print current_trial, 'practice'
+				maintain(current_trial, block, dframe = pract_df)		
 			practiceEnd()
 		maintain(trial_i, block, dframe = df)
 
