@@ -313,7 +313,7 @@ def pickProbes(n_blocks, catch_range, N_CATCH_PER_BLOCK):
 	return (probe_ravel_1, probe_ravel_2)
 
 # Practice probes
-practProbes = np.array(range(1,16))
+practProbes = np.array(range(2,16))
 np.random.choice(practProbes)
 def pickProbes_pract(x): 
 	return np.random.choice(practProbes)
@@ -468,6 +468,8 @@ for dataf in range(2):
 				if targOrNah == 0: #target not present for MAINTAIN
 					top_theta = np.random.choice(possible_thetas_minusTarg)
 					bot_theta = np.random.choice(possible_thetas_minusTarg)
+					if top_theta == bot_theta: 
+						bot_theta = list(compress(possible_thetas_minusTarg, (possible_thetas_minusTarg != top_theta)))
 				elif targOrNah == 1: #target present for MAINTAIN
 					if probe_loc == 'top': 
 						top_theta = memTarg
@@ -494,6 +496,7 @@ for dataf in range(2):
 						raise Warning('uh oh')
 			else: 
 				raise Warning('Nooooooo')	
+
 
 
 			dframe_make.loc[i, thetaTop_col] = top_theta
@@ -531,7 +534,7 @@ win = visual.Window(
 	colorSpace = 'rgb255', 
 	#size=[1024,576], #Small size of screen for testing it out
 	units="pix", 
-	fullscr=True, #set to True when running for real
+	fullscr=False, #set to True when running for real
 	)
 
 windowSize = win.size
@@ -581,7 +584,8 @@ circle_top = visual.Circle(
 	units = "pix", 
 	radius = 70,
 	pos = [0, 150], 
-	#colorSpace = 'rgb255')
+	lineColor = None, 
+	fillColorSpace = 'rgb255'
 	)
 
 circle_bot = visual.Circle(
@@ -589,7 +593,8 @@ circle_bot = visual.Circle(
 	units = "pix", 
 	radius = 70,
 	pos = [0, -150], 
-	#colorSpace = 'rgb255')
+	lineColor = None, 
+	fillColorSpace = 'rgb255'
 	)
 
 # Text set up 
@@ -695,8 +700,8 @@ def getResp(trial_i, probe_n, block, dframe, stimDraw):
 					dframe.iloc[trial_i, dframe.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 					#stim_top.color = color_red
 					#stim_bot.color = color_red
-					circle_top.color = 'red'
-					circle_bot.color = 'red'
+					circle_top.fillColor = color_red
+					circle_bot.fillColor = color_red
 					circle_top.draw()
 					circle_bot.draw()
 					twoStims(trial_i, probe_n, dframe)
@@ -760,8 +765,8 @@ def getResp_targ(trial_i, probe_n, block, dframe, stimDraw):
 						if ((((block == maintain1) or (block == maintain2)) and (targNoTarg == 1)) or ((block == monitor1) or (block == monitor2) or (block == mnm1) or (block == mnm2))): 
 							#picked target, correct
 							dframe.iloc[trial_i, dframe.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
-							circle_top.color = 'green'
-							circle_bot.color = 'green'
+							circle_top.fillColor = color_green
+							circle_bot.fillColor = color_green
 							circle_top.draw()
 							circle_bot.draw()
 							twoStims(trial_i, probe_n, dframe)
@@ -771,8 +776,8 @@ def getResp_targ(trial_i, probe_n, block, dframe, stimDraw):
 						elif ((((block == maintain1) or (block == maintain2)) and (targNoTarg == 0)) or ((block == monitor1) or (block == monitor2) or (block == mnm1) or (block == mnm2))): #picked target, correct
 							#picked target, incorrect
 							dframe.iloc[trial_i, dframe.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
-							circle_top.color = 'red'
-							circle_bot.color = 'red'
+							circle_top.fillColor = color_red
+							circle_bot.fillColor = color_red
 							circle_top.draw()
 							circle_bot.draw()
 							twoStims(trial_i, probe_n, dframe)
@@ -783,8 +788,8 @@ def getResp_targ(trial_i, probe_n, block, dframe, stimDraw):
 						if ((((block == maintain1) or (block == maintain2)) and (targNoTarg == 0)) or ((block == monitor1) or (block == monitor2) or (block == mnm1) or (block == mnm2))):
 							#picked no target, correct
 							dframe.iloc[trial_i, dframe.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 1
-							circle_top.color = 'green'
-							circle_bot.color = 'green'
+							circle_top.fillColor = color_green
+							circle_bot.fillColor = color_green
 							circle_top.draw()
 							circle_bot.draw()
 							twoStims(trial_i, probe_n, dframe)
@@ -794,8 +799,8 @@ def getResp_targ(trial_i, probe_n, block, dframe, stimDraw):
 						elif ((((block == maintain1) or (block == maintain2)) and (targNoTarg == 1)) or ((block == monitor1) or (block == monitor2) or (block == mnm1) or (block == mnm2))):
 							#picked no target, incorrect
 							dframe.iloc[trial_i, dframe.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
-							circle_top.color = 'red'
-							circle_bot.color = 'red'
+							circle_top.fillColor = color_red
+							circle_bot.fillColor = color_red
 							circle_top.draw()
 							circle_bot.draw()
 							twoStims(trial_i, probe_n, dframe)
