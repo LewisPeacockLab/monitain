@@ -1115,11 +1115,11 @@ for trial_i in range(N_TOTAL_TRIALS):
 	win.flip()
 
 	## BASELINE
-	if block == 1: 
-		baseline(trial_i, block, dframe = df)
+#	if block == 1: 
+#		baseline(trial_i, block, dframe = df)
 
 	## MAINTAIN
-	elif block == 2:
+	if block == 2:
 	#print 'maintain1',trial_i
 		if trial_i in pract_starts: 
 			for pract_trial in range(5):
