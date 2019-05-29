@@ -63,7 +63,7 @@ BLCKSTR = BLOCKSTRUCT
 
 
 ## Check to see if file exists
-data_path = "monitain_v1_" + str(SUBJ)
+data_path = "monitain_v1.1_" + str(SUBJ)
 data_path_exists = os.path.exists(data_path)
 
 filename = data_path + ".csv"
@@ -531,7 +531,7 @@ win = visual.Window(
 	colorSpace = 'rgb255', 
 	#size=[1024,576], #Small size of screen for testing it out
 	units="pix", 
-	fullscr=False, #set to True when running for real
+	fullscr=True, #set to True when running for real
 	)
 
 windowSize = win.size
