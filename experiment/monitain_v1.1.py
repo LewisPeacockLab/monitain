@@ -469,7 +469,8 @@ for dataf in range(2):
 					top_theta = np.random.choice(possible_thetas_minusTarg)
 					bot_theta = np.random.choice(possible_thetas_minusTarg)
 					if top_theta == bot_theta: 
-						bot_theta = list(compress(possible_thetas_minusTarg, (possible_thetas_minusTarg != top_theta)))
+						bot_theta_minusSame = list(compress(possible_thetas_minusTarg, (possible_thetas_minusTarg != top_theta)))
+						bot_theta = np.random.choice(bot_theta_minusSame)
 				elif targOrNah == 1: #target present for MAINTAIN
 					if probe_loc == 'top': 
 						top_theta = memTarg
@@ -534,7 +535,7 @@ win = visual.Window(
 	colorSpace = 'rgb255', 
 	#size=[1024,576], #Small size of screen for testing it out
 	units="pix", 
-	fullscr=False, #set to True when running for real
+	fullscr=True, #set to True when running for real
 	)
 
 windowSize = win.size
@@ -1120,11 +1121,11 @@ for trial_i in range(N_TOTAL_TRIALS):
 	win.flip()
 
 	## BASELINE
-#	if block == 1: 
-#		baseline(trial_i, block, dframe = df)
+	if block == 1: 
+		baseline(trial_i, block, dframe = df)
 
 	## MAINTAIN
-	if block == 2:
+	elif block == 2:
 	#print 'maintain1',trial_i
 		if trial_i in pract_starts: 
 			for pract_trial in range(5):
