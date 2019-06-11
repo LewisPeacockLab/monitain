@@ -33,7 +33,7 @@ args = parser.parse_args()
 
 
 PATH = os.path.expanduser('~')
-data_dir = PATH+'/Dropbox (LewPeaLab)/BEHAVIOR/monitain/'
+data_dir = PATH+'/Dropbox (LewPeaLab)/BEHAVIOR/monitain'
 FIGURE_PATH = PATH + '/monitain/analysis/output/'
 
 fnames = glob.glob(data_dir+'/v*/*.csv')
@@ -47,7 +47,6 @@ for i, fn in enumerate(fnames):
     # add subj and trial num to df
     subj_df['subj'] = 's{:02d}'.format(i+1)
     subj_df['trial'] = range(subj_df.shape[0])
-    subj_df['version'] = 
     df_list.append(subj_df)
 
 df_main = pd.concat(df_list,ignore_index=False)
