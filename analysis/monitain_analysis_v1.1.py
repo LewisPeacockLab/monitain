@@ -134,13 +134,13 @@ for acc in range(0,15): #get rid of probe14 bc you'll never look at it
 block_base1 = df_main[(df_main['block'] == "('base1', 1)")]
 block_base2 = df_main[(df_main['block'] == "('base2', 8)")]
 
-block_base1_df = pd.concat([ block_base1['subj'], block_base1['acc'], block_base1[rtProbes].mean(axis=1), block_base1[accCols].mean(axis=1)], axis=1)
+block_base1_df = pd.concat([ block_base1['subj'], block_base1['version'], block_base1['acc'], block_base1[rtProbes].mean(axis=1), block_base1[accCols].mean(axis=1)], axis=1)
 block_base1_df['block'] = 'Baseline 1'
-block_base1_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
+block_base1_df.columns = ['subj', 'version', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 
-block_base2_df = pd.concat([ block_base2['subj'], block_base2['acc'], block_base2[rtProbes].mean(axis=1), block_base2[accCols].mean(axis=1)], axis=1)
+block_base2_df = pd.concat([ block_base2['subj'], block_base2['version'], block_base2['acc'], block_base2[rtProbes].mean(axis=1), block_base2[accCols].mean(axis=1)], axis=1)
 block_base2_df['block'] = 'Baseline 2'
-block_base2_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
+block_base2_df.columns = ['subj', 'version', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 
 
 # # Find mean rt for baseline blocks (CORRECT RESPONSES)
@@ -152,7 +152,7 @@ block_base2_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 #block_base1 = df_main[(df_main['block'] == 1) & (df_main['probe0_acc']== 1)]
 #block_base2 = df_main[(df_main['block'] == 8) & (df_main['probe0_acc']== 1)]
 baseline_df = pd.concat([block_base1_df, block_base2_df], axis = 0)#axis = 0 for horiz cat, = 1 for vert cat
-baseline_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
+baseline_df.columns = ['subj', 'version', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 
 
 # Compare baseline 1 to baseline 8 
@@ -175,17 +175,17 @@ block_maintain1 = df_main[(df_main['block'] == "('maintain1', 2)")]
 block_maintain2 = df_main[(df_main['block'] == "('maintain2', 3)") | (df_main['block'] == "('maintain2', 5)")]
 
 
-block_maintain1_df = pd.concat([ block_maintain1['subj'], block_maintain1['acc'], block_maintain1[rtProbes].mean(axis=1), block_maintain1[accCols].mean(axis=1)], axis=1)
+block_maintain1_df = pd.concat([ block_maintain1['subj'], block_maintain1['version'], block_maintain1['acc'], block_maintain1[rtProbes].mean(axis=1), block_maintain1[accCols].mean(axis=1)], axis=1)
 block_maintain1_df['block'] = 'Maintain 1'
-block_maintain1_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
+block_maintain1_df.columns = ['subj', 'version', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 
-block_maintain2_df = pd.concat([ block_maintain2['subj'], block_maintain2['acc'], block_maintain2[rtProbes].mean(axis=1), block_maintain2[accCols].mean(axis=1)], axis=1)
+block_maintain2_df = pd.concat([ block_maintain2['subj'], block_maintain2['version'], block_maintain2['acc'], block_maintain2[rtProbes].mean(axis=1), block_maintain2[accCols].mean(axis=1)], axis=1)
 block_maintain2_df['block'] = 'Maintain 2'
-block_maintain2_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
+block_maintain2_df.columns = ['subj', 'version', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 
 
 maintain_df = pd.concat([block_maintain1_df, block_maintain2_df], axis=0)
-maintain_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
+maintain_df.columns = ['subj', 'version', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 
 ax = sea.violinplot(x='subj', y = 'meanTrial_rt', hue = 'block', data=maintain_df, palette = "Blues", cut = 0)
 # Cut = 0 so range is limited to observed data
@@ -222,17 +222,17 @@ block_monitor1 = df_main[(df_main['block'] == "('monitor1', 4)") | (df_main['blo
 block_monitor2 = df_main[(df_main['block'] == "('monitor2', 5)") | (df_main['block'] == "('monitor2', 6)")]
 
 
-block_monitor1_df = pd.concat([ block_monitor1['subj'], block_monitor1['acc'], block_monitor1[rtProbes].mean(axis=1), block_monitor1[accCols].mean(axis=1)], axis=1)
+block_monitor1_df = pd.concat([ block_monitor1['subj'], block_monitor1['version'], block_monitor1['acc'], block_monitor1[rtProbes].mean(axis=1), block_monitor1[accCols].mean(axis=1)], axis=1)
 block_monitor1_df['block'] = 'Monitor 1'
-block_monitor1_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
+block_monitor1_df.columns = ['subj', 'version', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 
-block_monitor2_df = pd.concat([ block_monitor2['subj'], block_monitor2['acc'], block_monitor2[rtProbes].mean(axis=1), block_monitor2[accCols].mean(axis=1)], axis=1)
+block_monitor2_df = pd.concat([ block_monitor2['subj'], block_monitor2['version'], block_monitor2['acc'], block_monitor2[rtProbes].mean(axis=1), block_monitor2[accCols].mean(axis=1)], axis=1)
 block_monitor2_df['block'] = 'Monitor 2'
-block_monitor2_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
+block_monitor2_df.columns = ['subj', 'version', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 
 
 monitor_df = pd.concat([block_monitor1_df, block_monitor2_df], axis=0)
-monitor_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
+monitor_df.columns = ['subj', 'version', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 
 ax = sea.violinplot(x='subj', y = 'meanTrial_rt', hue = 'block', data=monitor_df, palette = "Reds", cut = 0)
 # Cut = 0 so range is limited to observed data
@@ -265,20 +265,20 @@ plt.close()
 ###M&M
 
 block_mnm1 = df_main[(df_main['block'] == "('mnm1', 6)") | (df_main['block'] == "('mnm1', 4)")]
-block_mnm2 = df_main[(df_main['block'] == "('mnm2', 7)") 
+block_mnm2 = df_main[(df_main['block'] == "('mnm2', 7)")] 
 
 
-block_mnm1_df = pd.concat([ block_mnm1['subj'], block_mnm1['acc'], block_mnm1[rtProbes].mean(axis=1), block_mnm1[accCols].mean(axis=1)], axis=1)
+block_mnm1_df = pd.concat([ block_mnm1['subj'], block_mnm1['version'], block_mnm1['acc'], block_mnm1[rtProbes].mean(axis=1), block_mnm1[accCols].mean(axis=1)], axis=1)
 block_mnm1_df['block'] = 'M&M 1'
-block_mnm1_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
+block_mnm1_df.columns = ['subj', 'version', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 
-block_mnm2_df = pd.concat([ block_mnm2['subj'], block_mnm2['acc'], block_mnm2[rtProbes].mean(axis=1), block_mnm2[accCols].mean(axis=1)], axis=1)
+block_mnm2_df = pd.concat([ block_mnm2['subj'], block_mnm2['version'], block_mnm2['acc'], block_mnm2[rtProbes].mean(axis=1), block_mnm2[accCols].mean(axis=1)], axis=1)
 block_mnm2_df['block'] = 'M&M 2'
-block_mnm2_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
+block_mnm2_df.columns = ['subj', 'version', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 
 
 mnm_df = pd.concat([block_mnm1_df, block_mnm2_df], axis=0)
-mnm_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
+mnm_df.columns = ['subj', 'version', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 
 ax = sea.violinplot(x='subj', y = 'meanTrial_rt', hue = 'block', data=mnm_df, palette = "Purples", cut = 0)
 # Cut = 0 so range is limited to observed data
@@ -327,8 +327,38 @@ my_pal = ['#aedea7', #Green
 		'#37a055'  #Green
 		  ]
 
+block_base1_df_v10 = block_base1_df[block_base1_df['version'] == 'vers1.0']
+block_base1_df_v11 = block_base1_df[block_base1_df['version'] == 'vers1.1']
+
+block_maintain1_df_v10 = block_maintain1_df[block_maintain1_df['version'] == 'vers1.0']
+block_maintain1_df_v11 = block_maintain1_df[block_maintain1_df['version'] == 'vers1.1']
+
+block_maintain2_df_v10 = block_maintain2_df[block_maintain2_df['version'] == 'vers1.0']
+block_maintain2_df_v11 = block_maintain2_df[block_maintain2_df['version'] == 'vers1.1']
+
+block_monitor1_df_v10 = block_monitor1_df[block_monitor1_df['version'] == 'vers1.0']
+block_monitor1_df_v11 = block_monitor1_df[block_monitor1_df['version'] == 'vers1.1']
+
+block_monitor2_df_v10 = block_monitor2_df[block_monitor2_df['version'] == 'vers1.0']
+block_monitor2_df_v11 = block_monitor2_df[block_monitor2_df['version'] == 'vers1.1']
+
+block_mnm1_df_v10 = block_mnm1_df[block_mnm1_df['version'] == 'vers1.0']
+block_mnm1_df_v11 = block_mnm1_df[block_mnm1_df['version'] == 'vers1.1']
+
+block_mnm2_df_v10 = block_mnm2_df[block_mnm2_df['version'] == 'vers1.0']
+block_mnm2_df_v11 = block_mnm2_df[block_mnm2_df['version'] == 'vers1.1']
+
+block_base2_df_v10 = block_base2_df[block_base2_df['version'] == 'vers1.0']
+block_base2_df_v11 = block_base2_df[block_base2_df['version'] == 'vers1.1']
+
+
+
 all_df = pd.concat([block_base1_df, block_maintain1_df, block_maintain2_df, block_monitor1_df, block_monitor2_df, block_mnm1_df, block_mnm2_df, block_base2_df], axis=0)
 
+all_df_v10 = pd.concat([block_base1_df_v10, block_maintain1_df_v10, block_maintain2_df_v10, block_monitor1_df_v10, block_monitor2_df_v10, block_mnm1_df_v10, block_mnm2_df_v10, block_base2_df_v10], axis=0)
+all_df_v11 = pd.concat([block_base1_df_v11, block_maintain1_df_v11, block_maintain2_df_v11, block_monitor1_df_v11, block_monitor2_df_v11, block_mnm1_df_v11, block_mnm2_df_v11, block_base2_df_v11], axis=0)
+
+all_df_combined = pd.concat([all_df_v10, all_df_v11], axis = 0)
 # for i in all_df.index: 
 # 	if (all_df.loc[i, 'block'] == 1) or (all_df.loc[i,'block'] == 8): 
 
@@ -341,8 +371,10 @@ all_df = pd.concat([block_base1_df, block_maintain1_df, block_maintain2_df, bloc
 # 		all_df.at[i, 'block'] = 'M&M'
 
 
-all_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
-ax = sea.violinplot(x='subj', y = 'meanTrial_rt', hue = 'block', data=all_df, palette = my_pal, cut = 0)
+all_df.columns = ['subj', 'version', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
+
+all_df_combined.columns = all_df.columns
+ax = sea.violinplot(x='subj', y = 'meanTrial_rt', hue = 'block', data=all_df_combined, palette = my_pal, cut = 0)
 plt.xlabel('Subject')
 plt.ylabel('Reaction time (s)')
 #legend_labels = (['Baseline 1', 'Maintain 1', 'Maintain 2',
@@ -393,7 +425,7 @@ plt.close()
 
 
 #allTogether_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'block']
-ax = sea.violinplot(x='block', y = 'meanTrial_rt', data=all_df, palette = my_pal, cut = 0)
+ax = sea.violinplot(x='block', y = 'meanTrial_rt', data=all_df_combined, palette = my_pal, cut = 0)
 plt.xlabel('Block')
 plt.ylabel('Reaction time (s)')
 ax.tick_params(axis='x', labelsize=7)
@@ -410,7 +442,9 @@ sea.despine()
 plt.savefig(FIGURE_PATH + 'all_together_compare_pmacc.png', dpi = 600)
 plt.close() 
 
-all_df = pd.concat([block_base1_df, block_maintain1_df, block_maintain2_df, block_monitor1_df, block_monitor2_df, block_mnm1_df, block_mnm2_df, block_base2_df], axis=0)
+all_df_v10 = pd.concat([block_base1_df, block_maintain1_df, block_maintain2_df, block_monitor1_df, block_monitor2_df, block_mnm1_df, block_mnm2_df, block_base2_df], axis=0)
+all_df_v11 = pd.concat([block_base1_df, block_maintain1_df, block_maintain2_df, block_monitor1_df, block_monitor2_df, block_mnm1_df, block_mnm2_df, block_base2_df], axis=0)
+
 
 # for i in all_df.index: 
 # 	if (all_df.loc[i, 'block'] == 1) or (all_df.loc[i,'block'] == 8): 
