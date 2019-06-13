@@ -512,27 +512,30 @@ plt.close()
 
 
 #allTogether_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'block']
-ax = sea.violinplot(x='block', y = 'meanTrial_rt', data=all_df_combined, palette = my_pal, cut = 0)
+ax = sea.violinplot(x='block', y = 'meanTrial_rt', hue = 'version', data=all_df_combined, palette = my_pal, cut = 0, split = True)
 plt.xlabel('Block')
 plt.ylabel('Reaction time (s)')
+ax.legend(title = 'Version')
 ax.tick_params(axis='x', labelsize=7)
 sea.despine()
 plt.savefig(FIGURE_PATH + 'all_together_compare_rt.png', dpi = 600)
 plt.close()
 
 # PM Accuracy
-ax = sea.barplot(x='block', y= 'pm_acc', data=all_df_combined_minusBase, palette=my_pal[1:-1], ci = None)
+ax = sea.barplot(x='block', y= 'pm_acc', hue = 'version', data=all_df_combined_minusBase, palette=my_pal[1:-1], ci = None)
 plt.xlabel('Block')
 plt.ylabel('PM accuracy')
+ax.legend(title = 'Version')
 ax.tick_params(axis='x', labelsize=7)
 sea.despine()
 plt.savefig(FIGURE_PATH + 'all_together_compare_pmacc.png', dpi = 600)
 plt.close()
 
 # OG Accuracy
-ax = sea.barplot(x='block', y= 'og_acc', data=all_df_combined, palette=my_pal, ci = None)
+ax = sea.barplot(x='block', y= 'og_acc', hue = 'version', data=all_df_combined, palette=my_pal, ci = None)
 plt.xlabel('Subject')
 plt.ylabel('OG accuracy')
+ax.legend(title = 'Version')
 ax.tick_params(axis='x', labelsize=7)
 sea.despine()
 plt.savefig(FIGURE_PATH + 'all_together_compare_ogacc.png', dpi = 600)
