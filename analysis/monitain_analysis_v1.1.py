@@ -543,6 +543,9 @@ plt.close()
 
 
 
+### PICK UP HERE ###
+
+
 #### PM cost
 
 base_cost = (baseline_df.groupby('subj')['meanTrial_rt'].mean())
