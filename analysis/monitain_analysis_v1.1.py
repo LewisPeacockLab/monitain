@@ -327,6 +327,24 @@ my_pal = ['#aedea7', #Green
 		'#37a055'  #Green
 		  ]
 
+my_pal_paired = ['#aedea7', #Green
+		'#7bc96f', #Darker green
+		'#abd0e6', #Blue 
+		'#70afd4', #Darker blue
+		'#3787c0', #Blue 
+		'##265d85', #Darker blue
+		'#fca082', #Red, 
+		'#fa6737', #Darker red 
+		'#e32f27', #Red
+		'#a81c16', #Darker red
+		'#c6c7e1', #Purple
+		'#9496c7', #Darker purple
+		'#796eb2', #Purple
+		'#54498a', #Darker purple
+		'#37a055', #Green
+		'#236737' #Darker green
+		  ]
+
 block_base1_df_v10 = block_base1_df[block_base1_df['version'] == 'vers1.0']
 block_base1_df_v11 = block_base1_df[block_base1_df['version'] == 'vers1.1']
 
@@ -460,8 +478,8 @@ plt.close()
 # 		all_df.at[i, 'block'] = 'M&M'
 
 
-all_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
-ax = sea.violinplot(x='subj', y = 'meanTrial_rt', hue = 'block', data=all_df, palette = my_pal, cut = 0)
+all_df_combined.columns = ['subj', 'version', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
+ax = sea.violinplot(x='subj', y = 'meanTrial_rt', hue = 'block', data=all_df_combined, palette = my_pal, cut = 0)
 plt.xlabel('Subject')
 plt.ylabel('Reaction time (s)')
 #legend_labels = (['Baseline 1', 'Maintain 1', 'Maintain 2',
@@ -550,8 +568,8 @@ plt.close()
 
 base_cost = (baseline_df.groupby('subj')['meanTrial_rt'].mean())
 
-maintain1_cost = block_maintain1_df.groupby('subj')['meanTrial_rt'].mean()
-maintain2_cost = block_maintain2_df.groupby('subj')['meanTrial_rt'].mean()
+maintain1_cost = block_maintain1_df.groupby(['subj', 'version'])['meanTrial_rt'].mean()
+maintain2_cost = block_maintain2_df.groupby(['subj', 'version'])['meanTrial_rt'].mean()
 
 maintain1_cost_PM = maintain1_cost - base_cost
 maintain1_cost_PM = maintain1_cost_PM.to_frame().reset_index()
@@ -561,8 +579,8 @@ maintain2_cost_PM = maintain2_cost - base_cost
 maintain2_cost_PM = maintain2_cost_PM.to_frame().reset_index()
 maintain2_cost_PM['block'] = 'Maintain 2'
 
-monitor1_cost = block_monitor1_df.groupby('subj')['meanTrial_rt'].mean()
-monitor2_cost = block_monitor2_df.groupby('subj')['meanTrial_rt'].mean()
+monitor1_cost = block_monitor1_df.groupby(['subj', 'version'])['meanTrial_rt'].mean()
+monitor2_cost = block_monitor2_df.groupby(['subj', 'version'])['meanTrial_rt'].mean()
 
 monitor1_cost_PM = monitor1_cost - base_cost
 monitor1_cost_PM = monitor1_cost_PM.to_frame().reset_index()
@@ -572,8 +590,8 @@ monitor2_cost_PM = monitor2_cost - base_cost
 monitor2_cost_PM = monitor2_cost_PM.to_frame().reset_index()
 monitor2_cost_PM['block'] = 'Monitor 2'
 
-mnm1_cost = block_mnm1_df.groupby('subj')['meanTrial_rt'].mean()
-mnm2_cost = block_mnm2_df.groupby('subj')['meanTrial_rt'].mean()
+mnm1_cost = block_mnm1_df.groupby(['subj', 'version'])['meanTrial_rt'].mean()
+mnm2_cost = block_mnm2_df.groupby(['subj', 'version'])['meanTrial_rt'].mean()
 
 mnm1_cost_PM = mnm1_cost - base_cost
 mnm1_cost_PM = mnm1_cost_PM.to_frame().reset_index()
@@ -588,7 +606,7 @@ pmCost = pd.concat([maintain1_cost_PM, maintain2_cost_PM,
 		  mnm1_cost_PM, mnm2_cost_PM], axis = 0)
 
 # PM cost
-ax = sea.barplot(x='block', y= 'meanTrial_rt', data=pmCost, palette=my_pal[1:-1], ci = None)
+ax = sea.barplot(x='block', y= 'meanTrial_rt', hue = 'version', data=pmCost, palette=my_pal[-1,1], ci = None)
 plt.xlabel('Block')
 plt.ylabel('PM cost (s)')
 ax.tick_params(axis='x', labelsize=7)
