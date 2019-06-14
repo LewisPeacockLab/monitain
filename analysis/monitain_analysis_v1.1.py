@@ -540,7 +540,7 @@ plt.savefig(FIGURE_PATH + 'all_together_compare_rt.png', dpi = 600)
 plt.close()
 
 # PM Accuracy
-ax = sea.barplot(x='block', y= 'pm_acc', hue = 'version', data=all_df_combined_minusBase, palette=my_pal[1:-1], ci = None)
+ax = sea.barplot(x='block', y= 'pm_acc', hue = 'version', data=all_df_combined_minusBase, palette=my_pal, ci = None)
 plt.xlabel('Block')
 plt.ylabel('PM accuracy')
 ax.legend(title = 'Version')
@@ -606,7 +606,7 @@ pmCost = pd.concat([maintain1_cost_PM, maintain2_cost_PM,
 		  mnm1_cost_PM, mnm2_cost_PM], axis = 0)
 
 # PM cost
-ax = sea.barplot(x='block', y= 'meanTrial_rt', hue = 'version', data=pmCost, palette=my_pal[-1,1], ci = None)
+ax = sea.barplot(x='block', y= 'meanTrial_rt', hue = 'version', data=pmCost, palette=my_pal, ci = None)
 plt.xlabel('Block')
 plt.ylabel('PM cost (s)')
 ax.tick_params(axis='x', labelsize=7)
