@@ -376,6 +376,8 @@ all_df = pd.concat([block_base1_df, block_maintain1_df, block_maintain2_df, bloc
 all_df_v10 = pd.concat([block_base1_df_v10, block_maintain1_df_v10, block_maintain2_df_v10, block_monitor1_df_v10, block_monitor2_df_v10, block_mnm1_df_v10, block_mnm2_df_v10, block_base2_df_v10], axis=0)
 all_df_v11 = pd.concat([block_base1_df_v11, block_maintain1_df_v11, block_maintain2_df_v11, block_monitor1_df_v11, block_monitor2_df_v11, block_mnm1_df_v11, block_mnm2_df_v11, block_base2_df_v11], axis=0)
 
+
+
 all_df_combined = pd.concat([all_df_v10, all_df_v11], axis = 0)
 # for i in all_df.index: 
 # 	if (all_df.loc[i, 'block'] == 1) or (all_df.loc[i,'block'] == 8): 
@@ -392,6 +394,17 @@ all_df_combined = pd.concat([all_df_v10, all_df_v11], axis = 0)
 all_df.columns = ['subj', 'version', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
 
 all_df_combined.columns = all_df.columns
+
+
+#Replace RT with nan in resp was quicker than 0.05 secs, also replace pm acc with nan
+#Cut off based on findings from "Eye Movements and Visual Encoding during Scene Perception"
+#Rayner et al., 2009
+for trial in all_df_combined.index: 
+	if all_df_combined.loc[trial, 'meanTrial_rt'] < 0.05: 
+		print all_df_combined.loc[trial, 'meanTrial_rt']
+		all_df_combined.at[trial, 'meanTrial_rt'] = np.nan
+		all_df_combined.at[trial, 'pm_acc'] = np.nan
+
 ax = sea.violinplot(x='subj', y = 'meanTrial_rt', hue = 'block', data=all_df_combined, palette = my_pal, cut = 0)
 plt.xlabel('Subject')
 plt.ylabel('Reaction time (s)')
