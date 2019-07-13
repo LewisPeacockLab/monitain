@@ -288,6 +288,9 @@ sea.despine()
 plt.savefig(FIGURE_PATH + 'mnm_compare_rt.png', dpi = 600)
 plt.close()
 
+#test_xx = mnm_df.subj == 'sxx'
+#mnm_df[test_xx].mean()
+
 # PM Accuracy
 ax = sea.barplot(x='subj', y= 'pm_acc', hue= 'block', data=mnm_df, palette="Purples", ci = None)
 plt.xlabel('Subject')
