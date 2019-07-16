@@ -374,6 +374,9 @@ block_base2_df_v11 = block_base2_df[block_base2_df['version'] == 'vers1.1']
 
 
 
+
+
+
 all_df = pd.concat([block_base1_df, block_maintain1_df, block_maintain2_df, block_monitor1_df, block_monitor2_df, block_mnm1_df, block_mnm2_df, block_base2_df], axis=0)
 
 all_df_v10 = pd.concat([block_base1_df_v10, block_maintain1_df_v10, block_maintain2_df_v10, block_monitor1_df_v10, block_monitor2_df_v10, block_mnm1_df_v10, block_mnm2_df_v10, block_base2_df_v10], axis=0)
@@ -398,6 +401,30 @@ all_df.columns = ['subj', 'version', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block'
 
 all_df_combined.columns = all_df.columns
 
+
+#######################
+## Analysis to try: 
+#all_df.groupby(['subj', 'pm_acc']).mean()
+## groups by subj and pm acc so you can so what everything else looks like by subject 
+#when they are correct and when the aren't correct on the pm task
+
+grouped = all_df.groupby('subj')['pm_acc'].mean()
+
+removeSubjs = []
+for subj, pmAcc in grouped.iteritems(): 
+	if pmAcc < 0.5: 
+		print subj #this tells us who to remove
+		removeSubjs.append(subj)
+		print removeSubjs
+
+for i in range(len(removeSubjs)):
+	#grouped = grouped.drop([removeSubjs[i]])
+	all_df_combined = all_df_combined[all_df_combined.subj != removeSubjs[i]]
+	all_df = all_df[all_df.subj != removeSubjs[i]]
+
+
+
+#######################
 
 #Replace RT with nan in resp was quicker than 0.05 secs, also replace pm acc with nan
 #Cut off based on findings from "Eye Movements and Visual Encoding during Scene Perception"
