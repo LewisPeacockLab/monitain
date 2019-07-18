@@ -408,19 +408,20 @@ all_df_combined.columns = all_df.columns
 ## groups by subj and pm acc so you can so what everything else looks like by subject 
 #when they are correct and when the aren't correct on the pm task
 
-grouped = all_df.groupby('subj')['pm_acc'].mean()
+##ADD BACK LATER IF NOT EXCLUDING ANYONE:
+# grouped = all_df.groupby('subj')['pm_acc'].mean()
 
-removeSubjs = []
-for subj, pmAcc in grouped.iteritems(): 
-	if pmAcc < 0.5: 
-		print subj #this tells us who to remove
-		removeSubjs.append(subj)
-		print removeSubjs
+# removeSubjs = []
+# for subj, pmAcc in grouped.iteritems(): 
+# 	if pmAcc < 0.5: 
+# 		print subj #this tells us who to remove
+# 		removeSubjs.append(subj)
+# 		print removeSubjs
 
-for i in range(len(removeSubjs)):
-	#grouped = grouped.drop([removeSubjs[i]])
-	all_df_combined = all_df_combined[all_df_combined.subj != removeSubjs[i]]
-	all_df = all_df[all_df.subj != removeSubjs[i]]
+# for i in range(len(removeSubjs)):
+# 	#grouped = grouped.drop([removeSubjs[i]])
+# 	all_df_combined = all_df_combined[all_df_combined.subj != removeSubjs[i]]
+# 	all_df = all_df[all_df.subj != removeSubjs[i]]
 
 
 
@@ -487,6 +488,16 @@ all_df_v11 = pd.concat([block_base1_df, block_maintain1_df, block_maintain2_df, 
 
 #allTogether_df = pd.concat([block_base1_df, block_maintain1_df, block_maintain2_df, block_monitor1_df, block_monitor2_df, block_mnm1_df, block_mnm2_df, block_base2_df], axis=0)
 
+for i in all_df_combined.index: 
+	if (all_df_combined.loc[i, 'block'] == 'Baseline 1') or (all_df_combined.loc[i,'block'] == 'Baseline 2'): 
+		all_df_combined.at[i, 'block'] = 'Baseline'
+	elif (all_df_combined.loc[i,'block'] == 'Maintain 1') or (all_df_combined.loc[i,'block'] == 'Maintain 2'): 
+		all_df_combined.at[i, 'block'] = 'Maintain'
+	elif (all_df_combined.loc[i,'block'] == 'Monitor 1') or (all_df_combined.loc[i,'block'] == 'Monitor 2'): 
+		all_df_combined.at[i, 'block'] = 'Monitor'
+	elif (all_df_combined.loc[i,'block'] == 'M&M 1') or (all_df_combined.loc[i,'block'] == 'M&M 2'): 
+		all_df_combined.at[i, 'block'] = 'M&M'
+
 
 #allTogether_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'block']
 ax = sea.violinplot(x='block', y = 'meanTrial_rt', hue = 'version', data=all_df_combined, palette = my_pal, cut = 0, split = True)
@@ -497,6 +508,8 @@ ax.tick_params(axis='x', labelsize=7)
 sea.despine()
 plt.savefig(FIGURE_PATH + 'all_together_compare_rt.png', dpi = 600)
 plt.close()
+
+
 
 # PM Accuracy
 ax = sea.barplot(x='block', y= 'pm_acc', hue = 'version', data=all_df_combined, palette=my_pal, ci = None)
@@ -509,16 +522,7 @@ plt.savefig(FIGURE_PATH + 'all_together_compare_pmacc.png', dpi = 600)
 plt.close() 
 
 
-# for i in all_df.index: 
-# 	if (all_df.loc[i, 'block'] == 1) or (all_df.loc[i,'block'] == 8): 
 
-# 		all_df.at[i, 'block'] = str('Baseline')
-# 	elif (all_df.loc[i,'block'] == 2) or (all_df.loc[i,'block'] == 3): 
-# 		all_df.at[i, 'block'] = 'Maintain'
-# 	elif (all_df.loc[i,'block'] == 4) or (all_df.loc[i,'block'] == 5): 
-# 		all_df.at[i, 'block'] = 'Monitor'
-# 	elif (all_df.loc[i,'block'] == 6) or (all_df.loc[i,'block'] == 7): 
-# 		all_df.at[i, 'block'] = 'M&M'
 
 
 all_df_combined.columns = ['subj', 'version', 'pm_acc', 'meanTrial_rt', 'og_acc', 'block']
@@ -603,6 +607,43 @@ plt.savefig(FIGURE_PATH + 'all_together_compare_ogacc.png', dpi = 600)
 plt.close() 
 
 
+#### ALL TOGETHER - just v1.1 - blocks collapsed
+#allTogether_df.columns = ['subj', 'pm_acc', 'meanTrial_rt', 'block']
+
+all_v11_df =  all_df_combined[all_df_combined.version == 'vers1.1']
+all_df_combined_minusBase_v11 = all_v11_df[all_v11_df.block != 'Baseline']
+
+ax = sea.violinplot(x='block', y = 'meanTrial_rt', data=all_v11_df, #palette = my_pal,#
+	cut = 0)
+plt.xlabel('Block')
+plt.ylabel('Reaction time (s)')
+ax.tick_params(axis='x', labelsize=7)
+sea.despine()
+plt.savefig(FIGURE_PATH + 'all_together_compare_rt_V1.1.png', dpi = 600)
+plt.close()
+
+
+# PM Accuracy
+ax = sea.barplot(x='block', y= 'pm_acc', data=all_df_combined_minusBase_v11)
+plt.xlabel('Block')
+plt.ylabel('PM accuracy')
+ax.tick_params(axis='x', labelsize=7)
+sea.despine()
+plt.savefig(FIGURE_PATH + 'all_together_compare_pmacc_v1.1.png', dpi = 600)
+plt.close() 
+
+# OG Accuracy
+ax = sea.barplot(x='block', y= 'og_acc', data=all_v11_df)
+plt.xlabel('Subject')
+plt.ylabel('OG accuracy')
+ax.tick_params(axis='x', labelsize=7)
+sea.despine()
+plt.savefig(FIGURE_PATH + 'all_together_compare_ogacc_V1.1.png', dpi = 600)
+plt.close() 
+
+###########
+
+
 
 ### PICK UP HERE ###
 
@@ -648,14 +689,25 @@ pmCost = pd.concat([maintain1_cost_PM, maintain2_cost_PM,
 		  monitor1_cost_PM, monitor2_cost_PM, 
 		  mnm1_cost_PM, mnm2_cost_PM], axis = 0)
 
+pmCost_v11 = pmCost[pmCost.version=='vers1.1']
+
 # PM cost
-ax = sea.barplot(x='block', y= 'meanTrial_rt', hue = 'version', data=pmCost, palette=my_pal, ci = None)
+ax = sea.barplot(x='block', y= 'meanTrial_rt', data=pmCost_v11)
 plt.xlabel('Block')
 plt.ylabel('PM cost (s)')
 ax.tick_params(axis='x', labelsize=7)
 sea.despine()
 plt.savefig(FIGURE_PATH + 'all_together_compare_PMCOST.png', dpi = 600)
 plt.close()
+
+
+
+blockRTs = all_df_combined.groupby(['subj', 'block'])['meanTrial_rt'].mean()
+baseline_df_v11 = all_df_combined[all_df_combined.block == 'Baseline']
+
+maintain_df_v11 = all_df_combined[all_df_combined.block == 'Maintain']
+monitor_df_v11 = all_df_combined[all_df_combined.block == 'Monitor']
+mnm_df_v11 = all_df_combined[all_df_combined.block == 'M&M']
 
 #####################################
 ############  Figures  ##############
