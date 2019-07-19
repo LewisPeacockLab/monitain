@@ -83,52 +83,129 @@ for acc in range(0,15): #get rid of probe14 bc you'll never look at it
 	accCols.append('probe{:d}_acc'.format(acc))
 
 
+
 ######### BY BLOCK TYPE DATAFRAMES #########
 
-def createBlockDFs(str1, str2):
-	block_name = df_main[(df_main['block'] == str1) | (df_main['block'] == str2)]
+def createBlockDFs(str1, str2, blockType):
+	block_name = df_main[(df_main['block'] == str1) | (df_main['block'] == str2)]	
 	block_name_df = pd.concat([ block_name['subj'], block_name['block'], block_name['acc'], block_name[rtProbes].mean(axis=1), block_name[accCols].mean(axis=1)], axis=1)
-	block_name_df.columns = ['subj', 'block', 'pm_acc', 'meanTrial_rt', 'og_acc']
+	block_name_df['blockType'] = blockType
+	block_name_df.columns = ['subj', 'block', 'pm_acc', 'meanTrial_rt', 'og_acc', 'blockType',]	
 	return block_name_df
 
-block_maintain_df = createBlockDFs("('maintain1', 2)", "('maintain2', 5)")
-block_monitor_df = createBlockDFs("('monitor1', 3)", "('monitor2', 6)")
-block_mnm_df = createBlockDFs("('mnm1', 4)", "('mnm2', 7)")
+block_baseline_df = createBlockDFs("('base1', 1)", "('base2', 8)", "Baseline")
+block_maintain_df = createBlockDFs("('maintain1', 2)", "('maintain2', 5)", "Maintain")
+block_monitor_df = createBlockDFs("('monitor1', 3)", "('monitor2', 6)", "Monitor")
+block_mnm_df = createBlockDFs("('mnm1', 4)", "('mnm2', 7)", "MnM")
+
 
 
 ######### BY SUBJECT FIGURES #########
 
-
 ## PM Accuracy
 def bySubj_pmAcc(block_name_df, blockStr, colorPalette):
 
-	ax = sea.barplot(x='subj', y= 'pm_acc', data=block_name_df, palette="Blues", ci = None)
+	ax = sea.barplot(x='subj', y= 'pm_acc', data=block_name_df, palette=colorPalette, ci = None)
 	plt.xlabel('Subject')
 	plt.ylabel('PM accuracy')
 	sea.despine()
-	plt.savefig(FIGURE_PATH + 'bysubj_' + blockStr + '_pmacc.png', dpi = 600)
+	plt.savefig(FIGURE_PATH + 'bySubj_' + blockStr + '_pmacc.png', dpi = 600)
 	plt.close()
 
-bySubj_pmAcc(block_maintain_df, 'maintain')
-bySubj_pmAcc(block_monitor_df, 'monitor')
-bySubj_pmAcc(block_mnm_df, 'mnm')
+bySubj_pmAcc(block_maintain_df, 'maintain', "Blues")
+bySubj_pmAcc(block_monitor_df, 'monitor', "Reds")
+bySubj_pmAcc(block_mnm_df, 'mnm', "Purples")
 
 
 ## OG Accuracy
 def bySubj_ogAcc(block_name_df, blockStr, colorPalette): 
-	ax = sea.barplot(x='subj', y= 'og_acc', hue= 'block', data=block_name_df, palette="Reds", ci = None)
+	ax = sea.barplot(x='subj', y= 'og_acc', data=block_name_df, palette=colorPalette, ci = None)
 	plt.xlabel('Subject')
 	plt.ylabel('OG accuracy')
 	sea.despine()
-	plt.savefig(FIGURE_PATH + 'bySubj' + blockStr + '_ogacc.png', dpi = 600)
+	plt.savefig(FIGURE_PATH + 'bySubj_' + blockStr + '_ogacc.png', dpi = 600)
 	plt.close()
 
+bySubj_ogAcc(block_baseline_df, 'baseline', "Greens")
 bySubj_ogAcc(block_monitor_df, 'maintain', "Blues")
 bySubj_ogAcc(block_monitor_df, 'monitor', "Reds")
 bySubj_ogAcc(block_monitor_df, 'mnm', "Purples")
 
+
+## Reaction time
+def bySubj_rt(block_name_df, blockStr, colorPalette):
+	ax = sea.violinplot(x='subj', y = 'meanTrial_rt', data=block_name_df, palette = colorPalette, cut = 0)
+	# Cut = 0 so range is limited to observed data
+	plt.xlabel('Subject')
+	plt.ylabel('Reaction time (s)')
+	sea.despine()
+	plt.savefig(FIGURE_PATH + 'bySubj_' + blockStr + '_rt.png', dpi = 600)
+	plt.close()
+
+bySubj_rt(block_baseline_df, 'baseline', "Greens")
+bySubj_rt(block_monitor_df, 'maintain', "Blues")
+bySubj_rt(block_monitor_df, 'monitor', "Reds")
+bySubj_rt(block_monitor_df, 'mnm', "Purples")
+
+
+######### ALL BLOCKS DATAFRAME #########
+
+all_df = pd.concat([block_baseline_df, block_maintain_df, block_monitor_df, block_mnm_df], axis = 0)
+all_df_minusBase = pd.concat([block_maintain_df, block_monitor_df, block_mnm_df], axis = 0)
+# If just looking at all_df_minusBase, need to redo exclusion criteria for that
+
+######### EXCLUDING DATA #########
+
+#Replace RT with nan in resp was quicker than 0.05 secs, also replace pm acc with nan
+#Cut off based on findings from "Eye Movements and Visual Encoding during Scene Perception"
+#Rayner et al., 2009
+for trial in all_df.index: 
+	if all_df.loc[trial, 'meanTrial_rt'] < 0.05: 
+		## print all_df_minusBase.loc[trial, 'meanTrial_rt']
+		all_df.at[trial, 'meanTrial_rt'] = np.nan
+		all_df.at[trial, 'pm_acc'] = np.nan
+
+
+
+######### ALL BLOCKS FIGURES #########
+
+## Custom color palette
+my_pal = ['#aedea7', #Green
+		'#abd0e6', #Blue 
+		##'#3787c0', #Blue 
+		'#fca082', #Red 
+		##'#e32f27', #Red
+		'#c6c7e1', #Purple
+		##'#796eb2', #Purple
+		##'#37a055'  #Green
+		  ]
+
+## PM accuracy
+def allSubj_pmAcc():
+	ax = sea.barplot(x='blockType', y= 'pm_acc', data=all_df, palette=my_pal)
+	plt.xlabel('Block Type')
+	plt.ylabel('PM accuracy')
+
+	sea.despine()
+	plt.savefig(FIGURE_PATH + 'allSubj_pmAcc.png', dpi = 600)
+	plt.close()
+
+allSubj_pmAcc()
+
+## OG accuracy
+
+
+## Reaction times
+def allSubj_rt(): 
+	ax = sea.violinplot(x='blockType', y = 'meanTrial_rt', data=all_df, palette = my_pal, cut = 0)
+	plt.xlabel('Block Type')
+	plt.ylabel('Reaction time (s)')
+	ax.tick_params(axis='x', labelsize=7)
+	sea.despine()
+	plt.savefig(FIGURE_PATH + 'allSubj_rt.png', dpi = 600)
+	plt.close()
+
+allSubj_rt()
+
 ## PM cost
 def bySubj_pmCost(block_name_df, blockStr): 
-
-# Reaction times
-def bySubj_rt(block_name_df, blockStr): 
