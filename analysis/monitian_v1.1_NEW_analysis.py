@@ -100,6 +100,24 @@ block_mnm_df = createBlockDFs("('mnm1', 4)", "('mnm2', 7)", "MnM")
 
 
 
+######### CALCULATE PM COST #########
+
+# Calculate base cost by subj
+base_cost = block_baseline_df.groupby('subj')['meanTrial_rt'].mean()
+
+def pmCost(block_name_df, blockStr): 
+	block_cost = block_name_df.groupby('subj')['meanTrial_rt'].mean()
+	block_cost_PM = (block_cost - base_cost).to_frame().reset_index()
+	block_cost_PM['blockType'] = blockStr
+	return block_cost_PM
+
+maintain_cost_PM = pmCost(block_maintain_df, 'Maintain')
+monitor_cost_PM = pmCost(block_monitor_df, 'Monitor')
+mnm_cost_PM = pmCost(block_mnm_df, 'MnM')
+
+pmCost_df = pd.concat([maintain_cost_PM, monitor_cost_PM, mnm_cost_PM], axis = 0)
+pmCost_df.columns = (['subj', 'pm_cost', 'blockType']) #PM cost is essentially the RT cost
+
 ######### BY SUBJECT FIGURES #########
 
 ## PM Accuracy
@@ -148,11 +166,14 @@ bySubj_rt(block_monitor_df, 'monitor', "Reds")
 bySubj_rt(block_monitor_df, 'mnm', "Purples")
 
 
+
 ######### ALL BLOCKS DATAFRAME #########
 
 all_df = pd.concat([block_baseline_df, block_maintain_df, block_monitor_df, block_mnm_df], axis = 0)
 all_df_minusBase = pd.concat([block_maintain_df, block_monitor_df, block_mnm_df], axis = 0)
 # If just looking at all_df_minusBase, need to redo exclusion criteria for that
+
+
 
 ######### EXCLUDING DATA #########
 
@@ -180,20 +201,25 @@ my_pal = ['#aedea7', #Green
 		##'#37a055'  #Green
 		  ]
 
+#### FUNCTIONS to create figures
+
 ## PM accuracy
 def allSubj_pmAcc():
 	ax = sea.barplot(x='blockType', y= 'pm_acc', data=all_df, palette=my_pal)
 	plt.xlabel('Block Type')
 	plt.ylabel('PM accuracy')
-
 	sea.despine()
 	plt.savefig(FIGURE_PATH + 'allSubj_pmAcc.png', dpi = 600)
 	plt.close()
 
-allSubj_pmAcc()
-
 ## OG accuracy
-
+def allSubj_ogAcc():
+	ax = sea.barplot(x='blockType', y= 'og_acc', data=all_df, palette=my_pal)
+	plt.xlabel('Block Type')
+	plt.ylabel('OG accuracy')
+	sea.despine()
+	plt.savefig(FIGURE_PATH + 'allSubj_ogAcc.png', dpi = 600)
+	plt.close() 
 
 ## Reaction times
 def allSubj_rt(): 
@@ -205,7 +231,18 @@ def allSubj_rt():
 	plt.savefig(FIGURE_PATH + 'allSubj_rt.png', dpi = 600)
 	plt.close()
 
-allSubj_rt()
-
 ## PM cost
-def bySubj_pmCost(block_name_df, blockStr): 
+def allSubj_pmCost():
+	ax = sea.barplot(x='blockType', y= 'pm_cost', data=pmCost_df)
+	plt.xlabel('Block')
+	plt.ylabel('PM cost (s)')
+	ea.despine()
+	plt.savefig(FIGURE_PATH + 'allSubj_PMCOST.png', dpi = 600)
+	plt.close()
+
+
+#### CREATE figures for all subjects
+allSubj_pmAcc()
+allSubj_ogAcc()
+allSubj_rt()
+allSubj_pmCost()
