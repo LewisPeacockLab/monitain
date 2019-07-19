@@ -96,27 +96,39 @@ block_monitor_df = createBlockDFs("('monitor1', 3)", "('monitor2', 6)")
 block_mnm_df = createBlockDFs("('mnm1', 4)", "('mnm2', 7)")
 
 
-
-
-
-
-
 ######### BY SUBJECT FIGURES #########
 
-#### MAINTAIN
 
-# PM Accuracy
-ax = sea.barplot(x='subj', y= 'pm_acc', hue= 'block', data=maintain_df, palette="Blues", ci = None)
-plt.xlabel('Subject')
-plt.ylabel('PM accuracy')
-sea.despine()
-plt.savefig(FIGURE_PATH + 'maintain_compare_pmacc.png', dpi = 600)
-plt.close()
+## PM Accuracy
+def bySubj_pmAcc(block_name_df, blockStr, colorPalette):
 
-# OG Accuracy
-ax = sea.barplot(x='subj', y= 'og_acc', hue= 'block', data=maintain_df, palette="Blues", ci = None)
-plt.xlabel('Subject')
-plt.ylabel('OG accuracy')
-sea.despine()
-plt.savefig(FIGURE_PATH + 'maintain_compare_ogacc.png', dpi = 600)
-plt.close()
+	ax = sea.barplot(x='subj', y= 'pm_acc', data=block_name_df, palette="Blues", ci = None)
+	plt.xlabel('Subject')
+	plt.ylabel('PM accuracy')
+	sea.despine()
+	plt.savefig(FIGURE_PATH + 'bysubj_' + blockStr + '_pmacc.png', dpi = 600)
+	plt.close()
+
+bySubj_pmAcc(block_maintain_df, 'maintain')
+bySubj_pmAcc(block_monitor_df, 'monitor')
+bySubj_pmAcc(block_mnm_df, 'mnm')
+
+
+## OG Accuracy
+def bySubj_ogAcc(block_name_df, blockStr, colorPalette): 
+	ax = sea.barplot(x='subj', y= 'og_acc', hue= 'block', data=block_name_df, palette="Reds", ci = None)
+	plt.xlabel('Subject')
+	plt.ylabel('OG accuracy')
+	sea.despine()
+	plt.savefig(FIGURE_PATH + 'bySubj' + blockStr + '_ogacc.png', dpi = 600)
+	plt.close()
+
+bySubj_ogAcc(block_monitor_df, 'maintain', "Blues")
+bySubj_ogAcc(block_monitor_df, 'monitor', "Reds")
+bySubj_ogAcc(block_monitor_df, 'mnm', "Purples")
+
+## PM cost
+def bySubj_pmCost(block_name_df, blockStr): 
+
+# Reaction times
+def bySubj_rt(block_name_df, blockStr): 
