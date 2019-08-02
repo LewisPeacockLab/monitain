@@ -200,6 +200,14 @@ my_pal = ['#aedea7', #Green
 		##'#37a055'  #Green
 		  ]
 
+#### Export dataframes to CSVs
+fname_all_df = os.path.join(FIGURE_PATH, 'all_bySubj.csv')
+all_df.to_csv(fname_all_df, index = False)
+
+fname_pmCost_df = os.path.join(FIGURE_PATH, 'pm_cost_bySubj.csv')
+pmCost_df.to_csv(fname_pmCost_df, index = False)
+
+
 #### FUNCTIONS to create figures
 
 ## PM accuracy
