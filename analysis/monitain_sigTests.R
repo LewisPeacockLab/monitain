@@ -78,7 +78,7 @@ summary(glht(pmCost_lme,
              linfct=mcp(blockType="Tukey")),
         test=adjusted(type="bonferroni"))
 
-
+### PICK UP HERE
 
 ##########################################
 ##  MCB rmANOVA across category combos  ##
