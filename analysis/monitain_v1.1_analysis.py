@@ -26,10 +26,11 @@ plt.ion() # This makes matplotlib SHOW the plots as soon as they are created
 ################################
 
 PATH = os.path.expanduser('~')
-data_dir = PATH+'/Dropbox (LewPeaLab)/BEHAVIOR/monitain/'
+data_dir = PATH+'/Dropbox (LewPeaLab)/BEHAVIOR/monitain'
 FIGURE_PATH = PATH + '/monitain/analysis/output/'
 
 fnames = glob.glob(data_dir+'/v1.1/*.csv')
+fnames = sorted(fnames)
 
 # Remove test subjects
 fnames = [ fn for fn in fnames if 's999' not in fn ]

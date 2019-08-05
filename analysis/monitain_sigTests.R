@@ -31,21 +31,19 @@ mnm_df <- read.csv(mnm_fname)
 baseline_PM_df <- read.csv(baseline_PM_fname)
 maintain_PM_df <- read.csv(maintain_PM_fname)
 monitor_PM_df <- read.csv(monitor_PM_fname)
-mnm_PM_df <- read.csv(mnm_PM_fname
+mnm_PM_df <- read.csv(mnm_PM_fname)
 
 
 ##########################################
-##  rmANOVA for load type across subjs  ##
+##  rmANOVA for block type across subjs  ##
 ##########################################
 
 # load_aov <- aov(acc ~ load_type + Error(subj), data=load_df)
 # summary(load_aov)
 
-load_all_df <- lme()
-
-load_lme <- lme(acc ~ load_type, random=~1|subj, data=load_df)
-anova(load_lme)
-summary(glht(load_lme,
+all_lme <- lme(pm_acc ~ blockType, random=~1|subj, data = all_df)
+anova(all_lme)
+summary(glht(all_lme,
              linfct=mcp(load_type="Tukey")),
         test=adjusted(type="bonferroni"))
 
