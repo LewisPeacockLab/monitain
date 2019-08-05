@@ -48,6 +48,7 @@ for i, fn in enumerate(fnames):
     	vers = 'vers1.1'
 
     subj_df['version'] = vers
+    subj_df = subj_df[1:] #get rid of first line because something is off
     df_list.append(subj_df)
 
 df_main = pd.concat(df_list,ignore_index=False)
