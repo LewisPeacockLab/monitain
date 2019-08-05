@@ -7,19 +7,31 @@ library(multcomp)
 ##  load data  ##
 #################
 
-all_fname <- '~/monitain/analysis/all_bySubj.csv'
-pmCost_fname <- '~/monitain/analysis/pm_cost_bySubj.csv'
+all_fname <- '~/monitain/analysis/csvs/all_bySubj.csv'
+pmCost_fname <- '~/monitain/analysis/csvs/pm_cost_bySubj.csv'
 
-vis_fname <- '~/Dropbox (LewPeaLab)/BEHAVIOR/RepO/data_output/vis_acc.csv'
-sem_fname <- '~/Dropbox (LewPeaLab)/BEHAVIOR/RepO/data_output/sem_acc.csv'
-pho_fname <- '~/Dropbox (LewPeaLab)/BEHAVIOR/RepO/data_output/pho_acc.csv'
+baseline_fname <- '~/monitain/analysis/csvs/baseline.csv'
+maintain_fname <- '~/monitain/analysis/csvs/maintain.csv'
+monitor_fname <- '~/monitain/analysis/csvs/monitor.csv'
+mnm_fname <- '~/monitain/analysis/csvs/mnm.csv'
+
+baseline_PM_fname <- '~/monitain/analysis/csvs/baseline_PM.csv'
+maintain_PM_fname <- '~/monitain/analysis/csvs/maintain_PM.csv'
+monitor_PM_fname <- '~/monitain/analysis/csvs/monitor_PM.csv'
+mnm_PM_fname <- '~/monitain/analysis/csvs/mnm_PM.csv'
 
 all_df <- read.csv(all_fname)
 pmCost_df <- read.csv(pmCost_fname)
 
-vis_df <- read.csv(vis_fname)
-sem_df <- read.csv(sem_fname)
-pho_df <- read.csv(pho_fname)
+baseline_df <- read.csv(baseline_fname)
+maintain_df <- read.csv(maintain_fname)
+monitor_df <- read.csv(monitor_fname)
+mnm_df <- read.csv(mnm_fname)
+
+baseline_PM_df <- read.csv(baseline_PM_fname)
+maintain_PM_df <- read.csv(maintain_PM_fname)
+monitor_PM_df <- read.csv(monitor_PM_fname)
+mnm_PM_df <- read.csv(mnm_PM_fname
 
 
 ##########################################
@@ -28,6 +40,8 @@ pho_df <- read.csv(pho_fname)
 
 # load_aov <- aov(acc ~ load_type + Error(subj), data=load_df)
 # summary(load_aov)
+
+load_all_df <- lme()
 
 load_lme <- lme(acc ~ load_type, random=~1|subj, data=load_df)
 anova(load_lme)

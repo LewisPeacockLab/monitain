@@ -201,11 +201,56 @@ my_pal = ['#aedea7', #Green
 		  ]
 
 #### Export dataframes to CSVs
-fname_all_df = os.path.join(FIGURE_PATH, 'all_bySubj.csv')
+CSV_PATH = FIGURE_PATH + 'csvs'
+
+## All DFs
+fname_all_df = os.path.join(CSV_PATH, 'all_bySubj.csv')
 all_df.to_csv(fname_all_df, index = False)
 
-fname_pmCost_df = os.path.join(FIGURE_PATH, 'pm_cost_bySubj.csv')
+### Baseline DF
+baseline_df = all_df[all_df['blockType'] == 'Baseline']
+fname_baseline_df = os.path.join(CSV_PATH, 'baseline.csv')
+baseline_df.to_csv(fname_baseline_df, index = False)
+
+### Maintain DF
+maintain_df = all_df[all_df['blockType'] == 'Maintain']
+fname_maintain_df = os.path.join(CSV_PATH, 'maintain.csv')
+maintain_df.to_csv(fname_maintain_df, index = False)
+
+### Monitor DF
+monitor_df = all_df[all_df['blockType'] == 'Monitor']
+fname_monitor_df = os.path.join(CSV_PATH, 'monitor.csv')
+monitor_df.to_csv(fname_monitor_df, index = False)
+
+### MNM DF
+mnm_df = all_df[all_df['blockType'] == 'MnM']
+fname_mnm_df = os.path.join(CSV_PATH, 'mnm.csv')
+mnm_df.to_csv(fname_mnm_df, index = False)
+
+
+## PM cost DFs
+fname_pmCost_df = os.path.join(CSV_PATH, 'pm_cost_bySubj.csv')
 pmCost_df.to_csv(fname_pmCost_df, index = False)
+
+### Baseline DF - PM cost
+baseline_df_pmCost = pmCost_df[pmCost_df['blockType'] == 'Baseline']
+fname_baseline_PM_df = os.path.join(CSV_PATH, 'baseline_PM.csv')
+baseline_df_pmCost.to_csv(fname_baseline_PM_df, index = False)
+
+### Maintain DF - PM cost
+maintain_df_pmCost = pmCost_df[pmCost_df['blockType'] == 'Maintain']
+fname_maintain_PM_df = os.path.join(CSV_PATH, 'maintain_PM.csv')
+maintain_df_pmCost.to_csv(fname_maintain_PM_df, index = False)
+
+### Monitor DF - PM cost
+monitor_df_pmCost = pmCost_df[pmCost_df['blockType'] == 'Monitor']
+fname_monitor_PM_df = os.path.join(CSV_PATH, 'monitor_PM.csv')
+monitor_df_pmCost.to_csv(fname_monitor_PM_df, index = False)
+
+### MnM DF - PM cost
+mnm_df_pmCost = pmCost_df[pmCost_df['blockType'] == 'MnM']
+fname_mnm_PM_df = os.path.join(CSV_PATH, 'mnm_PM.csv')
+mnm_df_pmCost.to_csv(fname_mnm_PM_df, index = False)
 
 
 #### FUNCTIONS to create figures
