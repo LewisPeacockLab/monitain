@@ -120,13 +120,6 @@ pmCost_df = pd.concat([maintain_cost_PM, monitor_cost_PM, mnm_cost_PM], axis = 0
 pmCost_df.columns = (['subj', 'pm_cost', 'blockType']) #PM cost is essentially the RT cost
 
 
-######### EXPORT CSVs #########
-
-def alldata(): 
-	all_df_averaged = all_df.groupby(['subj', 'blockType']).mean().reset_index(drop = False)
-	pmCost_df_averaged = pmCost_df.groupby(['subj', 'blockType']).mean().reset_index(drop = False)
-
-
 ######### BY SUBJECT FIGURES #########
 
 ## PM Accuracy
@@ -213,8 +206,12 @@ my_pal = ['#aedea7', #Green
 #### Export dataframes to CSVs
 CSV_PATH = FIGURE_PATH + 'csvs'
 
+
+######### EXPORT CSVs #########
 ## All DFs
-alldata()
+all_df_averaged = all_df.groupby(['subj', 'blockType']).mean().reset_index(drop = False)
+pmCost_df_averaged = pmCost_df.groupby(['subj', 'blockType']).mean().reset_index(drop = False)
+
 fname_all = os.path.join(CSV_PATH, 'ALL.csv')
 all_df_averaged.to_csv(fname_all, index = False)
 fname_pm = os.path.join(CSV_PATH, 'PM_COST.csv')
