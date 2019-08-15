@@ -21,3 +21,65 @@ aov_pmCost = pg.rm_anova(dv='pm_cost', within = 'blockType', subject = 'subj', d
 posthoc_pmCost = pg.pairwise_ttests(dv='pm_cost', within='blockType', subject = 'subj', data=pmCost_df_averaged)
 
 
+### export p values to dataframe and then csv
+
+# utility functions
+def findSignificance(p_val_list, sig_list):
+	for i in range(len(p_val_list)): 
+		if p_val_list[i] < 0.001: 
+			sig_list.append('***')
+		elif p_val_list[i] < 0.01: 
+			sig_list.append('**')
+		elif p_val_list[i] < 0.05: 
+			sig_list.append('*')
+		elif p_val_list[i] < 0.1: 
+			sig_list.append('.')
+		else: 
+			sig_list.append(' ')
+
+def addToList(posthoc_type):
+	for i in range(len(posthoc_type)): 
+		p_val_list_ttests.append(posthoc_type['p-unc'][i])
+		condition_list_ttests.append(posthoc_type['A'][i] + " + " + posthoc_type['B'][i])
+
+# set index
+data_indx_anova = ['og_acc', 'pm_acc', 'rt', 'pmCost']
+
+
+### RM ANOVAS
+
+# create lists for anovas
+p_val_list_anova = [aov_og['p-unc'][0], aov_pm['p-unc'][0],
+	aov_rt['p-unc'][0], aov_pmCost['p-unc'][0]]
+sig_list_anova = []
+
+# find sig codes for anova
+findSignificance(p_val_list_anova, sig_list_anova)
+
+## create df for anova data
+anova_data = {'p-unc': p_val_list_anova, 'sig code': sig_list_anova}
+rm_anova_df = pd.DataFrame(anova_data, index = data_indx_anova)
+
+
+### POST-HOC T-TESTs
+
+# set index
+data_indx_ttest = ([('og_acc')] * len(posthoc_og))  + ([('pm_acc')] * len(posthoc_pm)) + ([('rt')] * len(posthoc_rt))  + ([('pmCost')] * len(posthoc_pmCost))
+ 
+# create empty lists for ttests
+p_val_list_ttests = []
+condition_list_ttests = []
+sig_list_ttests = []
+
+# fill in lists
+addToList(posthoc_og)
+addToList(posthoc_pm)
+addToList(posthoc_rt)
+addToList(posthoc_pmCost)
+
+# find sig codes for ttest results
+findSignificance(p_val_list_ttests, sig_list_ttests)
+
+## create df for ttest data
+ttest_data = {'p-unc': p_val_list_ttests, 'sig code': sig_list_ttests}
+ttest_df = pd.DataFrame(ttest_data, index = data_indx_ttest)
