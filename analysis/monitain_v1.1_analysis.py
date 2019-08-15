@@ -275,9 +275,10 @@ def allSubj_pmAcc():
 	ax = sea.barplot(x='blockType', y= 'pm_acc', data=all_df, palette=my_pal)
 	plt.xlabel('Block type')
 	plt.ylabel('PM accuracy')
+	plt.ylim(0,1.0)
 	sea.despine()
-	plt.title('Average PM accuracy by block type')
-	plt.savefig(FIGURE_PATH + 'allSubj_pmAcc.png', dpi = 600)
+	#plt.title('Average PM accuracy by block type')
+	plt.savefig(FIGURE_PATH + 'allSubj_pmAcc.eps', dpi = 600)
 	plt.close()
 
 ## OG accuracy
@@ -285,9 +286,10 @@ def allSubj_ogAcc():
 	ax = sea.barplot(x='blockType', y= 'og_acc', data=all_df, palette=my_pal)
 	plt.xlabel('Block type')
 	plt.ylabel('OG accuracy')
+	plt.ylim(0,1.0)
 	sea.despine()
-	plt.title('Average OG accuracy by block type')
-	plt.savefig(FIGURE_PATH + 'allSubj_ogAcc.png', dpi = 600)
+	#plt.title('Average OG accuracy by block type')
+	plt.savefig(FIGURE_PATH + 'allSubj_ogAcc.eps', dpi = 600)
 	plt.close() 
 
 ## Reaction times
@@ -297,8 +299,8 @@ def allSubj_rt():
 	plt.ylabel('Reaction time (s)')
 	ax.tick_params(axis='x', labelsize=7)
 	sea.despine()
-	plt.title('Average RTs (s) by block type')
-	plt.savefig(FIGURE_PATH + 'allSubj_rt.png', dpi = 600)
+	#plt.title('Average RTs (s) by block type')
+	plt.savefig(FIGURE_PATH + 'allSubj_rt.eps', dpi = 600)
 	plt.close()
 
 ## PM cost
@@ -307,8 +309,8 @@ def allSubj_pmCost():
 	plt.xlabel('Block type')
 	plt.ylabel('PM cost (s)')
 	sea.despine()
-	plt.title('Average PM cost by block type')
-	plt.savefig(FIGURE_PATH + 'allSubj_PMCOST.png', dpi = 600)
+	#plt.title('Average PM cost by block type')
+	plt.savefig(FIGURE_PATH + 'allSubj_PMCOST.eps', dpi = 600)
 	plt.close()
 
 
