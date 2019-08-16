@@ -1,8 +1,15 @@
+import os
 import pingouin as pg
 import pandas as pd
 import numpy as np
 
 ### run repeated measure ANOVAs and post hoc t-tests
+PATH = os.path.expanduser('~')
+FIGURE_PATH = PATH + '/monitain/analysis/output/'
+CSV_PATH = FIGURE_PATH + 'csvs'
+
+all_df_averaged = pd.read_csv(FIGURE_PATH+'/csvs/ALL.csv')
+pmCost_df_averaged = pd.read_csv(FIGURE_PATH+'/csvs/PM_COST.csv')
 
 ## og acc
 aov_og = pg.rm_anova(dv='og_acc', within = 'blockType', subject = 'subj', data=all_df_averaged, detailed = True)
@@ -59,6 +66,8 @@ findSignificance(p_val_list_anova, sig_list_anova)
 ## create df for anova data
 anova_data = {'p-unc': p_val_list_anova, 'sig code': sig_list_anova}
 rm_anova_df = pd.DataFrame(anova_data, index = data_indx_anova)
+fname_anova = os.path.join('rm_anova_pvals.csv')
+rm_anova_df.to_csv(fname_anova)
 
 
 ### POST-HOC T-TESTs
@@ -83,3 +92,6 @@ findSignificance(p_val_list_ttests, sig_list_ttests)
 ## create df for ttest data
 ttest_data = {'p-unc': p_val_list_ttests, 'sig code': sig_list_ttests}
 ttest_df = pd.DataFrame(ttest_data, index = data_indx_ttest)
+# export to csv
+fname_ttest = os.path.join('ttest_pvals.csv')
+ttest_df.to_csv(fname_ttest)
