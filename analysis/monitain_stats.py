@@ -90,7 +90,7 @@ addToList(posthoc_pmCost)
 findSignificance(p_val_list_ttests, sig_list_ttests)
 
 ## create df for ttest data
-ttest_data = {'p-unc': p_val_list_ttests, 'sig code': sig_list_ttests}
+ttest_data = {'p-unc': p_val_list_ttests, 'condition': condition_list_ttests, 'sig code': sig_list_ttests}
 ttest_df = pd.DataFrame(ttest_data, index = data_indx_ttest)
 # export to csv
 fname_ttest = os.path.join('ttest_pvals.csv')
