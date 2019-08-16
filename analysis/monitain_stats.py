@@ -10,6 +10,7 @@ CSV_PATH = FIGURE_PATH + 'csvs'
 
 all_df_averaged = pd.read_csv(FIGURE_PATH+'/csvs/ALL.csv')
 pmCost_df_averaged = pd.read_csv(FIGURE_PATH+'/csvs/PM_COST.csv')
+all_df_averaged_minusBase = all_df_averaged[all_df_averaged.blockType != 'Baseline']   
 
 ## og acc
 aov_og = pg.rm_anova(dv='og_acc', within = 'blockType', subject = 'subj', data=all_df_averaged, detailed = True)
@@ -95,3 +96,9 @@ ttest_df = pd.DataFrame(ttest_data, index = data_indx_ttest)
 # export to csv
 fname_ttest = os.path.join('ttest_pvals.csv')
 ttest_df.to_csv(fname_ttest)
+
+
+### LOGISTIC REGRESSION
+X = all_df_averaged
+lom = logistic_regression(X = )
+

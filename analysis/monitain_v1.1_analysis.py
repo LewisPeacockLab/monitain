@@ -119,6 +119,12 @@ mnm_cost_PM = pmCost(block_mnm_df, 'MnM')
 pmCost_df = pd.concat([maintain_cost_PM, monitor_cost_PM, mnm_cost_PM], axis = 0)
 pmCost_df.columns = (['subj', 'pm_cost', 'blockType']) #PM cost is essentially the RT cost
 
+def byTrial_pmCost(block_name_df, blockStr): 
+	for index, row in block_maintain_df.iterrows():  
+    	for subj, rt in base_cost.iteritems():  
+    		if row.subj == subj: 
+    			print(index_1) 
+####PICK UP HERE
 
 ######### BY SUBJECT FIGURES #########
 
@@ -305,7 +311,7 @@ def allSubj_rt():
 
 ## PM cost
 def allSubj_pmCost():
-	ax = sea.barplot(x='blockType', y= 'pm_cost', data=pmCost_df, palette = my_pal)
+	ax = sea.barplot(x='blockType', y= 'pm_cost', data=pmCost_df, palette = my_pal[1:])
 	plt.xlabel('Block type')
 	plt.ylabel('PM cost (s)')
 	sea.despine()
