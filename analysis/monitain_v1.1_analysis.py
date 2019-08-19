@@ -37,21 +37,21 @@ fnames = [ fn for fn in fnames if 's999' not in fn ]
 
 df_list = []
 for i, fn in enumerate(fnames): 
-    subj_df = pd.read_csv(fn, index_col=0)
-    # Add subj and trial num to df
-    subj_df['subj'] = 's{:02d}'.format(i+1)
-    subj_df['trial'] = range(subj_df.shape[0])
+	subj_df = pd.read_csv(fn, index_col=0)
+	# Add subj and trial num to df
+	subj_df['subj'] = 's{:02d}'.format(i+1)
+	subj_df['trial'] = range(subj_df.shape[0])
 
-    if 'v1.0' in fn: 
-    	vers = 'vers1.0'
-    elif 'v1.1' in fn: 
-    	vers = 'vers1.1'
+	if 'v1.0' in fn: 
+		vers = 'vers1.0'
+	elif 'v1.1' in fn: 
+		vers = 'vers1.1'
 
-    subj_df['version'] = vers
-    subj_df = subj_df[1:] #get rid of first line because something is off
-    df_list.append(subj_df)
+	subj_df['version'] = vers
+	subj_df = subj_df[1:] #get rid of first line because something is off
+	df_list.append(subj_df)
 
-df_main = pd.concat(df_list,ignore_index=False)
+df_main = pd.concat(df_list,ignore_index=False, sort=False)
 df_main = df_main.reset_index()
 # Make a copy to replace inaccurate responses with no RT
 df_main_copy = df_main
@@ -89,7 +89,7 @@ for acc in range(0,15): #get rid of probe14 bc you'll never look at it
 
 def createBlockDFs(str1, str2, blockType):
 	block_name = df_main[(df_main['block'] == str1) | (df_main['block'] == str2)]	
-	block_name_df = pd.concat([ block_name['subj'], block_name['block'], block_name['acc'], block_name[rtProbes].mean(axis=1), block_name[accCols].mean(axis=1)], axis=1)
+	block_name_df = pd.concat([ block_name['subj'], block_name['block'], block_name['acc'], block_name[rtProbes].mean(axis=1), block_name[accCols].mean(axis=1)], axis=1, sort=False)
 	block_name_df['blockType'] = blockType
 	block_name_df.columns = ['subj', 'block', 'pm_acc', 'meanTrial_rt', 'og_acc', 'blockType',]	
 	return block_name_df
@@ -116,14 +116,22 @@ maintain_cost_PM = pmCost(block_maintain_df, 'Maintain')
 monitor_cost_PM = pmCost(block_monitor_df, 'Monitor')
 mnm_cost_PM = pmCost(block_mnm_df, 'MnM')
 
-pmCost_df = pd.concat([maintain_cost_PM, monitor_cost_PM, mnm_cost_PM], axis = 0)
+pmCost_df = pd.concat([maintain_cost_PM, monitor_cost_PM, mnm_cost_PM], axis = 0, sort=False)
 pmCost_df.columns = (['subj', 'pm_cost', 'blockType']) #PM cost is essentially the RT cost
 
-def byTrial_pmCost(block_name_df, blockStr): 
-	for index, row in block_maintain_df.iterrows():  
-    	for subj, rt in base_cost.iteritems():  
-    		if row.subj == subj: 
-    			print(index_1) 
+def byTrial_pmCost(block_name_df): 
+	pmCost = []
+	for index, row in block_name_df.iterrows():  
+		for subj, rt in base_cost.iteritems():  
+			if row.subj == subj: 
+				pmCost.append(row.meanTrial_rt - rt)
+	block_name_df['pm_cost'] = pmCost
+
+## Calculuate by trial PM cost
+byTrial_pmCost(block_maintain_df)
+byTrial_pmCost(block_monitor_df)
+byTrial_pmCost(block_mnm_df)
+
 ####PICK UP HERE
 
 ######### BY SUBJECT FIGURES #########
@@ -177,8 +185,8 @@ bySubj_rt(block_monitor_df, 'mnm', "Purples")
 
 ######### ALL BLOCKS DATAFRAME #########
 
-all_df = pd.concat([block_baseline_df, block_maintain_df, block_monitor_df, block_mnm_df], axis = 0)
-all_df_minusBase = pd.concat([block_maintain_df, block_monitor_df, block_mnm_df], axis = 0)
+all_df = pd.concat([block_baseline_df, block_maintain_df, block_monitor_df, block_mnm_df], axis = 0, sort=False)
+all_df_minusBase = pd.concat([block_maintain_df, block_monitor_df, block_mnm_df], axis = 0, sort=False)
 # If just looking at all_df_minusBase, need to redo exclusion criteria for that
 
 
@@ -222,6 +230,9 @@ fname_all = os.path.join(CSV_PATH, 'ALL.csv')
 all_df_averaged.to_csv(fname_all, index = False)
 fname_pm = os.path.join(CSV_PATH, 'PM_COST.csv')
 pmCost_df_averaged.to_csv(fname_pm, index = False)
+
+fname_all_byTrial = os.path.join(CSV_PATH, 'ALL_BYTRIAL.csv')
+all_df.to_csv(fname_all_byTrial, index = False)
 
 
 

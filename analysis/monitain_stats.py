@@ -12,6 +12,8 @@ all_df_averaged = pd.read_csv(FIGURE_PATH+'/csvs/ALL.csv')
 pmCost_df_averaged = pd.read_csv(FIGURE_PATH+'/csvs/PM_COST.csv')
 all_df_averaged_minusBase = all_df_averaged[all_df_averaged.blockType != 'Baseline']   
 
+all_df_byTrial = pd.read_csv(FIGURE_PATH+'csvs/ALL_BYTRIAL.csv')
+
 ## og acc
 aov_og = pg.rm_anova(dv='og_acc', within = 'blockType', subject = 'subj', data=all_df_averaged, detailed = True)
 posthoc_og = pg.pairwise_ttests(dv='og_acc', within='blockType', data=all_df_averaged)
@@ -99,6 +101,8 @@ ttest_df.to_csv(fname_ttest)
 
 
 ### LOGISTIC REGRESSION
-X = all_df_averaged
-lom = logistic_regression(X = )
+X = all_df_byTrial.pm_cost
+y = all_df_byTrial.pm_acc
+pg.logistic_regression(X, y, remove_na=True)  
+
 
