@@ -2,6 +2,8 @@ import os
 import pingouin as pg
 import pandas as pd
 import numpy as np
+import seaborn as seaborn
+import matplotlib.pyplot as plt
 
 ### run repeated measure ANOVAs and post hoc t-tests
 PATH = os.path.expanduser('~')
@@ -105,4 +107,10 @@ X = all_df_byTrial.pm_cost
 y = all_df_byTrial.pm_acc
 pg.logistic_regression(X, y, remove_na=True)  
 
+## create scatter plot of x = pm cost and y = pm acc
+ax = sea.barplot(x="pm_acc", y = "pm_cost", data=all_df_byTrial) 
+plt.xlabel('PM accuracy')
+plt.ylabel('PM cost (secs)')
+plt.savefig(FIGURE_PATH + 'pmAcc_v_pmCost.png', dpi = 600)
+plt.close()
 
