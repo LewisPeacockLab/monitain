@@ -18,19 +18,19 @@ all_df_byTrial = pd.read_csv(FIGURE_PATH+'csvs/ALL_BYTRIAL.csv')
 
 ## og acc
 aov_og = pg.rm_anova(dv='og_acc', within = 'blockType', subject = 'subj', data=all_df_averaged, detailed = True)
-posthoc_og = pg.pairwise_ttests(dv='og_acc', within='blockType', data=all_df_averaged)
+posthoc_og = pg.pairwise_ttests(dv='og_acc', within='blockType', data=all_df_averaged, padjust='bonferroni')
 
 ## pm acc
 aov_pm = pg.rm_anova(dv='pm_acc', within = 'blockType', subject = 'subj', data=all_df_averaged, detailed = True)
-posthoc_pm = pg.pairwise_ttests(dv='pm_acc', within='blockType', subject = 'subj', data=all_df_averaged)
+posthoc_pm = pg.pairwise_ttests(dv='pm_acc', within='blockType', subject = 'subj', data=all_df_averaged, padjust='bonferroni')
 
 ## rt
 aov_rt = pg.rm_anova(dv='meanTrial_rt', within = 'blockType', subject = 'subj', data=all_df_averaged, detailed = True)
-posthoc_rt = pg.pairwise_ttests(dv='meanTrial_rt', within='blockType', subject = 'subj', data=all_df_averaged)
+posthoc_rt = pg.pairwise_ttests(dv='meanTrial_rt', within='blockType', subject = 'subj', data=all_df_averaged, padjust='bonferroni')
 
 ## pm cost
 aov_pmCost = pg.rm_anova(dv='pm_cost', within = 'blockType', subject = 'subj', data=pmCost_df_averaged, detailed = True)
-posthoc_pmCost = pg.pairwise_ttests(dv='pm_cost', within='blockType', subject = 'subj', data=pmCost_df_averaged)
+posthoc_pmCost = pg.pairwise_ttests(dv='pm_cost', within='blockType', subject = 'subj', data=pmCost_df_averaged, padjust='bonferroni')
 
 
 ### export p values to dataframe and then csv
@@ -51,7 +51,7 @@ def findSignificance(p_val_list, sig_list):
 
 def addToList(posthoc_type):
 	for i in range(len(posthoc_type)): 
-		p_val_list_ttests.append(posthoc_type['p-unc'][i])
+		p_val_list_ttests.append(posthoc_type['p-corr'][i])
 		condition_list_ttests.append(posthoc_type['A'][i] + " + " + posthoc_type['B'][i])
 
 # set index
@@ -95,7 +95,7 @@ addToList(posthoc_pmCost)
 findSignificance(p_val_list_ttests, sig_list_ttests)
 
 ## create df for ttest data
-ttest_data = {'p-unc': p_val_list_ttests, 'condition': condition_list_ttests, 'sig code': sig_list_ttests}
+ttest_data = {'p-corr': p_val_list_ttests, 'condition': condition_list_ttests, 'sig code': sig_list_ttests}
 ttest_df = pd.DataFrame(ttest_data, index = data_indx_ttest)
 # export to csv
 fname_ttest = os.path.join('ttest_pvals.csv')

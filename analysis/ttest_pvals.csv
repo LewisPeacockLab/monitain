@@ -1,0 +1,22 @@
+,p-corr,condition,sig code
+og_acc,0.17303076547801258,Baseline + Maintain, 
+og_acc,9.518327078871443e-07,Baseline + MnM,***
+og_acc,0.001256867541405157,Baseline + Monitor,**
+og_acc,4.901062075403246e-06,Maintain + MnM,***
+og_acc,0.11358574326233345,Maintain + Monitor, 
+og_acc,9.365031558117925e-07,MnM + Monitor,***
+pm_acc,0.005128568060547343,Baseline + Maintain,**
+pm_acc,6.668588234242624e-08,Baseline + MnM,***
+pm_acc,0.00046807003276578836,Baseline + Monitor,***
+pm_acc,0.0007314209068061089,Maintain + MnM,***
+pm_acc,1.0,Maintain + Monitor, 
+pm_acc,1.9397557399701044e-06,MnM + Monitor,***
+rt,2.339444041879685e-07,Baseline + Maintain,***
+rt,5.068456104399449e-09,Baseline + MnM,***
+rt,7.622500588999872e-08,Baseline + Monitor,***
+rt,5.7678057153177176e-06,Maintain + MnM,***
+rt,0.1565428875878223,Maintain + Monitor, 
+rt,1.2579209285685373e-05,MnM + Monitor,***
+pmCost,2.9383970459410475e-06,Maintain + MnM,***
+pmCost,0.05899746158510532,Maintain + Monitor,.
+pmCost,6.289604642842711e-06,MnM + Monitor,***
