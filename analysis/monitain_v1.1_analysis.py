@@ -289,7 +289,8 @@ all_df.to_csv(fname_all_byTrial, index = False)
 
 ## PM accuracy
 def allSubj_pmAcc():
-	ax = sea.barplot(x='blockType', y= 'pm_acc', data=all_df, palette=my_pal)
+	all_df_minusBase = all_df[all_df.blockType!= 'Baseline']
+	ax = sea.barplot(x='blockType', y= 'pm_acc', data=all_df_minusBase, palette = my_pal[1:])
 	plt.xlabel('Block type')
 	plt.ylabel('PM accuracy')
 	plt.ylim(0,1.0)
