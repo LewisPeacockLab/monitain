@@ -51,7 +51,7 @@ for i, fn in enumerate(fnames):
 	subj_df = subj_df[1:] #get rid of first line because something is off
 	df_list.append(subj_df)
 
-df_main = pd.concat(df_list,ignore_index=False) #, sort=False)
+df_main = pd.concat(df_list,ignore_index=False, sort=False)
 df_main = df_main.reset_index()
 # Make a copy to replace inaccurate responses with no RT
 df_main_copy = df_main
@@ -89,7 +89,7 @@ for acc in range(0,15): #get rid of probe14 bc you'll never look at it
 
 def createBlockDFs(str1, str2, blockType):
 	block_name = df_main[(df_main['block'] == str1) | (df_main['block'] == str2)]	
-	block_name_df = pd.concat([ block_name['subj'], block_name['block'], block_name['acc'], block_name[rtProbes].mean(axis=1), block_name[accCols].mean(axis=1)], axis=1 )#, sort=False)
+	block_name_df = pd.concat([ block_name['subj'], block_name['block'], block_name['acc'], block_name[rtProbes].mean(axis=1), block_name[accCols].mean(axis=1)], axis=1 , sort=False)
 	block_name_df['blockType'] = blockType
 	block_name_df.columns = ['subj', 'block', 'pm_acc', 'meanTrial_rt', 'og_acc', 'blockType',]	
 	return block_name_df
@@ -116,7 +116,7 @@ maintain_cost_PM = pmCost(block_maintain_df, 'Maintain')
 monitor_cost_PM = pmCost(block_monitor_df, 'Monitor')
 mnm_cost_PM = pmCost(block_mnm_df, 'MnM')
 
-pmCost_df = pd.concat([maintain_cost_PM, monitor_cost_PM, mnm_cost_PM], axis = 0)#, sort=False)
+pmCost_df = pd.concat([maintain_cost_PM, monitor_cost_PM, mnm_cost_PM], axis = 0, sort=False)
 pmCost_df.columns = (['subj', 'pm_cost', 'blockType']) #PM cost is essentially the RT cost
 
 def byTrial_pmCost(block_name_df): 
@@ -185,8 +185,8 @@ bySubj_rt(block_monitor_df, 'mnm', "Purples")
 
 ######### ALL BLOCKS DATAFRAME #########
 
-all_df = pd.concat([block_baseline_df, block_maintain_df, block_monitor_df, block_mnm_df], axis = 0) #, sort=False)
-all_df_minusBase = pd.concat([block_maintain_df, block_monitor_df, block_mnm_df], axis = 0)#, sort=False)
+all_df = pd.concat([block_baseline_df, block_maintain_df, block_monitor_df, block_mnm_df], axis = 0, sort=False)
+all_df_minusBase = pd.concat([block_maintain_df, block_monitor_df, block_mnm_df], axis = 0, sort=False)
 # If just looking at all_df_minusBase, need to redo exclusion criteria for that
 
 
@@ -342,6 +342,52 @@ new_df = all_df.groupby(['subj','blockType']).mean().reset_index(drop=False)
 combine_df = new_df[(new_df['blockType'] == 'Monitor') |(new_df['blockType']=='Maintain')]
 combine_df = combine_df.groupby('subj').sum()
 mnm_df = new_df[(new_df['blockType'] == 'MnM')]
+mnm_df = mnm_df.groupby('subj').sum() 
 
-combine_df = combine_df.reset_index(drop=True)
-mnm_df = mnm_df.reset_index(drop=True)
+combine_df = combine_df.reset_index()
+combine_df['type'] = 'Maintain + Monitor'
+mnm_df = mnm_df.reset_index()
+mnm_df['type'] = 'MnM'  
+
+#both_pm = combine_df.pm_cost  
+#mnm_pm = mnm_df.pm_cost 
+all_pm_df = pd.concat([combine_df, mnm_df], axis=0, sort=False)
+#all_pm_df.columns = 'maintain_monitor', 'mnm' 
+#all_pm_df = all_pm_df.reset_index()   
+
+both_pm = combine_df.pm_cost  
+mnm_pm = mnm_df.pm_cost 
+all_2 = pd.concat([both_pm, mnm_pm], axis=1, sort=False)
+all_2.columns = 'maintain_monitor', 'mnm' 
+import pingouin as pg
+post_hoc = pg.ttest(all_2.maintain_monitor, all_2.mnm, paired=True)
+
+#remove s18 because they don't have a pm cost
+all_pm_df = all_pm_df[(all_pm_df['subj'] != 's18')] 
+
+
+
+#all_pm_df[(all_pm_df['subj'] == 's01')].plot(kind="bar") 
+
+for i, j in all_pm_df.iterrows():  
+	sea.relplot(x='type', y='pm_cost', data = all_pm_df[(all_pm_df['subj'] == j.subj)], kind = "line") 
+	sea.barplot(x='type', y = 'pm_cost', data = all_pm_df[(all_pm_df['subj'] == j.subj)], palette = "Purples")
+	#all_pm_df[(all_pm_df['subj'] == j.subj)].plot(color = 'purple',kind="bar") 
+	#plt.colorPalette(my_pal)
+	#plt.xlabel('Block type')
+	#plt.ylabel('PM cost')
+	#plt.savefig(FIGURE_PATH + 'allSubj_pmCompare' + j.subj + '.eps', dpi = 600)
+	#plt.close()
+	#plt.legend('Maintain + Monitor', 'MnM')
+
+sea.pointplot(x = 'type', y = 'pm_cost', hue = 'subj', data = all_pm_df)  
+
+ax = sea.pointplot(x = 'type', y = 'pm_cost', hue = 'subj', data = all_pm_df)
+plt.xlabel('Block type')
+plt.ylabel('PM cost')
+plt.savefig(FIGURE_PATH + 'pm_compare.eps', dpi = 600)
+
+
+fig, ax = plt.subplots() 
+for i, j in all_pm_df.iterrows():
+	sea.pointplot(x='type', y='pm_cost', data = all_pm_df[(all_pm_df['subj' == j.subj)], ax = ax, kind = "line") 
