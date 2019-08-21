@@ -141,7 +141,7 @@ def bySubj_pmAcc(block_name_df, blockStr, colorPalette):
 
 	ax = sea.barplot(x='subj', y= 'pm_acc', data=block_name_df, palette=colorPalette, ci = None)
 	plt.xlabel('Subject')
-	plt.ylabel('PM accuracy')
+	plt.ylabel('Accuracy')
 	sea.despine()
 	plt.savefig(FIGURE_PATH + 'bySubj_' + blockStr + '_pmacc.png', dpi = 600)
 	plt.close()
@@ -292,7 +292,7 @@ def allSubj_pmAcc():
 	all_df_minusBase = all_df[all_df.blockType!= 'Baseline']
 	ax = sea.barplot(x='blockType', y= 'pm_acc', data=all_df_minusBase, palette = my_pal[1:])
 	plt.xlabel('Block type')
-	plt.ylabel('PM accuracy')
+	plt.ylabel('Accuracy')
 	plt.ylim(0,1.0)
 	sea.despine()
 	#plt.title('Average PM accuracy by block type')
