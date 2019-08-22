@@ -2,7 +2,7 @@ import os
 import pingouin as pg
 import pandas as pd
 import numpy as np
-import seaborn as seaborn
+import seaborn as sea
 import matplotlib.pyplot as plt
 
 ### run repeated measure ANOVAs and post hoc t-tests
@@ -15,6 +15,9 @@ pmCost_df_averaged = pd.read_csv(FIGURE_PATH+'/csvs/PM_COST.csv')
 all_df_averaged_minusBase = all_df_averaged[all_df_averaged.blockType != 'Baseline']   
 
 all_df_byTrial = pd.read_csv(FIGURE_PATH+'csvs/ALL_BYTRIAL.csv')
+
+# Remove 
+all_df_averaged = all_df_averaged[(all_df_averaged['subj'] != 's18')]
 
 ## og acc
 aov_og = pg.rm_anova(dv='og_acc', within = 'blockType', subject = 'subj', data=all_df_averaged, detailed = True)
@@ -77,6 +80,8 @@ rm_anova_df.to_csv(fname_anova)
 
 ### POST-HOC T-TESTs
 
+
+
 # set index
 data_indx_ttest = ([('og_acc')] * len(posthoc_og))  + ([('pm_acc')] * len(posthoc_pm)) + ([('rt')] * len(posthoc_rt))  + ([('pmCost')] * len(posthoc_pmCost))
  
@@ -113,4 +118,19 @@ plt.xlabel('PM accuracy')
 plt.ylabel('PM cost (secs)')
 plt.savefig(FIGURE_PATH + 'pmAcc_v_pmCost.png', dpi = 600)
 plt.close()
+
+#remove s18 because they don't have a pm cost
+all_df_averaged = all_df_averaged[(all_df_averaged['subj'] != 's18')] 
+
+# Does maintenance cost predict combined performance? 
+maintain_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')].pm_cost 
+monitor_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Monitor')].pm_cost
+mnm_pm_perform = all_df_averaged[(all_df_averaged['blockType'] == 'MnM')].pm_acc
+
+
+weight_of_maintain = pg.linear_regression(maintain_cost, mnm_pm_perform)
+weight_of_monitor = pg.linear_regression(monitor_cost, mnm_pm_perform)
+
+
+# Does monitoring cost predict combined performance? 
 

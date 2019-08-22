@@ -286,6 +286,7 @@ all_df.to_csv(fname_all_byTrial, index = False)
 
 
 #### FUNCTIONS to create figures
+all_df = all_df[(all_df['subj'] != 's18')] 
 
 ## PM accuracy
 def allSubj_pmAcc():
