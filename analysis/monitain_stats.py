@@ -127,8 +127,38 @@ maintain_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')].pm
 monitor_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Monitor')].pm_cost
 mnm_pm_perform = all_df_averaged[(all_df_averaged['blockType'] == 'MnM')].pm_acc
 
+maintain_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')].groupby(['subj', 'pm_cost']).mean().reset_index()
+maintain_cost = maintain_cost.drop(columns=['pm_acc', 'meanTrial_rt','og_acc'], axis=1)  
+
+monitor_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Monitor')].groupby(['subj', 'pm_cost']).mean().reset_index()
+monitor_cost = monitor_cost.drop(columns=['pm_acc', 'meanTrial_rt','og_acc'], axis=1)  
+
+mnm_pm_perform = all_df_averaged[(all_df_averaged['blockType'] == 'MnM')].groupby(['subj', 'pm_acc']).mean().reset_index()
+mnm_pm_perform = mnm_pm_perform.drop(columns=['subj','pm_cost', 'meanTrial_rt','og_acc'], axis=1)  
+
+main_V_combine = pd.concat([maintain_cost, mnm_pm_perform], axis=1, sort=False)
+mon_V_combine = pd.concat([monitor_cost, mnm_pm_perform], axis=1, sort=False)
+
+sea.regplot(x='pm_cost', y = 'pm_acc', data = main_V_combine, color = 'b') 
+plt.xlabel('Maintain cost (s)')
+plt.ylabel('Combined performance')
+plt.savefig(FIGURE_PATH + 'maintainCost_v_pmAcc.pdf', dpi = 600)
+plt.close()
+
+sea.regplot(x='pm_cost', y = 'pm_acc', data = mon_V_combine, color = 'r') 
+plt.xlabel('Monitor cost (s)')
+plt.ylabel('Combined performance')
+plt.savefig(FIGURE_PATH + 'monitorCost_v_pmAcc.pdf', dpi = 600)
+plt.close()
+
+maintain_array = maintain_cost.array
+monitor_array = monitor_cost.array
+mnm_pm_array = mnm_pm_perform.array
 
 weight_of_maintain = pg.linear_regression(maintain_cost, mnm_pm_perform)
+
+ax = sea.pointplot(x=all_df_averaged[(all_df_averaged['blockType'].pm_cost == 'Maintain')], y = all_df_averaged[(all_df_averaged['blockType'].pm_acc == 'MnM')], data = all_df_averaged) 
+
 weight_of_monitor = pg.linear_regression(monitor_cost, mnm_pm_perform)
 
 
