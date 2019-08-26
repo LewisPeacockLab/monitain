@@ -123,9 +123,9 @@ plt.close()
 all_df_averaged = all_df_averaged[(all_df_averaged['subj'] != 's18')] 
 
 # Does maintenance cost predict combined performance? 
-maintain_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')].pm_cost 
-monitor_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Monitor')].pm_cost
-mnm_pm_perform = all_df_averaged[(all_df_averaged['blockType'] == 'MnM')].pm_acc
+maintain_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')]
+monitor_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Monitor')]
+mnm_pm_perform = all_df_averaged[(all_df_averaged['blockType'] == 'MnM')]
 
 maintain_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')].groupby(['subj', 'pm_cost']).mean().reset_index()
 maintain_cost = maintain_cost.drop(columns=['pm_acc', 'meanTrial_rt','og_acc'], axis=1)  
@@ -155,11 +155,11 @@ maintain_array = maintain_cost.array
 monitor_array = monitor_cost.array
 mnm_pm_array = mnm_pm_perform.array
 
-weight_of_maintain = pg.linear_regression(maintain_cost, mnm_pm_perform)
+weight_of_maintain = pg.linear_regression(maintain_cost.pm_cost, mnm_pm_perform.pm_acc)
 
 ax = sea.pointplot(x=all_df_averaged[(all_df_averaged['blockType'].pm_cost == 'Maintain')], y = all_df_averaged[(all_df_averaged['blockType'].pm_acc == 'MnM')], data = all_df_averaged) 
 
-weight_of_monitor = pg.linear_regression(monitor_cost, mnm_pm_perform)
+weight_of_monitor = pg.linear_regression(monitor_cost.pm_cost, mnm_pm_perform.pm_acc)
 
 
 # Does monitoring cost predict combined performance? 
