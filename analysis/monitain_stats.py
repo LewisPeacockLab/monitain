@@ -133,11 +133,16 @@ maintain_cost = maintain_cost.drop(columns=['pm_acc', 'meanTrial_rt','og_acc'], 
 monitor_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Monitor')].groupby(['subj', 'pm_cost']).mean().reset_index()
 monitor_cost = monitor_cost.drop(columns=['pm_acc', 'meanTrial_rt','og_acc'], axis=1)  
 
+mnm_cost = all_df_averaged[(all_df_averaged['blockType'] == 'MnM')].groupby(['subj', 'pm_cost']).mean().reset_index()
+mnm_cost = mnm_cost.drop(columns=['pm_acc', 'meanTrial_rt','og_acc'], axis=1)
+
 mnm_pm_perform = all_df_averaged[(all_df_averaged['blockType'] == 'MnM')].groupby(['subj', 'pm_acc']).mean().reset_index()
 mnm_pm_perform = mnm_pm_perform.drop(columns=['subj','pm_cost', 'meanTrial_rt','og_acc'], axis=1)  
 
 main_V_combine = pd.concat([maintain_cost, mnm_pm_perform], axis=1, sort=False)
 mon_V_combine = pd.concat([monitor_cost, mnm_pm_perform], axis=1, sort=False)
+
+mnm_V_combine = pd.concat([mnm_cost, mnm_pm_perform], axis=1, sort=False)
 
 sea.regplot(x='pm_cost', y = 'pm_acc', data = main_V_combine, color = 'b') 
 plt.xlabel('Maintain cost (s)')
@@ -151,6 +156,12 @@ plt.ylabel('Combined performance')
 plt.savefig(FIGURE_PATH + 'monitorCost_v_pmAcc.pdf', dpi = 600)
 plt.close()
 
+sea.regplot(x='pm_cost', y = 'pm_acc', data = mnm_V_combine, color = 'purple') 
+plt.xlabel('MnM cost (s)')
+plt.ylabel('Combined performance')
+plt.savefig(FIGURE_PATH + 'mnmCost_v_pmAcc.pdf', dpi = 600)
+plt.close()
+
 maintain_array = maintain_cost.array
 monitor_array = monitor_cost.array
 mnm_pm_array = mnm_pm_perform.array
@@ -161,6 +172,8 @@ ax = sea.pointplot(x=all_df_averaged[(all_df_averaged['blockType'].pm_cost == 'M
 
 weight_of_monitor = pg.linear_regression(monitor_cost.pm_cost, mnm_pm_perform.pm_acc)
 
+combined_cost = maintain_cost.pm_cost + monitor_cost.pm_cost
+weight_of_combined = pg.linear_regression(combined_cost, mnm_pm_perform.pm_acc)
 
 # Does monitoring cost predict combined performance? 
 
