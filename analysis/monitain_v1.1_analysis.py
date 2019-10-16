@@ -51,7 +51,8 @@ for i, fn in enumerate(fnames):
 	subj_df = subj_df[1:] #get rid of first line because something is off
 	df_list.append(subj_df)
 
-df_main = pd.concat(df_list,ignore_index=False, sort=False)
+##df_main = pd.concat(df_list,ignore_index=False, sort=False)
+df_main = pd.concat(df_list,ignore_index=False)
 df_main = df_main.reset_index()
 # Make a copy to replace inaccurate responses with no RT
 df_main_copy = df_main
@@ -89,7 +90,8 @@ for acc in range(0,15): #get rid of probe14 bc you'll never look at it
 
 def createBlockDFs(str1, str2, blockType):
 	block_name = df_main[(df_main['block'] == str1) | (df_main['block'] == str2)]	
-	block_name_df = pd.concat([ block_name['subj'], block_name['block'], block_name['acc'], block_name[rtProbes].mean(axis=1), block_name[accCols].mean(axis=1)], axis=1 , sort=False)
+	##block_name_df = pd.concat([ block_name['subj'], block_name['block'], block_name['acc'], block_name[rtProbes].mean(axis=1), block_name[accCols].mean(axis=1)], axis=1 , sort=False)
+	block_name_df = pd.concat([ block_name['subj'], block_name['block'], block_name['acc'], block_name[rtProbes].mean(axis=1), block_name[accCols].mean(axis=1)], axis=1)
 	block_name_df['blockType'] = blockType
 	block_name_df.columns = ['subj', 'block', 'pm_acc', 'meanTrial_rt', 'og_acc', 'blockType',]	
 	return block_name_df
@@ -116,7 +118,8 @@ maintain_cost_PM = pmCost(block_maintain_df, 'Maintain')
 monitor_cost_PM = pmCost(block_monitor_df, 'Monitor')
 mnm_cost_PM = pmCost(block_mnm_df, 'MnM')
 
-pmCost_df = pd.concat([maintain_cost_PM, monitor_cost_PM, mnm_cost_PM], axis = 0, sort=False)
+##pmCost_df = pd.concat([maintain_cost_PM, monitor_cost_PM, mnm_cost_PM], axis = 0, sort=False)
+pmCost_df = pd.concat([maintain_cost_PM, monitor_cost_PM, mnm_cost_PM], axis = 0)
 pmCost_df.columns = (['subj', 'pm_cost', 'blockType']) #PM cost is essentially the RT cost
 
 def byTrial_pmCost(block_name_df): 
@@ -185,8 +188,10 @@ bySubj_rt(block_monitor_df, 'mnm', "Purples")
 
 ######### ALL BLOCKS DATAFRAME #########
 
-all_df = pd.concat([block_baseline_df, block_maintain_df, block_monitor_df, block_mnm_df], axis = 0, sort=False)
-all_df_minusBase = pd.concat([block_maintain_df, block_monitor_df, block_mnm_df], axis = 0, sort=False)
+##all_df = pd.concat([block_baseline_df, block_maintain_df, block_monitor_df, block_mnm_df], axis = 0, sort=False)
+##all_df_minusBase = pd.concat([block_maintain_df, block_monitor_df, block_mnm_df], axis = 0, sort=False)
+all_df = pd.concat([block_baseline_df, block_maintain_df, block_monitor_df, block_mnm_df], axis = 0)
+all_df_minusBase = pd.concat([block_maintain_df, block_monitor_df, block_mnm_df], axis = 0)
 # If just looking at all_df_minusBase, need to redo exclusion criteria for that
 
 
@@ -352,13 +357,15 @@ mnm_df['type'] = 'MnM'
 
 #both_pm = combine_df.pm_cost  
 #mnm_pm = mnm_df.pm_cost 
-all_pm_df = pd.concat([combine_df, mnm_df], axis=0, sort=False)
+##all_pm_df = pd.concat([combine_df, mnm_df], axis=0, sort=False)
+all_pm_df = pd.concat([combine_df, mnm_df], axis=0)
 #all_pm_df.columns = 'maintain_monitor', 'mnm' 
 #all_pm_df = all_pm_df.reset_index()   
 
 both_pm = combine_df.pm_cost  
 mnm_pm = mnm_df.pm_cost 
-all_2 = pd.concat([both_pm, mnm_pm], axis=1, sort=False)
+##all_2 = pd.concat([both_pm, mnm_pm], axis=1, sort=False)
+all_2 = pd.concat([both_pm, mnm_pm], axis=1)
 all_2.columns = 'maintain_monitor', 'mnm' 
 import pingouin as pg
 post_hoc = pg.ttest(all_2.maintain_monitor, all_2.mnm, paired=True)
