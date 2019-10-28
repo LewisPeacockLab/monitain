@@ -367,6 +367,8 @@ mnm_pm = mnm_df.pm_cost
 ##all_2 = pd.concat([both_pm, mnm_pm], axis=1, sort=False)
 all_2 = pd.concat([both_pm, mnm_pm], axis=1)
 all_2.columns = 'maintain_monitor', 'mnm' 
+
+
 import pingouin as pg
 post_hoc = pg.ttest(all_2.maintain_monitor, all_2.mnm, paired=True)
 
