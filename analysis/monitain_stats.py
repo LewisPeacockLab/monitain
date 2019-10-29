@@ -178,5 +178,7 @@ weight_of_monitor = pg.linear_regression(monitor_cost.pm_cost, mnm_pm_perform.pm
 combined_cost = maintain_cost.pm_cost + monitor_cost.pm_cost
 weight_of_combined = pg.linear_regression(combined_cost, mnm_pm_perform.pm_acc)
 
+weight_of_mnm = pg.linear_regression(mnm_cost.pm_cst, mnm_pm_perform.pm_acc)
+
 # Does monitoring cost predict combined performance? 
 
