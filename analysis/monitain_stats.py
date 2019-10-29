@@ -121,6 +121,7 @@ plt.close()
 
 #remove s18 because they don't have a pm cost
 all_df_averaged = all_df_averaged[(all_df_averaged['subj'] != 's18')] 
+all_df_averaged = all_df_averaged[(all_df_averaged['subj'] != 's28')] ## remove later
 
 # Does maintenance cost predict combined performance? 
 maintain_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')]
@@ -162,13 +163,15 @@ plt.ylabel('Combined performance')
 plt.savefig(FIGURE_PATH + 'mnmCost_v_pmAcc.pdf', dpi = 600)
 plt.close()
 
-maintain_array = maintain_cost.array
-monitor_array = monitor_cost.array
-mnm_pm_array = mnm_pm_perform.array
+## not sure what these are for
+##maintain_array = maintain_cost.array
+##monitor_array = monitor_cost.array
+##mnm_pm_array = mnm_pm_perform.array
 
 weight_of_maintain = pg.linear_regression(maintain_cost.pm_cost, mnm_pm_perform.pm_acc)
 
-ax = sea.pointplot(x=all_df_averaged[(all_df_averaged['blockType'].pm_cost == 'Maintain')], y = all_df_averaged[(all_df_averaged['blockType'].pm_acc == 'MnM')], data = all_df_averaged) 
+## not sure about this either
+##ax = sea.pointplot(x=all_df_averaged[(all_df_averaged['blockType'].pm_cost == 'Maintain')], y = all_df_averaged[(all_df_averaged['blockType'].pm_acc == 'MnM')], data = all_df_averaged) 
 
 weight_of_monitor = pg.linear_regression(monitor_cost.pm_cost, mnm_pm_perform.pm_acc)
 

@@ -58,6 +58,25 @@ df_main = df_main.reset_index()
 df_main_copy = df_main
 # Use for backup
 
+# #### WORK MORE HERE
+# # Change if they hit num_1 to 1 and num_2 to 2
+# for i in df_main.index: 
+# 	for probe in range(0,15):  
+#     	value = df_main.loc[i, 'respProbe{:d}'.format(probe)] 
+#     	if isinstance(value, str) and 'num_1' in value and : 
+    		 
+
+# for i in df_main.index:
+# 	for probe in range(0,15): 
+# 		value = df_main.loc[i, 'respProbe{:d}'.format(probe)]
+# 		if isinstance(value, str) and 'num_1' in value:
+# 			print('here')
+# 		if 'num_1' in value and isinstance(df_main.loc[i, 'respProbe{:d}'.format(probe)], str): 
+# 			print('here')
+
+# 	print (df_main.respProbe+trial)
+# for line in df_main.respProbe
+
 # Record PM accuracy per trial
 for trial in df_main.index: 
 	probeNum = df_main.loc[trial, 'n_probes']
@@ -74,6 +93,7 @@ for i in df_main.index:
 	for probe in range(0,15): 
 		if df_main.loc[i, 'probe{:d}_acc'.format(probe)] == 0: 
 			df_main.at[i, 'rtProbe{:d}'.format(probe)] = np.nan
+
 
 # Master list of all rt probe titles
 rtProbes = []
@@ -292,6 +312,7 @@ all_df.to_csv(fname_all_byTrial, index = False)
 
 #### FUNCTIONS to create figures
 all_df = all_df[(all_df['subj'] != 's18')] 
+all_df = all_df[(all_df['subj'] != 's28')] ## remove later
 
 ## PM accuracy
 def allSubj_pmAcc():
@@ -374,6 +395,7 @@ post_hoc = pg.ttest(all_2.maintain_monitor, all_2.mnm, paired=True)
 
 #remove s18 because they don't have a pm cost
 all_pm_df = all_pm_df[(all_pm_df['subj'] != 's18')] 
+all_pm_df = all_pm_df[(all_pm_df['subj'] != 's28')]  ## remove later
 
 
 
@@ -398,6 +420,6 @@ plt.ylabel('PM cost')
 plt.savefig(FIGURE_PATH + 'pm_compare.eps', dpi = 600)
 
 
-fig, ax = plt.subplots() 
-for i, j in all_pm_df.iterrows():
-	sea.pointplot(x='type', y='pm_cost', data = all_pm_df[(all_pm_df['subj' == j.subj)], ax = ax, kind = "line") 
+##fig, ax = plt.subplots() 
+##for i, j in all_pm_df.iterrows():
+##	sea.pointplot(x='type', y='pm_cost', data = all_pm_df[(all_pm_df['subj' == j.subj)], ax = ax, kind = "line") 
