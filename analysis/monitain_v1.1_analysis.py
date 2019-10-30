@@ -376,6 +376,7 @@ combine_df['type'] = 'Maintain + Monitor'
 mnm_df = mnm_df.reset_index()
 mnm_df['type'] = 'MnM'  
 
+
 #both_pm = combine_df.pm_cost  
 #mnm_pm = mnm_df.pm_cost 
 ##all_pm_df = pd.concat([combine_df, mnm_df], axis=0, sort=False)
@@ -418,6 +419,9 @@ ax = sea.pointplot(x = 'type', y = 'pm_cost', hue = 'subj', data = all_pm_df)
 plt.xlabel('Block type')
 plt.ylabel('PM cost')
 plt.savefig(FIGURE_PATH + 'pm_compare.eps', dpi = 600)
+
+sea.violinplot(x = all_pm_df.type, y = all_pm_df.pm_cost)     
+sea.pointplot(x = 'type', y = 'pm_cost', hue = 'subj', data = all_pm_df, color = '0.75')
 
 
 fig, ax = plt.subplots() 
