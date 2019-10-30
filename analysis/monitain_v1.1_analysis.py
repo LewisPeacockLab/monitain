@@ -420,6 +420,6 @@ plt.ylabel('PM cost')
 plt.savefig(FIGURE_PATH + 'pm_compare.eps', dpi = 600)
 
 
-##fig, ax = plt.subplots() 
-##for i, j in all_pm_df.iterrows():
-##	sea.pointplot(x='type', y='pm_cost', data = all_pm_df[(all_pm_df['subj' == j.subj)], ax = ax, kind = "line") 
+fig, ax = plt.subplots() 
+for i, j in all_pm_df.iterrows():
+	sea.pointplot(x='type', y='pm_cost', data = all_pm_df[(all_pm_df['subj' == j.subj)], ax = ax, kind = "line") 
