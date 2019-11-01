@@ -48,6 +48,18 @@ for i, fn in enumerate(fnames):
 		vers = 'vers1.1'
 
 	subj_df['version'] = vers
+	for i in df_main.index: 
+		for probe in range(0,15):
+			word_or_non = subj_df.iloc[i, subj_df.columns.get_loc('word{:d}_cond'.format(probe))]
+			value = subj_df.loc[i, 'respProbe{:d}'.format(probe)]
+			if (isinstance(value, str) and 'num_1' in value) and (word_or_non == 'word'):
+				subj_df.iloc[i, subj_df.columns.get_loc('probe{:d}_acc'.format(probe))] = 1 ## correct - picked word for word
+			elif (isinstance(value, str) and 'num_1' in value) and (word_or_non != 'word'):
+				subj_df.iloc[i, subj_df.columns.get_loc('probe{:d}_acc'.format(probe))] = 0 ## incorrect - picked word for nonword
+			elif (isinstance(value, str) and 'num_2' in value) and (word_or_non == 'nonword'):
+				subj_df.iloc[i, subj_df.columns.get_loc('probe{:d}_acc'.format(probe))] = 1 ## correct - picked nonword for nonword
+			elif (isinstance(value, str) and 'num_2' in value) and (word_or_non != 'nonword'): 
+				subj_df.iloc[i, subj_df.columns.get_loc('probe{:d}_acc'.format(probe))] = 0 ## incorrect - picked word for nonword
 	subj_df = subj_df[1:] #get rid of first line because something is off
 	df_list.append(subj_df)
 
@@ -58,12 +70,14 @@ df_main = df_main.reset_index()
 df_main_copy = df_main
 # Use for backup
 
-# #### WORK MORE HERE
-# # Change if they hit num_1 to 1 and num_2 to 2
-# for i in df_main.index: 
-# 	for probe in range(0,15):  
-#     	value = df_main.loc[i, 'respProbe{:d}'.format(probe)] 
-#     	if isinstance(value, str) and 'num_1' in value and : 
+#### WORK MORE HERE
+# Change if they hit num_1 to 1 and num_2 to 2
+
+
+for i in df_main.index: 
+	for probe in range(0,15):  
+    	value = df_main.loc[i, 'respProbe{:d}'.format(probe)] 
+    	if isinstance(value, str) and 'num_1' in value and : 
     		 
 
 # for i in df_main.index:
@@ -358,12 +372,25 @@ def allSubj_pmCost():
 	plt.savefig(FIGURE_PATH + 'allSubj_PMCOST.eps', dpi = 600)
 	plt.close()
 
+def allSubj_pmCompare_point():
+	## Point plot of pmCost of maintain + pmCost of monitor compared to pmCost of MnM
+	## All subjects on one plot
+	fig, ax = plt.subplots() 
+	for i, j in all_pm_df.iterrows():
+		sea.pointplot(x = 'type', y = 'pm_cost', data = all_pm_df[(all_pm_df['subj'] == j.subj)], color = '0.75', scale = 0.7, ax = ax)
+	plt.xlabel('Block type');
+	plt.ylabel('PM cost');
+	plt.savefig(FIGURE_PATH + 'allSubj_pmCompare_point.eps', dpi = 600)
+	plt.close()
+
 
 #### CREATE figures for all subjects
 allSubj_pmAcc()
 allSubj_ogAcc()
 allSubj_rt()
 allSubj_pmCost()
+
+allSubj_pmCompare_point()
 
 new_df = all_df.groupby(['subj','blockType']).mean().reset_index(drop=False)
 combine_df = new_df[(new_df['blockType'] == 'Monitor') |(new_df['blockType']=='Maintain')]
@@ -402,9 +429,10 @@ all_pm_df = all_pm_df[(all_pm_df['subj'] != 's28')]  ## remove later
 
 #all_pm_df[(all_pm_df['subj'] == 's01')].plot(kind="bar") 
 
+# this will print a bar and line graph for every participant
 for i, j in all_pm_df.iterrows():  
-	sea.relplot(x='type', y='pm_cost', data = all_pm_df[(all_pm_df['subj'] == j.subj)], kind = "line") 
-	sea.barplot(x='type', y = 'pm_cost', data = all_pm_df[(all_pm_df['subj'] == j.subj)], palette = "Purples")
+	## sea.relplot(x='type', y='pm_cost', data = all_pm_df[(all_pm_df['subj'] == j.subj)], kind = "line") 
+	## sea.barplot(x='type', y = 'pm_cost', data = all_pm_df[(all_pm_df['subj'] == j.subj)], palette = "Purples")
 	#all_pm_df[(all_pm_df['subj'] == j.subj)].plot(color = 'purple',kind="bar") 
 	#plt.colorPalette(my_pal)
 	#plt.xlabel('Block type')
@@ -422,6 +450,8 @@ plt.savefig(FIGURE_PATH + 'pm_compare.eps', dpi = 600)
 
 sea.violinplot(x = all_pm_df.type, y = all_pm_df.pm_cost)     
 sea.pointplot(x = 'type', y = 'pm_cost', hue = 'subj', data = all_pm_df, color = '0.75')
+all_pm_df.groupby('subj').mean()
+
 
 
 fig, ax = plt.subplots() 
