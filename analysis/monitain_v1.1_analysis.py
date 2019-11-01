@@ -48,7 +48,9 @@ for i, fn in enumerate(fnames):
 		vers = 'vers1.1'
 
 	subj_df['version'] = vers
-	for i in df_main.index: 
+
+	# Change if they hit num_1 to 1 and num_2 to 2
+	for i in subj_df.index: 
 		for probe in range(0,15):
 			word_or_non = subj_df.iloc[i, subj_df.columns.get_loc('word{:d}_cond'.format(probe))]
 			value = subj_df.loc[i, 'respProbe{:d}'.format(probe)]
@@ -70,27 +72,6 @@ df_main = df_main.reset_index()
 df_main_copy = df_main
 # Use for backup
 
-#### WORK MORE HERE
-# Change if they hit num_1 to 1 and num_2 to 2
-
-
-for i in df_main.index: 
-	for probe in range(0,15):  
-    	value = df_main.loc[i, 'respProbe{:d}'.format(probe)] 
-    	if isinstance(value, str) and 'num_1' in value and : 
-    		 
-
-# for i in df_main.index:
-# 	for probe in range(0,15): 
-# 		value = df_main.loc[i, 'respProbe{:d}'.format(probe)]
-# 		if isinstance(value, str) and 'num_1' in value:
-# 			print('here')
-# 		if 'num_1' in value and isinstance(df_main.loc[i, 'respProbe{:d}'.format(probe)], str): 
-# 			print('here')
-
-# 	print (df_main.respProbe+trial)
-# for line in df_main.respProbe
-
 # Record PM accuracy per trial
 for trial in df_main.index: 
 	probeNum = df_main.loc[trial, 'n_probes']
@@ -107,6 +88,10 @@ for i in df_main.index:
 	for probe in range(0,15): 
 		if df_main.loc[i, 'probe{:d}_acc'.format(probe)] == 0: 
 			df_main.at[i, 'rtProbe{:d}'.format(probe)] = np.nan
+
+#remove s18 because they don't have a pm cost
+df_main = df_main[(df_main['subj'] != 's18')] 
+##all_pm_df = all_pm_df[(all_pm_df['subj'] != 's28')]  ## remove later
 
 
 # Master list of all rt probe titles
@@ -326,7 +311,7 @@ all_df.to_csv(fname_all_byTrial, index = False)
 
 #### FUNCTIONS to create figures
 all_df = all_df[(all_df['subj'] != 's18')] 
-all_df = all_df[(all_df['subj'] != 's28')] ## remove later
+##all_df = all_df[(all_df['subj'] != 's28')] ## remove later
 
 ## PM accuracy
 def allSubj_pmAcc():
@@ -390,7 +375,7 @@ allSubj_ogAcc()
 allSubj_rt()
 allSubj_pmCost()
 
-allSubj_pmCompare_point()
+
 
 new_df = all_df.groupby(['subj','blockType']).mean().reset_index(drop=False)
 combine_df = new_df[(new_df['blockType'] == 'Monitor') |(new_df['blockType']=='Maintain')]
@@ -411,6 +396,8 @@ all_pm_df = pd.concat([combine_df, mnm_df], axis=0)
 #all_pm_df.columns = 'maintain_monitor', 'mnm' 
 #all_pm_df = all_pm_df.reset_index()   
 
+allSubj_pmCompare_point()
+
 both_pm = combine_df.pm_cost  
 mnm_pm = mnm_df.pm_cost 
 ##all_2 = pd.concat([both_pm, mnm_pm], axis=1, sort=False)
@@ -421,16 +408,14 @@ all_2.columns = 'maintain_monitor', 'mnm'
 import pingouin as pg
 post_hoc = pg.ttest(all_2.maintain_monitor, all_2.mnm, paired=True)
 
-#remove s18 because they don't have a pm cost
-all_pm_df = all_pm_df[(all_pm_df['subj'] != 's18')] 
-all_pm_df = all_pm_df[(all_pm_df['subj'] != 's28')]  ## remove later
+
 
 
 
 #all_pm_df[(all_pm_df['subj'] == 's01')].plot(kind="bar") 
 
 # this will print a bar and line graph for every participant
-for i, j in all_pm_df.iterrows():  
+## for i, j in all_pm_df.iterrows():  
 	## sea.relplot(x='type', y='pm_cost', data = all_pm_df[(all_pm_df['subj'] == j.subj)], kind = "line") 
 	## sea.barplot(x='type', y = 'pm_cost', data = all_pm_df[(all_pm_df['subj'] == j.subj)], palette = "Purples")
 	#all_pm_df[(all_pm_df['subj'] == j.subj)].plot(color = 'purple',kind="bar") 
