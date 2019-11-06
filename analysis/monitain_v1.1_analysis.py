@@ -35,6 +35,7 @@ fnames = sorted(fnames)
 # Remove test subjects
 fnames = [ fn for fn in fnames if 's999' not in fn ]
 
+# Create a dataframe from these subjects
 df_list = []
 for i, fn in enumerate(fnames): 
 	subj_df = pd.read_csv(fn, index_col=0)
@@ -42,6 +43,7 @@ for i, fn in enumerate(fnames):
 	subj_df['subj'] = 's{:02d}'.format(i+1)
 	subj_df['trial'] = range(subj_df.shape[0])
 
+	# Indicate what version of the expt subj completed
 	if 'v1.0' in fn: 
 		vers = 'vers1.0'
 	elif 'v1.1' in fn: 
@@ -49,25 +51,44 @@ for i, fn in enumerate(fnames):
 
 	subj_df['version'] = vers
 
-	# Change if they hit num_1 to 1 and num_2 to 2
-	for i in subj_df.index: 
-		for probe in range(0,15):
-			word_or_non = subj_df.iloc[i, subj_df.columns.get_loc('word{:d}_cond'.format(probe))]
-			value = subj_df.loc[i, 'respProbe{:d}'.format(probe)]
-			if (isinstance(value, str) and 'num_1' in value) and (word_or_non == 'word'):
-				subj_df.iloc[i, subj_df.columns.get_loc('probe{:d}_acc'.format(probe))] = 1 ## correct - picked word for word
-			elif (isinstance(value, str) and 'num_1' in value) and (word_or_non != 'word'):
-				subj_df.iloc[i, subj_df.columns.get_loc('probe{:d}_acc'.format(probe))] = 0 ## incorrect - picked word for nonword
-			elif (isinstance(value, str) and 'num_2' in value) and (word_or_non == 'nonword'):
-				subj_df.iloc[i, subj_df.columns.get_loc('probe{:d}_acc'.format(probe))] = 1 ## correct - picked nonword for nonword
-			elif (isinstance(value, str) and 'num_2' in value) and (word_or_non != 'nonword'): 
-				subj_df.iloc[i, subj_df.columns.get_loc('probe{:d}_acc'.format(probe))] = 0 ## incorrect - picked word for nonword
+	## Code for fixing if num_n was recorded instead of n
+	## Not currently used because their data s28 was the only one that repeatedly had
+	## the wrong thing recorded 
+	## s28 removed for consistency in that everyone was doing the same thing
+	# # Change if they hit num_1 to 1 and num_2 to 2
+	# # This is a bug in sub 28 (and maybe more) 
+	# for trial in subj_df.index: 
+	# 	for probe in range(0,15):
+	# 		word_or_non = subj_df.iloc[trial, subj_df.columns.get_loc('word{:d}_cond'.format(probe))]
+	# 		value = subj_df.loc[trial, 'respProbe{:d}'.format(probe)]
+	# 		if (isinstance(value, str) and 'num_1' in value) and (word_or_non == 'word'): 
+	# 			print ('subj ', i)
+	# 			#print ('trial', trial)
+	# 			subj_df.iloc[trial, subj_df.columns.get_loc('probe{:d}_acc'.format(probe))] = 1 ## correct - picked word for word
+	# 		elif (isinstance(value, str) and 'num_1' in value) and (word_or_non != 'word'):
+	# 			print ('subj ', i)
+	# 			#print ('trial', trial)
+	# 			subj_df.iloc[trial, subj_df.columns.get_loc('probe{:d}_acc'.format(probe))] = 0 ## incorrect - picked word for nonword
+	# 		elif (isinstance(value, str) and 'num_2' in value) and (word_or_non == 'nonword'):
+	# 			print ('subj ', i)
+	# 			#print ('trial', trial)
+	# 			subj_df.iloc[i, subj_df.columns.get_loc('probe{:d}_acc'.format(probe))] = 1 ## correct - picked nonword for nonword
+	# 		elif (isinstance(value, str) and 'num_2' in value) and (word_or_non != 'nonword'): 
+	# 			print ('subj ', i)
+	# 			#print ('trial', trial)
+	# 			subj_df.iloc[trial, subj_df.columns.get_loc('probe{:d}_acc'.format(probe))] = 0 ## incorrect - picked word for nonword
+	# 		elif (isinstance(value, str) and 'num' in value): 
+	# 			print ('subj ', i)
+	# 			print ('trial', trial)
+	# 			print ('value', value)
+
 	subj_df = subj_df[1:] #get rid of first line because something is off
 	df_list.append(subj_df)
 
 ##df_main = pd.concat(df_list,ignore_index=False, sort=False)
 df_main = pd.concat(df_list,ignore_index=False)
 df_main = df_main.reset_index()
+
 # Make a copy to replace inaccurate responses with no RT
 df_main_copy = df_main
 # Use for backup
@@ -90,8 +111,10 @@ for i in df_main.index:
 			df_main.at[i, 'rtProbe{:d}'.format(probe)] = np.nan
 
 #remove s18 because they don't have a pm cost
+#remove s28 because they didn't follow the instructions
 df_main = df_main[(df_main['subj'] != 's18')] 
-##all_pm_df = all_pm_df[(all_pm_df['subj'] != 's28')]  ## remove later
+df_main = df_main[(df_main['subj'] != 's28')] 
+#all_pm_df = all_pm_df[(all_pm_df['subj'] != 's28')]  
 
 
 # Master list of all rt probe titles
@@ -216,6 +239,8 @@ all_df_minusBase = pd.concat([block_maintain_df, block_monitor_df, block_mnm_df]
 
 
 ######### EXCLUDING DATA #########
+# Note that data excluded will still be displayed in by subj plots
+# By subj plots are more of a sanity check than presentable results
 
 #Replace RT with nan in resp was quicker than 0.05 secs, also replace pm acc with nan
 #Cut off based on findings from "Eye Movements and Visual Encoding during Scene Perception"
@@ -225,6 +250,43 @@ for trial in all_df.index:
 		## print all_df_minusBase.loc[trial, 'meanTrial_rt']
 		all_df.at[trial, 'meanTrial_rt'] = np.nan
 		all_df.at[trial, 'pm_acc'] = np.nan
+
+
+######### DATAFRAMES for MnM and Maintain + Monitor #########
+
+# Combine everything
+new_df = all_df.groupby(['subj','blockType']).mean().reset_index(drop=False)
+
+# Make a dataframe of just Maintain blocks and Monitor trials
+combine_df = new_df[(new_df['blockType'] == 'Monitor') |(new_df['blockType']=='Maintain')]
+# Add maintain plus monitor for each subject
+combine_df = combine_df.groupby('subj').sum()
+combine_df = combine_df.reset_index()
+combine_df['type'] = 'Maintain + Monitor'
+
+# Make a dataframe of just MnM trials
+mnm_df = new_df[(new_df['blockType'] == 'MnM')]
+mnm_df = mnm_df.groupby('subj').sum() 
+mnm_df = mnm_df.reset_index()
+mnm_df['type'] = 'MnM'  
+
+# Make a dataframe of with a column for Maintain + Monitor alongside column
+# for MnM for each subject
+#both_pm = combine_df.pm_cost  
+#mnm_pm = mnm_df.pm_cost 
+##all_pm_df = pd.concat([combine_df, mnm_df], axis=0, sort=False)
+all_pm_df = pd.concat([combine_df, mnm_df], axis=0)
+#all_pm_df.columns = 'maintain_monitor', 'mnm' 
+#all_pm_df = all_pm_df.reset_index() 
+
+# Pull out PM cost
+both_pm = combine_df.pm_cost  
+mnm_pm = mnm_df.pm_cost 
+##all_2 = pd.concat([both_pm, mnm_pm], axis=1, sort=False)
+
+# Make a dataframe of just PM cost
+all_2 = pd.concat([both_pm, mnm_pm], axis=1)
+all_2.columns = 'maintain_monitor', 'mnm' 
 
 
 
@@ -310,8 +372,6 @@ all_df.to_csv(fname_all_byTrial, index = False)
 
 
 #### FUNCTIONS to create figures
-all_df = all_df[(all_df['subj'] != 's18')] 
-##all_df = all_df[(all_df['subj'] != 's28')] ## remove later
 
 ## PM accuracy
 def allSubj_pmAcc():
@@ -369,41 +429,29 @@ def allSubj_pmCompare_point():
 	plt.close()
 
 
+def allSubj_pmCompare_pointPlusViolin():
+	## Point plot of pmCost of maintain + pmCost of monitor compared to pmCost of MnM
+	## All subjects on one plot    
+	fig, ax = plt.subplots() 
+	for i, j in all_pm_df.iterrows():
+		sea.pointplot(x = 'type', y = 'pm_cost', data = all_pm_df[(all_pm_df['subj'] == j.subj)], color = '0.25', scale = 0.5, ax = ax)
+	ax = sea.violinplot(x = all_pm_df.type, y = all_pm_df.pm_cost, palette="Purples")
+	plt.xlabel('Block type');
+	plt.ylabel('PM cost');
+	plt.savefig(FIGURE_PATH + 'allSubj_pmCompare_point.eps', dpi = 600)
+	plt.close()
+
 #### CREATE figures for all subjects
 allSubj_pmAcc()
 allSubj_ogAcc()
 allSubj_rt()
 allSubj_pmCost()
-
-
-
-new_df = all_df.groupby(['subj','blockType']).mean().reset_index(drop=False)
-combine_df = new_df[(new_df['blockType'] == 'Monitor') |(new_df['blockType']=='Maintain')]
-combine_df = combine_df.groupby('subj').sum()
-mnm_df = new_df[(new_df['blockType'] == 'MnM')]
-mnm_df = mnm_df.groupby('subj').sum() 
-
-combine_df = combine_df.reset_index()
-combine_df['type'] = 'Maintain + Monitor'
-mnm_df = mnm_df.reset_index()
-mnm_df['type'] = 'MnM'  
-
-
-#both_pm = combine_df.pm_cost  
-#mnm_pm = mnm_df.pm_cost 
-##all_pm_df = pd.concat([combine_df, mnm_df], axis=0, sort=False)
-all_pm_df = pd.concat([combine_df, mnm_df], axis=0)
-#all_pm_df.columns = 'maintain_monitor', 'mnm' 
-#all_pm_df = all_pm_df.reset_index()   
-
 allSubj_pmCompare_point()
+allSubj_pmCompare_pointPlusViolin()
 
-both_pm = combine_df.pm_cost  
-mnm_pm = mnm_df.pm_cost 
-##all_2 = pd.concat([both_pm, mnm_pm], axis=1, sort=False)
-all_2 = pd.concat([both_pm, mnm_pm], axis=1)
-all_2.columns = 'maintain_monitor', 'mnm' 
 
+
+######### ALL BLOCKS FIGURES #########
 
 import pingouin as pg
 post_hoc = pg.ttest(all_2.maintain_monitor, all_2.mnm, paired=True)
@@ -411,20 +459,6 @@ post_hoc = pg.ttest(all_2.maintain_monitor, all_2.mnm, paired=True)
 
 
 
-
-#all_pm_df[(all_pm_df['subj'] == 's01')].plot(kind="bar") 
-
-# this will print a bar and line graph for every participant
-## for i, j in all_pm_df.iterrows():  
-	## sea.relplot(x='type', y='pm_cost', data = all_pm_df[(all_pm_df['subj'] == j.subj)], kind = "line") 
-	## sea.barplot(x='type', y = 'pm_cost', data = all_pm_df[(all_pm_df['subj'] == j.subj)], palette = "Purples")
-	#all_pm_df[(all_pm_df['subj'] == j.subj)].plot(color = 'purple',kind="bar") 
-	#plt.colorPalette(my_pal)
-	#plt.xlabel('Block type')
-	#plt.ylabel('PM cost')
-	#plt.savefig(FIGURE_PATH + 'allSubj_pmCompare' + j.subj + '.eps', dpi = 600)
-	#plt.close()
-	#plt.legend('Maintain + Monitor', 'MnM')
 
 sea.pointplot(x = 'type', y = 'pm_cost', hue = 'subj', data = all_pm_df)  
 
@@ -434,7 +468,7 @@ plt.ylabel('PM cost')
 plt.savefig(FIGURE_PATH + 'pm_compare.eps', dpi = 600)
 
 sea.violinplot(x = all_pm_df.type, y = all_pm_df.pm_cost)     
-sea.pointplot(x = 'type', y = 'pm_cost', hue = 'subj', data = all_pm_df, color = '0.75')
+sea.pointplot(x = 'type', y = 'pm_cost', hue = 'subj', data = all_pm_df, color = '0.5')
 all_pm_df.groupby('subj').mean()
 
 
