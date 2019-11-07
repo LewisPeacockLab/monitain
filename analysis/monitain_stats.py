@@ -1,3 +1,15 @@
+##################################
+##################################
+######## monitain STATS ##########
+########### for v.1.1 ############
+######## Katie Hedgpeth ##########
+############ updated #############
+######### November 2019 ##########
+##################################
+
+### This script will: 
+# run repeated measure ANOVAs and post hoc t-tests 
+
 import os
 import pingouin as pg
 import pandas as pd
@@ -5,19 +17,22 @@ import numpy as np
 import seaborn as sea
 import matplotlib.pyplot as plt
 
-### run repeated measure ANOVAs and post hoc t-tests
+## Set paths for where files will be opened from or saved
 PATH = os.path.expanduser('~')
 FIGURE_PATH = PATH + '/monitain/analysis/output/'
 CSV_PATH = FIGURE_PATH + 'csvs'
 
+# Read in CSVs
 all_df_averaged = pd.read_csv(FIGURE_PATH+'/csvs/ALL.csv')
 pmCost_df_averaged = pd.read_csv(FIGURE_PATH+'/csvs/PM_COST.csv')
-all_df_averaged_minusBase = all_df_averaged[all_df_averaged.blockType != 'Baseline']   
-
 all_df_byTrial = pd.read_csv(FIGURE_PATH+'csvs/ALL_BYTRIAL.csv')
 
-# Remove 
-all_df_averaged = all_df_averaged[(all_df_averaged['subj'] != 's18')]
+# Remove baseline trials (blocks 1 and 8)
+# Add this back in (can be done by commenting out line below, to plot baseline)
+all_df_averaged_minusBase = all_df_averaged[all_df_averaged.blockType != 'Baseline']   
+
+# If you needed to remove a specific subject, do this and change 's18'
+##all_df_averaged = all_df_averaged[(all_df_averaged['subj'] != 's18')]
 
 ## og acc
 aov_og = pg.rm_anova(dv='og_acc', within = 'blockType', subject = 'subj', data=all_df_averaged, detailed = True)
@@ -61,6 +76,7 @@ def addToList(posthoc_type):
 data_indx_anova = ['og_acc', 'pm_acc', 'rt', 'pmCost']
 
 
+
 ### RM ANOVAS
 
 # create lists for anovas
@@ -78,9 +94,8 @@ fname_anova = os.path.join('rm_anova_pvals.csv')
 rm_anova_df.to_csv(fname_anova)
 
 
+
 ### POST-HOC T-TESTs
-
-
 
 # set index
 data_indx_ttest = ([('og_acc')] * len(posthoc_og))  + ([('pm_acc')] * len(posthoc_pm)) + ([('rt')] * len(posthoc_rt))  + ([('pmCost')] * len(posthoc_pmCost))
@@ -107,21 +122,19 @@ fname_ttest = os.path.join('ttest_pvals.csv')
 ttest_df.to_csv(fname_ttest)
 
 
+
 ### LOGISTIC REGRESSION
+
 X = all_df_byTrial.pm_cost
 y = all_df_byTrial.pm_acc
 pg.logistic_regression(X, y, remove_na=True)  
 
 ## create scatter plot of x = pm cost and y = pm acc
-ax = sea.barplot(x="pm_acc", y = "pm_cost", data=all_df_byTrial) 
-plt.xlabel('PM accuracy')
-plt.ylabel('PM cost (secs)')
-plt.savefig(FIGURE_PATH + 'pmAcc_v_pmCost.png', dpi = 600)
-plt.close()
-
-#remove s18 because they don't have a pm cost
-all_df_averaged = all_df_averaged[(all_df_averaged['subj'] != 's18')] 
-all_df_averaged = all_df_averaged[(all_df_averaged['subj'] != 's28')] ## remove later
+# ax = sea.barplot(x="pm_acc", y = "pm_cost", data=all_df_byTrial) 
+# plt.xlabel('PM accuracy')
+# plt.ylabel('PM cost (secs)')
+# plt.savefig(FIGURE_PATH + 'pmAcc_v_pmCost.png', dpi = 600)
+# plt.close()
 
 # Does maintenance cost predict combined performance? 
 maintain_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')]
@@ -145,11 +158,15 @@ mon_V_combine = pd.concat([monitor_cost, mnm_pm_perform], axis=1, sort=False)
 
 mnm_V_combine = pd.concat([mnm_cost, mnm_pm_perform], axis=1, sort=False)
 
-sea.regplot(x='pm_cost', y = 'pm_acc', data = main_V_combine, color = 'b') 
-plt.xlabel('Maintain cost (s)')
-plt.ylabel('Combined performance')
-plt.savefig(FIGURE_PATH + 'maintainCost_v_pmAcc.pdf', dpi = 600)
-plt.close()
+regplot(main_V_combine)
+
+def regplot(data): 
+
+	sea.regplot(x='pm_cost', y = 'pm_acc', data = main_V_combine, color = 'b') 
+	plt.xlabel('Maintain cost (s)')
+	plt.ylabel('Combined performance')
+	plt.savefig(FIGURE_PATH + 'maintainCost_v_pmAcc.pdf', dpi = 600)
+	plt.close()
 
 sea.regplot(x='pm_cost', y = 'pm_acc', data = mon_V_combine, color = 'r') 
 plt.xlabel('Monitor cost (s)')
