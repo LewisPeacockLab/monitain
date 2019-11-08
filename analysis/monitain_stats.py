@@ -137,8 +137,8 @@ pg.logistic_regression(X, y, remove_na=True)
 # plt.close()
 
 # Does maintenance cost predict combined performance? 
-maintain_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')]
-monitor_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Monitor')]
+maintain_perform = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')]
+monitor_perform = all_df_averaged[(all_df_averaged['blockType'] == 'Monitor')]
 mnm_pm_perform = all_df_averaged[(all_df_averaged['blockType'] == 'MnM')]
 
 maintain_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')].groupby(['subj', 'pm_cost']).mean().reset_index()
@@ -150,6 +150,12 @@ monitor_cost = monitor_cost.drop(columns=['pm_acc', 'meanTrial_rt','og_acc'], ax
 mnm_cost = all_df_averaged[(all_df_averaged['blockType'] == 'MnM')].groupby(['subj', 'pm_cost']).mean().reset_index()
 mnm_cost = mnm_cost.drop(columns=['pm_acc', 'meanTrial_rt','og_acc'], axis=1)
 
+maintain_pm_perform = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')].groupby(['subj', 'pm_acc']).mean().reset_index()
+maintain_pm_perform = maintain_pm_perform.drop(columns=['subj','pm_cost', 'meanTrial_rt','og_acc'], axis=1)  
+
+monitor_pm_perform = all_df_averaged[(all_df_averaged['blockType'] == 'Monitor')].groupby(['subj', 'pm_acc']).mean().reset_index()
+monitor_pm_perform = monitor_pm_perform.drop(columns=['subj','pm_cost', 'meanTrial_rt','og_acc'], axis=1)  
+
 mnm_pm_perform = all_df_averaged[(all_df_averaged['blockType'] == 'MnM')].groupby(['subj', 'pm_acc']).mean().reset_index()
 mnm_pm_perform = mnm_pm_perform.drop(columns=['subj','pm_cost', 'meanTrial_rt','og_acc'], axis=1)  
 
@@ -158,15 +164,28 @@ mon_V_combine = pd.concat([monitor_cost, mnm_pm_perform], axis=1, sort=False)
 
 mnm_V_combine = pd.concat([mnm_cost, mnm_pm_perform], axis=1, sort=False)
 
-regplot(main_V_combine)
+main_V_main = pd.concat([maintain_cost, maintain_pm_perform], axis=1, sort = False)
+mon_V_mon = pd.concat([monitor_cost, monitor_pm_perform], axis = 1, sort = False)
 
-def regplot(data): 
+def regPlot(combinedData, x_label, y_label): 
+	sea.regplot(x='pm_cost', y = 'pm_acc', data = combinedData, color = 'b') 
+	plt.xlabel(x_label)
+	plt.ylabel(y_label)
 
-	sea.regplot(x='pm_cost', y = 'pm_acc', data = main_V_combine, color = 'b') 
-	plt.xlabel('Maintain cost (s)')
-	plt.ylabel('Combined performance')
-	plt.savefig(FIGURE_PATH + 'maintainCost_v_pmAcc.pdf', dpi = 600)
-	plt.close()
+regPlot(main_V_main, 'Maintain cost (s)', 'Maintain performance')
+plt.savefig(FIGURE_PATH + 'maintainCost_v_maintainPerf.pdf', dpi = 600)
+plt.close()
+
+regPlot(mon_V_mon, 'Monitor cost (s)', 'Monitor performance')
+plt.savefig(FIGURE_PATH + 'monitorCost_v_monitorPerf.pdf', dpi = 600)
+plt.close()
+
+regPlot(main_V_combine, 'Maintain cost (s)','Combined performance')
+plt.savefig(FIGURE_PATH + 'maintainCost_v_pmAcc.pdf', dpi = 600)
+plt.close()
+
+
+	
 
 sea.regplot(x='pm_cost', y = 'pm_acc', data = mon_V_combine, color = 'r') 
 plt.xlabel('Monitor cost (s)')
