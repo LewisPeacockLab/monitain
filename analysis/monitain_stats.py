@@ -161,60 +161,110 @@ mnm_pm_perform = mnm_pm_perform.drop(columns=['subj','pm_cost', 'meanTrial_rt','
 
 main_V_combine = pd.concat([maintain_cost, mnm_pm_perform], axis=1, sort=False)
 mon_V_combine = pd.concat([monitor_cost, mnm_pm_perform], axis=1, sort=False)
-
 mnm_V_combine = pd.concat([mnm_cost, mnm_pm_perform], axis=1, sort=False)
 
 main_V_main = pd.concat([maintain_cost, maintain_pm_perform], axis=1, sort = False)
 mon_V_mon = pd.concat([monitor_cost, monitor_pm_perform], axis = 1, sort = False)
 
-def regPlot(combinedData, x_label, y_label): 
-	sea.regplot(x='pm_cost', y = 'pm_acc', data = combinedData, color = 'b') 
+combined_cost = maintain_cost.pm_cost + monitor_cost.pm_cost
+mplusm_V_combine = pd.concat([combined_cost, mnm_pm_perform], axis=1, sort=False) 
+
+def regPlot(combinedData, x_label, y_label, color): 
+	sea.regplot(x='pm_cost', y = 'pm_acc', data = combinedData, color = color) 
 	plt.xlabel(x_label)
 	plt.ylabel(y_label)
 
-regPlot(main_V_main, 'Maintain cost (s)', 'Maintain performance')
-plt.savefig(FIGURE_PATH + 'maintainCost_v_maintainPerf.pdf', dpi = 600)
+def residPlot(combinedData, x_label, y_label, color):
+	sea.residplot(x = 'pm_cost', y = 'pm_acc', data = main_V_main, color = color, scatter_kws = {"s": 80}) 
+	plt.xlabel(x_label)
+	plt.ylabel(y_label)
+
+##TODO: Change file extension based on what the image is for
+# png for Slack
+# pdf for viewing
+# eps for editing
+
+## How does maintainance cost affect performance when only maintaining?
+regPlot(main_V_main, 'Maintain cost (s)', 'Maintain performance', 'b')
+plt.savefig(FIGURE_PATH + 'maintainCost_v_maintainPerf.png', dpi = 600)
 plt.close()
 
-regPlot(mon_V_mon, 'Monitor cost (s)', 'Monitor performance')
-plt.savefig(FIGURE_PATH + 'monitorCost_v_monitorPerf.pdf', dpi = 600)
+residPlot(main_V_main, 'Maintain cost (s)', 'Maintain performance residual', 'b')
+plt.savefig(FIGURE_PATH + 'maintainCost_v_maintainPerf_residual.png', dpi = 600)
 plt.close()
 
-regPlot(main_V_combine, 'Maintain cost (s)','Combined performance')
-plt.savefig(FIGURE_PATH + 'maintainCost_v_pmAcc.pdf', dpi = 600)
+maintain_maintain_lr = pg.linear_regression(maintain_cost.pm_cost, maintain_pm_perform.pm_acc) 
+
+## How does monitoring cost affect performance when only monitoring?
+regPlot(mon_V_mon, 'Monitor cost (s)', 'Monitor performance', 'r')
+plt.savefig(FIGURE_PATH + 'monitorCost_v_monitorPerf.png', dpi = 600)
 plt.close()
 
-
-	
-
-sea.regplot(x='pm_cost', y = 'pm_acc', data = mon_V_combine, color = 'r') 
-plt.xlabel('Monitor cost (s)')
-plt.ylabel('Combined performance')
-plt.savefig(FIGURE_PATH + 'monitorCost_v_pmAcc.pdf', dpi = 600)
+residPlot(mon_V_mon, 'Monitor cost (s)', 'Monitor performance residual', 'r')
+plt.savefig(FIGURE_PATH + 'monitorCost_v_monitorPerf_residual.png', dpi = 600)
 plt.close()
 
-sea.regplot(x='pm_cost', y = 'pm_acc', data = mnm_V_combine, color = 'purple') 
-plt.xlabel('MnM cost (s)')
-plt.ylabel('Combined performance')
-plt.savefig(FIGURE_PATH + 'mnmCost_v_pmAcc.pdf', dpi = 600)
+monitor_monitor_lr = pg.linear_regression(monitor_cost.pm_cost, monitor_pm_perform.pm_acc) 
+
+
+## How does maintaining cost affect PM performance?
+regPlot(main_V_combine, 'Maintain cost (s)','Combined performance', 'b')
+plt.savefig(FIGURE_PATH + 'maintainCost_v_pmAcc.png', dpi = 600)
 plt.close()
+
+residPlot(main_V_combine, 'Maintain cost (s)','Combined performance residual', 'b')
+plt.savefig(FIGURE_PATH + 'maintainCost_v_pmAcc_residual.png', dpi = 600)
+plt.close()
+
+weight_of_maintain = pg.linear_regression(maintain_cost.pm_cost, mnm_pm_perform.pm_acc)
+
+## How does monitoring cost affect PM performance?
+regPlot(mon_V_combine, 'Monitor cost (s)','Combined performance', 'r')
+plt.savefig(FIGURE_PATH + 'monitorCost_v_pmAcc.png', dpi = 600)
+plt.close()
+
+residPlot(mon_V_combine, 'Monitor cost (s)','Combined performance residual', 'r')
+plt.savefig(FIGURE_PATH + 'monitorCost_v_pmAcc_residual.png', dpi = 600)
+plt.close()
+
+weight_of_monitor = pg.linear_regression(monitor_cost.pm_cost, mnm_pm_perform.pm_acc)
+
+## How does PM cost affect performance when maintaining AND monitoring?
+regPlot(mnm_V_combine, 'MnM cost (s)','Combined performance', 'purple')
+plt.savefig(FIGURE_PATH + 'mnmCost_v_pmAcc.png', dpi = 600)
+plt.close()
+
+residPlot(mnm_V_combine, 'MnM cost (s)','Combined performance residual', 'purple')
+plt.savefig(FIGURE_PATH + 'mnmCost_v_pmAcc_residual.png', dpi = 600)
+plt.close()
+
+weight_of_mnm = pg.linear_regression(mnm_cost.pm_cost, mnm_pm_perform.pm_acc)
+
+## How does additive maintainence and monitoring cost affect performance when maintaining AND monitoring?
+regPlot(mplusm_V_combine, 'Maintainence + Monitoring cost (s)','Combined performance', 'purple')
+plt.savefig(FIGURE_PATH + 'mplusmCost_v_pmAcc.png', dpi = 600)
+plt.close()
+
+residPlot(mplusm_V_combine, 'Maintainence + Monitoring cost (s)','Combined performance residual', 'purple')
+plt.savefig(FIGURE_PATH + 'mplusmCost_v_pmAcc_residual.png', dpi = 600)
+plt.close()
+
+weight_of_combined = pg.linear_regression(combined_cost, mnm_pm_perform.pm_acc)
 
 ## not sure what these are for
 ##maintain_array = maintain_cost.array
 ##monitor_array = monitor_cost.array
 ##mnm_pm_array = mnm_pm_perform.array
 
-weight_of_maintain = pg.linear_regression(maintain_cost.pm_cost, mnm_pm_perform.pm_acc)
 
 ## not sure about this either
 ##ax = sea.pointplot(x=all_df_averaged[(all_df_averaged['blockType'].pm_cost == 'Maintain')], y = all_df_averaged[(all_df_averaged['blockType'].pm_acc == 'MnM')], data = all_df_averaged) 
 
-weight_of_monitor = pg.linear_regression(monitor_cost.pm_cost, mnm_pm_perform.pm_acc)
 
-combined_cost = maintain_cost.pm_cost + monitor_cost.pm_cost
-weight_of_combined = pg.linear_regression(combined_cost, mnm_pm_perform.pm_acc)
 
-weight_of_mnm = pg.linear_regression(mnm_cost.pm_cst, mnm_pm_perform.pm_acc)
+
+
+
 
 # Does monitoring cost predict combined performance? 
 
