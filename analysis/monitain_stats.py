@@ -125,6 +125,8 @@ ttest_df.to_csv(fname_ttest)
 
 ### LOGISTIC REGRESSION
 
+##### BY SUBJECT 
+
 X = all_df_byTrial.pm_cost
 y = all_df_byTrial.pm_acc
 pg.logistic_regression(X, y, remove_na=True)  
@@ -250,6 +252,16 @@ plt.savefig(FIGURE_PATH + 'mplusmCost_v_pmAcc_residual.png', dpi = 600)
 plt.close()
 
 weight_of_combined = pg.linear_regression(combined_cost, mnm_pm_perform.pm_acc)
+
+
+
+
+#### BY TRIAL 
+
+maintain_perform_byTrial = all_df_byTrial[(all_df_byTrial['blockType'] == 'Maintain')]
+monitor_perform_byTrial = all_df_byTrial[(all_df_byTrial['blockType'] == 'Monitor')]
+mnm_pm_perform_byTrial = all_df_byTrial[(all_df_byTrial['blockType'] == 'MnM')]
+
 
 ## not sure what these are for
 ##maintain_array = maintain_cost.array
