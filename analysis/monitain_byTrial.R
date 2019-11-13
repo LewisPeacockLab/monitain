@@ -26,12 +26,15 @@ mnm_trials = subset(data_bytrial, blockType == 'MnM')
 
 lm1_maintain <- glmer(pm_acc ~ pm_cost + (1 + pm_cost | subj), data = maintain_trials, family=binomial(link="logit") )
 lm2_maintain <- glmer(pm_acc ~ pm_cost + (1 | subj), data = maintain_trials, family=binomial(link="logit") )
+maintain_anova = anova(lm1_maintain, lm2_maintain)
 
 lm1_monitor <- glmer(pm_acc ~ pm_cost + (1 + pm_cost | subj), data = monitor_trials, family=binomial(link="logit") )
 lm2_monitor <- glmer(pm_acc ~ pm_cost + (1 | subj), data = monitor_trials, family=binomial(link="logit") )
+monitor_anova = anova(lm1_monitor, lm2_monitor)
 
 lm1_mnm <- glmer(pm_acc ~ pm_cost + (1 + pm_cost | subj), data = mnm_trials, family=binomial(link="logit") )
 lm2_mnm <- glmer(pm_acc ~ pm_cost + (1 | subj), data = mnm_trials, family=binomial(link="logit") )
+mnm_anova = anova(lm1_mnm, lm2_mnm)
 
 # Run ANOVA on 2 models
 

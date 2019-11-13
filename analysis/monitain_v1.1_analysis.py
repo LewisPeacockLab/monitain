@@ -438,7 +438,7 @@ def allSubj_pmCompare_pointPlusViolin():
 	ax = sea.violinplot(x = all_pm_df.type, y = all_pm_df.pm_cost, palette="Purples")
 	plt.xlabel('Block type');
 	plt.ylabel('PM cost');
-	plt.savefig(FIGURE_PATH + 'allSubj_pmCompare_point.eps', dpi = 600)
+	plt.savefig(FIGURE_PATH + 'allSubj_pmCompare_point_violin.png', dpi = 600)
 	plt.close()
 
 #### CREATE figures for all subjects
@@ -448,6 +448,26 @@ allSubj_rt()
 allSubj_pmCost()
 allSubj_pmCompare_point()
 allSubj_pmCompare_pointPlusViolin()
+
+maintain_val = []
+monitor_val = []
+pm_acc_val = []
+smaller = all_df.groupby(['subj', 'blockType']).mean() 
+for index, row in smaller.iterrows(): 
+	if (index[1] == 'Maintain'):
+		maintain_val.append(row.pm_cost)
+	elif (index[1] == 'Monitor'):
+		monitor_val.append(row.pm_cost)
+	elif (index[1] == 'MnM'): 
+		pm_acc_val.append(row.pm_acc)
+
+result = np.subtract(maintain_val, monitor_val)   
+
+sea.scatterplot(x = result, y = pm_acc_val) 
+plt.axvline(x = 0, linestyle='--', color = 'gray')
+plt.xlabel('Maintain cost - Monitor cost')
+plt.ylabel('Average PM accuracy on combined trials')
+
 
 
 
