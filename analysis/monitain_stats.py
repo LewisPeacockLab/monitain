@@ -139,37 +139,39 @@ pg.logistic_regression(X, y, remove_na=True)
 # plt.close()
 
 # Does maintenance cost predict combined performance? 
-maintain_perform = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')]
-monitor_perform = all_df_averaged[(all_df_averaged['blockType'] == 'Monitor')]
-mnm_pm_perform = all_df_averaged[(all_df_averaged['blockType'] == 'MnM')]
+maintain_trials = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')] # maintain block trials
+monitor_trials = all_df_averaged[(all_df_averaged['blockType'] == 'Monitor')] # monitor block trials
+mnm_trials = all_df_averaged[(all_df_averaged['blockType'] == 'MnM')] # mnm block trials
 
-maintain_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')].groupby(['subj', 'pm_cost']).mean().reset_index()
-maintain_cost = maintain_cost.drop(columns=['pm_acc', 'meanTrial_rt','og_acc'], axis=1)  
+maintain_results = maintain_trials.groupby(['subj']).mean().reset_index()
+maintain_cost = maintain_results.drop(columns=['pm_acc', 'meanTrial_rt','og_acc'], axis=1)
+maintain_acc = maintain_results.drop(columns=['subj', 'pm_cost', 'meanTrial_rt','og_acc'], axis=1) 
+# Remove 'subj' column if you need a subj num indication in accuracy df
 
-monitor_cost = all_df_averaged[(all_df_averaged['blockType'] == 'Monitor')].groupby(['subj', 'pm_cost']).mean().reset_index()
-monitor_cost = monitor_cost.drop(columns=['pm_acc', 'meanTrial_rt','og_acc'], axis=1)  
+monitor_results = monitor_trials.groupby(['subj']).mean().reset_index()
+monitor_cost = monitor_results.drop(columns=['pm_acc', 'meanTrial_rt','og_acc'], axis=1)
+monitor_acc = monitor_results.drop(columns=['subj', 'pm_cost', 'meanTrial_rt','og_acc'], axis=1) 
 
-mnm_cost = all_df_averaged[(all_df_averaged['blockType'] == 'MnM')].groupby(['subj', 'pm_cost']).mean().reset_index()
-mnm_cost = mnm_cost.drop(columns=['pm_acc', 'meanTrial_rt','og_acc'], axis=1)
+mnm_results = mnm_trials.groupby(['subj']).mean().reset_index()
+mnm_cost = mnm_results.drop(columns=['pm_acc', 'meanTrial_rt','og_acc'], axis=1)
+mnm_acc = mnm_results.drop(columns=['subj', 'pm_cost', 'meanTrial_rt','og_acc'], axis=1) 
 
-maintain_pm_perform = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')].groupby(['subj', 'pm_acc']).mean().reset_index()
-maintain_pm_perform = maintain_pm_perform.drop(columns=['subj','pm_cost', 'meanTrial_rt','og_acc'], axis=1)  
+# Maintain cost versus combined performance
+mainCost_combineAcc = pd.concat([maintain_cost, mnm_acc], axis = 1, sort = False)
+# Monitor cost versus combined performance
+monCost_combineAcc = pd.concat([monitor_cost, mnm_acc], axis = 1, sort = False)
+# Combined cost versus combined performance
+combineCost_combineAcc = pd.concat([mnm_cost, mnm_acc], axis = 1, sort = False)
 
-monitor_pm_perform = all_df_averaged[(all_df_averaged['blockType'] == 'Monitor')].groupby(['subj', 'pm_acc']).mean().reset_index()
-monitor_pm_perform = monitor_pm_perform.drop(columns=['subj','pm_cost', 'meanTrial_rt','og_acc'], axis=1)  
+# Maintain cost versus maintain performance
+mainCost_mainAcc = pd.concat([maintain_cost, maintain_acc], axis = 1, sort = False)
+# Monitor cost versus monitor performance
+monCost_monAcc = pd.concat([monitor_cost, monitor_acc], axis = 1, sort = False)
 
-mnm_pm_perform = all_df_averaged[(all_df_averaged['blockType'] == 'MnM')].groupby(['subj', 'pm_acc']).mean().reset_index()
-mnm_pm_perform = mnm_pm_perform.drop(columns=['subj','pm_cost', 'meanTrial_rt','og_acc'], axis=1)  
-
-main_V_combine = pd.concat([maintain_cost, mnm_pm_perform], axis=1, sort=False)
-mon_V_combine = pd.concat([monitor_cost, mnm_pm_perform], axis=1, sort=False)
-mnm_V_combine = pd.concat([mnm_cost, mnm_pm_perform], axis=1, sort=False)
-
-main_V_main = pd.concat([maintain_cost, maintain_pm_perform], axis=1, sort = False)
-mon_V_mon = pd.concat([monitor_cost, monitor_pm_perform], axis = 1, sort = False)
-
+# Maintain cost + Monitor cost
 combined_cost = maintain_cost.pm_cost + monitor_cost.pm_cost
-mplusm_V_combine = pd.concat([combined_cost, mnm_pm_perform], axis=1, sort=False) 
+# Combined cost (above) versus combined performance
+mplusmCost_combineAcc = pd.concat([combined_cost, mnm_acc], axis=1, sort=False) 
 
 def regPlot(combinedData, x_label, y_label, color): 
 	sea.regplot(x='pm_cost', y = 'pm_acc', data = combinedData, color = color) 
@@ -187,7 +189,7 @@ def residPlot(combinedData, x_label, y_label, color):
 # eps for editing
 
 ## How does maintainance cost affect performance when only maintaining?
-regPlot(main_V_main, 'Maintain cost (s)', 'Maintain performance', 'b')
+regPlot(mainCost_mainAcc, 'Maintain cost (s)', 'Maintain performance', 'b')
 plt.savefig(FIGURE_PATH + 'maintainCost_v_maintainPerf.png', dpi = 600)
 plt.close()
 
@@ -195,7 +197,7 @@ residPlot(main_V_main, 'Maintain cost (s)', 'Maintain performance residual', 'b'
 plt.savefig(FIGURE_PATH + 'maintainCost_v_maintainPerf_residual.png', dpi = 600)
 plt.close()
 
-maintain_maintain_lr = pg.linear_regression(maintain_cost.pm_cost, maintain_pm_perform.pm_acc) 
+maintain_maintain_lr = pg.linear_regression(maintain_cost.pm_cost, maintain_acc.pm_acc) 
 
 ## How does monitoring cost affect performance when only monitoring?
 regPlot(mon_V_mon, 'Monitor cost (s)', 'Monitor performance', 'r')

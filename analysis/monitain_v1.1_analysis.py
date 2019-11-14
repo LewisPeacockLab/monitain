@@ -467,6 +467,8 @@ sea.scatterplot(x = result, y = pm_acc_val)
 plt.axvline(x = 0, linestyle='--', color = 'gray')
 plt.xlabel('Maintain cost - Monitor cost')
 plt.ylabel('Average PM accuracy on combined trials')
+plt.savefig(FIGURE_PATH + 'maintain_v_monitor.png', dpi = 600)
+plt.close()
 
 
 
