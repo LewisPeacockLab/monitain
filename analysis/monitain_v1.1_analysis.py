@@ -87,11 +87,17 @@ for i, fn in enumerate(fnames):
 
 ##df_main = pd.concat(df_list,ignore_index=False, sort=False)
 df_main = pd.concat(df_list,ignore_index=False)
+
+# Add new column for RT on PM probes
+df_main['pm_probe_rt'] = np.nan
+
 df_main = df_main.reset_index()
 
 # Make a copy to replace inaccurate responses with no RT
 df_main_copy = df_main
 # Use for backup
+
+baseline_str = "base"
 
 # Record PM accuracy per trial
 for trial in df_main.index: 
@@ -100,8 +106,13 @@ for trial in df_main.index:
 		pass
 	elif df_main.loc[trial, 'probe{:d}_acc'.format(probeNum-1)] == 1: #correct PM resp
 		df_main.loc[trial, 'acc'] = 1
+		# add rt from PM probe into PM RT probe column and then set this to NaN so it doesn't average in for PM cost
+		# note that this will add the 1 RT for baseline probes to pm probe column so don't do that for baseline
+		index_base = (df_main.loc[trial, 'block']).find(baseline_str)
+		if index_base == -1: 
+			df_main.loc[trial, 'pm_probe_rt'] = df_main.loc[trial, 'rtProbe{:d}'.format(probeNum-1)]
+			df_main.loc[trial, 'rtProbe{:d}'.format(probeNum-1)] = np.nan;
 	else:
-		print
 		df_main.loc[trial, 'acc'] = 0
 
 # Replace rt with nan if probe resp was incorrect 
@@ -133,9 +144,10 @@ for acc in range(0,15): #get rid of probe14 bc you'll never look at it
 def createBlockDFs(str1, str2, blockType):
 	block_name = df_main[(df_main['block'] == str1) | (df_main['block'] == str2)]	
 	##block_name_df = pd.concat([ block_name['subj'], block_name['block'], block_name['acc'], block_name[rtProbes].mean(axis=1), block_name[accCols].mean(axis=1)], axis=1 , sort=False)
-	block_name_df = pd.concat([ block_name['subj'], block_name['block'], block_name['acc'], block_name[rtProbes].mean(axis=1), block_name[accCols].mean(axis=1)], axis=1)
+	block_name_df = pd.concat([ block_name['subj'], block_name['block'], block_name['acc'], block_name['pm_probe_rt'],
+		block_name[rtProbes].mean(axis=1), block_name[accCols].mean(axis=1)], axis=1)
 	block_name_df['blockType'] = blockType
-	block_name_df.columns = ['subj', 'block', 'pm_acc', 'meanTrial_rt', 'og_acc', 'blockType',]	
+	block_name_df.columns = ['subj', 'block', 'pm_acc', 'pm_probe_rt', 'meanTrial_rt', 'og_acc', 'blockType',]	
 	return block_name_df
 
 block_baseline_df = createBlockDFs("('base1', 1)", "('base2', 8)", "Baseline")

@@ -16,6 +16,10 @@ import pandas as pd
 import numpy as np
 import seaborn as sea
 import matplotlib.pyplot as plt
+import math
+
+import bootstrapped.bootstrap as baseline
+import bootstrapped.stats_functions as bs_stats
 
 ## Set paths for where files will be opened from or saved
 PATH = os.path.expanduser('~')
@@ -123,6 +127,7 @@ ttest_df.to_csv(fname_ttest)
 
 
 
+
 ### LOGISTIC REGRESSION
 
 ##### BY SUBJECT 
@@ -156,6 +161,26 @@ mnm_results = mnm_trials.groupby(['subj']).mean().reset_index()
 mnm_cost = mnm_results.drop(columns=['pm_acc', 'meanTrial_rt','og_acc'], axis=1)
 mnm_acc = mnm_results.drop(columns=['subj', 'pm_cost', 'meanTrial_rt','og_acc'], axis=1) 
 
+
+### LOOKING FOR OUTLIERS
+
+# Find outliers and remove only for specific analyses
+
+def findOutliers(cost, measure): 
+	q1 = measure.quantile(0.25)
+	q3 = measure.quantile(0.75)
+	iqr = q3 - q1
+	return cost[~(measure < (q1 - 1.5 * iqr)) | (measure > (q3 + 1.5 * iqr)) ]
+
+maintain_cost = findOutliers(maintain_cost, maintain_cost.pm_cost)
+monitor_cost = findOutliers(monitor_cost, monitor_cost.pm_cost)
+mnm_cost = findOutliers(mnm_cost, mnm_cost.pm_cost)
+
+maintain_acc = findOutliers(maintain_acc, maintain_acc.pm_acc)
+monitor_acc = findOutliers(monitor_acc, monitor_acc.pm_acc)
+mnm_acc = findOutliers(mnm_acc, mnm_acc.pm_acc)
+
+
 # Maintain cost versus combined performance
 mainCost_combineAcc = pd.concat([maintain_cost, mnm_acc], axis = 1, sort = False)
 # Monitor cost versus combined performance
@@ -172,6 +197,31 @@ monCost_monAcc = pd.concat([monitor_cost, monitor_acc], axis = 1, sort = False)
 combined_cost = maintain_cost.pm_cost + monitor_cost.pm_cost
 # Combined cost (above) versus combined performance
 mplusmCost_combineAcc = pd.concat([combined_cost, mnm_acc], axis=1, sort=False) 
+
+# Don't look at subjects where PM cost was removed for being an outlier
+def removeOutliers(df): 
+	for index, row in df.iterrows(): 
+		if (math.isnan(row.pm_cost) or math.isnan(row.pm_acc)): 
+			print(index)
+			df = df.drop([index])
+	return df
+
+mainCost_combineAcc = removeOutliers(mainCost_combineAcc)
+monCost_combineAcc = removeOutliers(monCost_combineAcc)
+combineCost_combineAcc = removeOutliers(combineCost_combineAcc)
+
+mainCost_mainAcc = removeOutliers(mainCost_mainAcc)
+monCost_monAcc = removeOutliers(monCost_monAcc)
+
+# Drop NaNs
+mainCost_combineAcc = mainCost_combineAcc.dropna()
+monCost_combineAcc = monCost_combineAcc.dropna()
+combineCost_combineAcc = combineCost_combineAcc.dropna()
+
+mainCost_mainAcc = mainCost_mainAcc.dropna()
+monCost_monAcc = monCost_monAcc.dropna()
+
+mplusmCost_combineAcc = mplusmCost_combineAcc.dropna()
 
 def regPlot(combinedData, x_label, y_label, color): 
 	sea.regplot(x='pm_cost', y = 'pm_acc', data = combinedData, color = color) 
@@ -193,67 +243,49 @@ regPlot(mainCost_mainAcc, 'Maintain cost (s)', 'Maintain performance', 'b')
 plt.savefig(FIGURE_PATH + 'maintainCost_v_maintainPerf.png', dpi = 600)
 plt.close()
 
-residPlot(main_V_main, 'Maintain cost (s)', 'Maintain performance residual', 'b')
-plt.savefig(FIGURE_PATH + 'maintainCost_v_maintainPerf_residual.png', dpi = 600)
-plt.close()
+maintain_maintain_lr = pg.linear_regression(mainCost_mainAcc.pm_cost, mainCost_mainAcc.pm_acc) 
 
-maintain_maintain_lr = pg.linear_regression(maintain_cost.pm_cost, maintain_acc.pm_acc) 
 
 ## How does monitoring cost affect performance when only monitoring?
-regPlot(mon_V_mon, 'Monitor cost (s)', 'Monitor performance', 'r')
+regPlot(monCost_monAcc, 'Monitor cost (s)', 'Monitor performance', 'r')
 plt.savefig(FIGURE_PATH + 'monitorCost_v_monitorPerf.png', dpi = 600)
 plt.close()
 
-residPlot(mon_V_mon, 'Monitor cost (s)', 'Monitor performance residual', 'r')
-plt.savefig(FIGURE_PATH + 'monitorCost_v_monitorPerf_residual.png', dpi = 600)
-plt.close()
+monitor_monitor_lr = pg.linear_regression(monCost_monAcc.pm_cost, monCost_monAcc.pm_acc)
 
-monitor_monitor_lr = pg.linear_regression(monitor_cost.pm_cost, monitor_pm_perform.pm_acc) 
 
 
 ## How does maintaining cost affect PM performance?
-regPlot(main_V_combine, 'Maintain cost (s)','Combined performance', 'b')
+regPlot(mainCost_combineAcc, 'Maintain cost (s)','Combined performance', 'b')
 plt.savefig(FIGURE_PATH + 'maintainCost_v_pmAcc.png', dpi = 600)
 plt.close()
 
-residPlot(main_V_combine, 'Maintain cost (s)','Combined performance residual', 'b')
-plt.savefig(FIGURE_PATH + 'maintainCost_v_pmAcc_residual.png', dpi = 600)
-plt.close()
+maintain_combine_lr = pg.linear_regression(mainCost_combineAcc.pm_cost, mainCost_combineAcc.pm_acc)
 
-weight_of_maintain = pg.linear_regression(maintain_cost.pm_cost, mnm_pm_perform.pm_acc)
 
 ## How does monitoring cost affect PM performance?
-regPlot(mon_V_combine, 'Monitor cost (s)','Combined performance', 'r')
+regPlot(monCost_combineAcc, 'Monitor cost (s)','Combined performance', 'r')
 plt.savefig(FIGURE_PATH + 'monitorCost_v_pmAcc.png', dpi = 600)
 plt.close()
 
-residPlot(mon_V_combine, 'Monitor cost (s)','Combined performance residual', 'r')
-plt.savefig(FIGURE_PATH + 'monitorCost_v_pmAcc_residual.png', dpi = 600)
-plt.close()
+monitor_combine_lr = pg.linear_regression(monCost_combineAcc.pm_cost, monCost_combineAcc.pm_acc)
 
-weight_of_monitor = pg.linear_regression(monitor_cost.pm_cost, mnm_pm_perform.pm_acc)
 
 ## How does PM cost affect performance when maintaining AND monitoring?
-regPlot(mnm_V_combine, 'MnM cost (s)','Combined performance', 'purple')
+regPlot(combineCost_combineAcc, 'MnM cost (s)','Combined performance', 'purple')
 plt.savefig(FIGURE_PATH + 'mnmCost_v_pmAcc.png', dpi = 600)
 plt.close()
 
-residPlot(mnm_V_combine, 'MnM cost (s)','Combined performance residual', 'purple')
-plt.savefig(FIGURE_PATH + 'mnmCost_v_pmAcc_residual.png', dpi = 600)
-plt.close()
+combine_combine_lr = pg.linear_regression(combineCost_combineAcc.pm_cost, combineCost_combineAcc.pm_acc)
 
-weight_of_mnm = pg.linear_regression(mnm_cost.pm_cost, mnm_pm_perform.pm_acc)
 
 ## How does additive maintainence and monitoring cost affect performance when maintaining AND monitoring?
-regPlot(mplusm_V_combine, 'Maintainence + Monitoring cost (s)','Combined performance', 'purple')
+regPlot(mplusmCost_combineAcc, 'Maintainence + Monitoring cost (s)','Combined performance', 'purple')
 plt.savefig(FIGURE_PATH + 'mplusmCost_v_pmAcc.png', dpi = 600)
 plt.close()
 
-residPlot(mplusm_V_combine, 'Maintainence + Monitoring cost (s)','Combined performance residual', 'purple')
-plt.savefig(FIGURE_PATH + 'mplusmCost_v_pmAcc_residual.png', dpi = 600)
-plt.close()
+mplusm_combineAcc_lr = pg.linear_regression(mplusmCost_combineAcc.pm_cost, mplusmCost_combineAcc.pm_acc)
 
-weight_of_combined = pg.linear_regression(combined_cost, mnm_pm_perform.pm_acc)
 
 
 
