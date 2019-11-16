@@ -1,10 +1,10 @@
 
 # Array of all of the subjects
-subj_list = all_df.subj.unique() 
+subj_list = all_df_byTrial.subj.unique() 
 
 
 
-def bootstrapped(trial_df, subj_list, n_iterations, x, y, type):
+def bootstrapped(trial_df, subj_list, n_iterations, x, y, type, color):
 
 	trial_dict = dict()
 	for k, v in trial_df.groupby('subj'):
@@ -45,7 +45,7 @@ def bootstrapped(trial_df, subj_list, n_iterations, x, y, type):
 
 
 	# Plot betas	
-	sea.distplot(betas.coef) 
+	sea.distplot(betas.coef, color = color) 
 	plt.xlabel('Coefficient')
 	plt.savefig(FIGURE_PATH + type + '_bootstrap.png', dpi = 600)
 	plt.close()
@@ -54,9 +54,9 @@ def bootstrapped(trial_df, subj_list, n_iterations, x, y, type):
 
 
 
-maintain_maintain_betas = bootstrapped(maintainCost_maintainAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_maintain')
-monitor_monitor_betas = bootstrapped(monitorCost_monitorAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_monitor')
-mnm_mnm_betas = bootstrapped(mnmCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'mnm_mnm')
+maintain_maintain_betas = bootstrapped(maintainCost_maintainAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_maintain', 'b')
+monitor_monitor_betas = bootstrapped(monitorCost_monitorAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_monitor', 'r')
+mnm_mnm_betas = bootstrapped(mnmCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'mnm_mnm', 'purple')
 
-maintain_mnm_betas = bootstrapped(maintainCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_mnm')
-monitor_mnm_betas = bootstrapped(monitorCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_mnm')
+maintain_mnm_betas = bootstrapped(maintainCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_mnm', 'b')
+monitor_mnm_betas = bootstrapped(monitorCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_mnm', 'r')

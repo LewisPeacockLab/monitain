@@ -18,8 +18,8 @@ import seaborn as sea
 import matplotlib.pyplot as plt
 import math
 
-import bootstrapped.bootstrap as baseline
-import bootstrapped.stats_functions as bs_stats
+#import bootstrapped.bootstrap as baseline
+#import bootstrapped.stats_functions as bs_stats
 
 ## Set paths for where files will be opened from or saved
 PATH = os.path.expanduser('~')
@@ -146,24 +146,26 @@ pg.logistic_regression(X, y, remove_na=True)
 ############
 
 # dfs of alllll trials by block type
-maintain_all = all_df[(all_df['blockType'] == 'Maintain')]
+maintain_all = all_df_byTrial[(all_df_byTrial['blockType'] == 'Maintain')]
 maintain_all = maintain_all.drop(columns=['block'])
 
-monitor_all = all_df[(all_df['blockType'] == 'Monitor')]
+monitor_all = all_df_byTrial[(all_df_byTrial['blockType'] == 'Monitor')]
 monitor_all = monitor_all.drop(columns=['block'])
 
-mnm_all = all_df[(all_df['blockType'] == 'MnM')]
+mnm_all = all_df_byTrial[(all_df_byTrial['blockType'] == 'MnM')]
 mnm_all = mnm_all.drop(columns=['block'])
 
+cost_columns_drop = ['blockType', 'pm_acc', 'meanTrial_rt','og_acc', 'pm_probe_rt']
+acc_columns_drop = ['blockType','pm_cost', 'meanTrial_rt','og_acc', 'pm_probe_rt']
 
-maintain_cost_all = maintain_all.drop(columns=['blockType', 'pm_acc', 'meanTrial_rt','og_acc', 'pm_probe_rt'], axis=1).reset_index(drop=True)
-maintain_acc_all = maintain_all.drop(columns=['pm_cost', 'meanTrial_rt','og_acc', 'pm_probe_rt'], axis=1).reset_index(drop=True)
+maintain_cost_all = maintain_all.drop(columns=cost_columns_drop, axis=1).reset_index(drop=True)
+maintain_acc_all = maintain_all.drop(columns=acc_columns_drop, axis=1).reset_index(drop=True)
 
-monitor_cost_all = monitor_all.drop(columns=['blockType', 'pm_acc', 'meanTrial_rt','og_acc', 'pm_probe_rt'], axis=1).reset_index(drop=True)
-monitor_acc_all = monitor_all.drop(columns=['pm_cost', 'meanTrial_rt','og_acc', 'pm_probe_rt'], axis=1).reset_index(drop=True)
+monitor_cost_all = monitor_all.drop(columns=cost_columns_drop, axis=1).reset_index(drop=True)
+monitor_acc_all = monitor_all.drop(columns=acc_columns_drop, axis=1).reset_index(drop=True)
 
-mnm_cost_all = mnm_all.drop(columns=['blockType', 'pm_acc', 'meanTrial_rt','og_acc', 'pm_probe_rt'], axis=1).reset_index(drop=True)
-mnm_acc_all = mnm_all.drop(columns=['pm_cost', 'meanTrial_rt','og_acc', 'pm_probe_rt'], axis=1).reset_index(drop=True)
+mnm_cost_all = mnm_all.drop(columns=cost_columns_drop, axis=1).reset_index(drop=True)
+mnm_acc_all = mnm_all.drop(columns=acc_columns_drop, axis=1).reset_index(drop=True)
 
 
 
@@ -174,34 +176,102 @@ def matchingSubjs(df1, df2):
 		if df1.loc[row].subj != df2.loc[row].subj:
 			print("the subjects do not match up in the two dataframes")
 	df2_drop = df2.drop(columns = ['subj'])
-	return df2_drop
+	return df2_drop	
 
-		
-
+# 2s added because subj eliminated after running through maintainSubjs in second df
+# want to keep that to double check s01 is combined with s01 and so on
 # Maintain cost, maintain accuracy
-maintain_acc_all = matchingSubjs(maintain_cost_all, maintain_acc_all)
-maintainCost_maintainAcc_all = pd.concat([maintain_cost_all, maintain_acc_all], axis = 1)
-maintainCost_maintainAcc_all = maintainCost_maintainAcc_all.drop(columns='blockType')
+maintain_acc_all2 = matchingSubjs(maintain_cost_all, maintain_acc_all)
+maintainCost_maintainAcc_all = pd.concat([maintain_cost_all, maintain_acc_all2], axis = 1)
 
 # Monitor cost, monitor accuracy
-monitor_acc_all = matchingSubjs(monitor_cost_all, monitor_acc_all)
-monitorCost_monitorAcc_all = pd.concat([monitor_cost_all, monitor_acc_all], axis = 1)
-monitorCost_monitorAcc_all = monitorCost_monitorAcc_all.drop(columns='blockType')
+monitor_acc_all2 = matchingSubjs(monitor_cost_all, monitor_acc_all)
+monitorCost_monitorAcc_all = pd.concat([monitor_cost_all, monitor_acc_all2], axis = 1)
 
 # MnM cost, MnM accuracy
-mnm_acc_all = matchingSubjs(mnm_cost_all, mnm_acc_all)
-mnmCost_mnmAcc_all = pd.concat([mnm_cost_all, mnm_acc_all], axis = 1)
-mnmCost_mnmAcc_all = mnmCost_mnmAcc_all.drop(columns='blockType')
+mnm_acc_all2 = matchingSubjs(mnm_cost_all, mnm_acc_all)
+mnmCost_mnmAcc_all = pd.concat([mnm_cost_all, mnm_acc_all2], axis = 1)
 
 # Maintain cost, MnM accuracy
-mnm_acc_all = matchingSubjs(maintain_cost_all, mnm_acc_all)
-maintainCost_mnmAcc_all = pd.concat([maintain_cost_all, mnm_acc_all], axis = 1)
-maintainCost_mnmAcc_all = maintainCost_mnmAcc_all.drop(columns='blockType')
+mnm_acc_all2 = matchingSubjs(maintain_cost_all, mnm_acc_all)
+maintainCost_mnmAcc_all = pd.concat([maintain_cost_all, mnm_acc_all2], axis = 1)
 
 # Monitor cost, MnM accuracy
-mnm_acc_all = matchingSubjs(monitor_cost_all, mnm_acc_all)
-monitorCost_mnmAcc_all = pd.concat([monitor_cost_all, mnm_acc_all], axis = 1)
-monitorCost_mnmAcc_all = monitorCost_mnmAcc_all.drop(columns='blockType')
+mnm_acc_all2 = matchingSubjs(monitor_cost_all, mnm_acc_all)
+monitorCost_mnmAcc_all = pd.concat([monitor_cost_all, mnm_acc_all2], axis = 1)
+
+
+
+
+
+
+
+
+# Array of all of the subjects
+subj_list = all_df_byTrial.subj.unique() 
+
+
+
+def bootstrapped(trial_df, subj_list, n_iterations, x, y, type):
+
+	trial_dict = dict()
+	for k, v in trial_df.groupby('subj'):
+		trial_dict[k] = v
+
+	# Create dictionary to store bootstrap results
+	boot_dict = dict()
+
+	for i in range(n_iterations):
+		# Create a new random subject list
+		resampled_subjList = np.random.choice(subj_list, size = len(subj_list), replace = True)
+
+		# Create a dictionary for the new resampled subject list
+		resampled_dict = dict()
+
+		# For each subject in new subject list, add all of their data
+		for subj in resampled_subjList: 
+			resampled_dict[subj] = trial_dict.get(subj)
+
+		resampled_df = pd.DataFrame()
+		# Merge all of the values from the dictionary together so there is one big dataframe of all new subject data
+		for key, value in trial_dict.items(): 
+			if value is None: 
+
+				print(key)
+		resampled_df = pd.concat(resampled_dict.values(), ignore_index = False) 
+
+		bootstrap_data = resampled_df.groupby(['subj']).mean()
+		bootstrap_lr = pg.linear_regression(bootstrap_data[x], bootstrap_data[y])
+		boot_dict[i] = bootstrap_lr
+
+	# Create df of linear regression results - include intercept and coefficient for each bootstrap iteration
+	betas = pd.DataFrame(columns = ['intercept', 'coef'])
+	for key in boot_dict: 
+		intercept = boot_dict.get(key).coef[0]
+		coef = boot_dict.get(key).coef[1]
+		betas.loc[key] = [intercept, coef]
+
+
+	# Plot betas	
+	sea.distplot(betas.coef) 
+	plt.xlabel('Coefficient')
+	plt.savefig(FIGURE_PATH + type + '_bootstrap.png', dpi = 600)
+	plt.close()
+
+	return betas;
+
+
+
+maintain_maintain_betas = bootstrapped(maintainCost_maintainAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_maintain')
+monitor_monitor_betas = bootstrapped(monitorCost_monitorAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_monitor')
+mnm_mnm_betas = bootstrapped(mnmCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'mnm_mnm')
+
+maintain_mnm_betas = bootstrapped(maintainCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_mnm')
+monitor_mnm_betas = bootstrapped(monitorCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_mnm')
+
+
+
+
 
 
 
