@@ -97,35 +97,6 @@ df_main = df_main.reset_index()
 df_main_copy = df_main
 # Use for backup
 
-baseline_str = "base"
-
-# Record PM accuracy per trial
-for trial in df_main.index: 
-	probeNum = df_main.loc[trial, 'n_probes']
-	if df_main.loc[trial, 'index'] == 0: #something wrong with first trial 
-		pass
-	elif df_main.loc[trial, 'probe{:d}_acc'.format(probeNum-1)] == 1: #correct PM resp
-		df_main.loc[trial, 'acc'] = 1
-		# add rt from PM probe into PM RT probe column and then set this to NaN so it doesn't average in for PM cost
-		# note that this will add the 1 RT for baseline probes to pm probe column so don't do that for baseline
-		index_base = (df_main.loc[trial, 'block']).find(baseline_str)
-		if index_base == -1: 
-			df_main.loc[trial, 'pm_probe_rt'] = df_main.loc[trial, 'rtProbe{:d}'.format(probeNum-1)]
-			df_main.loc[trial, 'rtProbe{:d}'.format(probeNum-1)] = np.nan;
-	else:
-		df_main.loc[trial, 'acc'] = 0
-
-# Replace rt with nan if probe resp was incorrect 
-for i in df_main.index: 
-	for probe in range(0,15): 
-		if df_main.loc[i, 'probe{:d}_acc'.format(probe)] == 0: 
-			df_main.at[i, 'rtProbe{:d}'.format(probe)] = np.nan
-
-#remove s18 because they don't have a pm cost
-#remove s28 because they didn't follow the instructions
-df_main = df_main[(df_main['subj'] != 's18')] 
-df_main = df_main[(df_main['subj'] != 's28')] 
-#all_pm_df = all_pm_df[(all_pm_df['subj'] != 's28')]  
 
 
 # Master list of all rt probe titles
@@ -139,7 +110,67 @@ for acc in range(0,15): #get rid of probe14 bc you'll never look at it
 
 
 
-######### BY BLOCK TYPE DATAFRAMES #########
+# Record PM accuracy per trial
+baseline_str = "base"
+for trial in df_main.index: 
+	probeNum = df_main.loc[trial, 'n_probes']
+	# Move RT for PM probe to it's own column and then replace probeX with nan so it 
+	# doesn't get averaged in with PM cost later
+	index_base = (df_main.loc[trial, 'block']).find(baseline_str)
+	if index_base == -1: 
+		df_main.loc[trial, 'pm_probe_rt'] = df_main.loc[trial, 'rtProbe{:d}'.format(probeNum-1)]
+		df_main.loc[trial, 'rtProbe{:d}'.format(probeNum-1)] = np.nan;
+
+	if df_main.loc[trial, 'index'] == 0: #something wrong with first trial 
+		pass
+	elif df_main.loc[trial, 'probe{:d}_acc'.format(probeNum-1)] == 1: #correct PM resp
+		df_main.loc[trial, 'acc'] = 1
+		# add rt from PM probe into PM RT probe column and then set this to NaN so it doesn't average in for PM cost
+		# note that this will add the 1 RT for baseline probes to pm probe column so don't do that for baseline
+		
+	else:
+		df_main.loc[trial, 'acc'] = 0
+
+
+
+
+################################
+####### Excluding data #########
+################################
+
+#Replace RT with nan if OG task was incorrect
+#Replace RT with nan in resp was quicker than 0.05 secs, also replace pm acc with nan
+#Cut off based on findings from "Eye Movements and Visual Encoding during Scene Perception"
+#Rayner et al., 2009
+ 
+for i in df_main.index: 
+	if df_main.loc[i, 'pm_probe_rt'] < 0.05: 
+		print(df_main.loc[i, 'pm_probe_rt'])
+		df_main.at[i, 'pm_probe_rt'] = np.nan
+
+	for probe in range(0,15): 
+		# Replace rt with nan if probe resp was incorrect
+		if df_main.loc[i, 'probe{:d}_acc'.format(probe)] == 0: 
+			df_main.at[i, 'rtProbe{:d}'.format(probe)] = np.nan
+		# Replace rt and acc with nan if probe RT was quicker than 0.05 secs
+		if df_main.loc[i, 'rtProbe{:d}'.format(probe)] < 0.05: 			
+			df_main.at[trial, 'rtProbe{:d}'.format(probe)] = np.nan
+			df_main.at[trial, 'probe{:d}_acc'.format(probe)] = np.nan
+
+
+#remove s18 because they don't have a pm cost
+#remove s28 because they didn't follow the instructions
+df_main = df_main[(df_main['subj'] != 's18')] 
+df_main = df_main[(df_main['subj'] != 's28')] 
+#all_pm_df = all_pm_df[(all_pm_df['subj'] != 's28')]  
+
+
+
+
+################################
+### By block type dataframes ###
+################################
+
 
 def createBlockDFs(str1, str2, blockType):
 	block_name = df_main[(df_main['block'] == str1) | (df_main['block'] == str2)]	
@@ -157,7 +188,10 @@ block_mnm_df = createBlockDFs("('mnm1', 4)", "('mnm2', 7)", "MnM")
 
 
 
-######### CALCULATE PM COST #########
+
+################################
+###### Calculate PM cost #######
+################################
 
 # Calculate base cost by subj
 base_cost = block_baseline_df.groupby('subj')['meanTrial_rt'].mean()
@@ -189,9 +223,67 @@ byTrial_pmCost(block_maintain_df)
 byTrial_pmCost(block_monitor_df)
 byTrial_pmCost(block_mnm_df)
 
-####PICK UP HERE
 
-######### BY SUBJECT FIGURES #########
+
+
+################################
+#### All blocks dataframe ######
+################################
+
+##all_df = pd.concat([block_baseline_df, block_maintain_df, block_monitor_df, block_mnm_df], axis = 0, sort=False)
+##all_df_minusBase = pd.concat([block_maintain_df, block_monitor_df, block_mnm_df], axis = 0, sort=False)
+all_df = pd.concat([block_baseline_df, block_maintain_df, block_monitor_df, block_mnm_df], axis = 0)
+all_df_minusBase = pd.concat([block_maintain_df, block_monitor_df, block_mnm_df], axis = 0)
+# If just looking at all_df_minusBase, need to redo exclusion criteria for that
+
+
+
+
+################################
+#### Dataframes for MnM & ######
+##### Maintain + Monitor #######
+################################
+
+# Combine everything
+new_df = all_df.groupby(['subj','blockType']).mean().reset_index(drop=False)
+
+# Make a dataframe of just Maintain blocks and Monitor trials
+combine_df = new_df[(new_df['blockType'] == 'Monitor') |(new_df['blockType']=='Maintain')]
+# Add maintain plus monitor for each subject
+combine_df = combine_df.groupby('subj').sum()
+combine_df = combine_df.reset_index()
+combine_df['type'] = 'Maintain + Monitor'
+
+# Make a dataframe of just MnM trials
+mnm_df = new_df[(new_df['blockType'] == 'MnM')]
+mnm_df = mnm_df.groupby('subj').sum() 
+mnm_df = mnm_df.reset_index()
+mnm_df['type'] = 'MnM'  
+
+# Make a dataframe of with a column for Maintain + Monitor alongside column
+# for MnM for each subject
+#both_pm = combine_df.pm_cost  
+#mnm_pm = mnm_df.pm_cost 
+##all_pm_df = pd.concat([combine_df, mnm_df], axis=0, sort=False)
+all_pm_df = pd.concat([combine_df, mnm_df], axis=0)
+#all_pm_df.columns = 'maintain_monitor', 'mnm' 
+#all_pm_df = all_pm_df.reset_index() 
+
+# Pull out PM cost
+both_pm = combine_df.pm_cost  
+mnm_pm = mnm_df.pm_cost 
+##all_2 = pd.concat([both_pm, mnm_pm], axis=1, sort=False)
+
+# Make a dataframe of just PM cost
+all_2 = pd.concat([both_pm, mnm_pm], axis=1)
+all_2.columns = 'maintain_monitor', 'mnm' 
+
+
+
+
+################################
+##### By subject figures #######
+################################
 
 ## PM Accuracy
 def bySubj_pmAcc(block_name_df, blockStr, colorPalette):
@@ -240,150 +332,11 @@ bySubj_rt(block_monitor_df, 'mnm', "Purples")
 
 
 
-######### ALL BLOCKS DATAFRAME #########
 
-##all_df = pd.concat([block_baseline_df, block_maintain_df, block_monitor_df, block_mnm_df], axis = 0, sort=False)
-##all_df_minusBase = pd.concat([block_maintain_df, block_monitor_df, block_mnm_df], axis = 0, sort=False)
-all_df = pd.concat([block_baseline_df, block_maintain_df, block_monitor_df, block_mnm_df], axis = 0)
-all_df_minusBase = pd.concat([block_maintain_df, block_monitor_df, block_mnm_df], axis = 0)
-# If just looking at all_df_minusBase, need to redo exclusion criteria for that
-
-
-
-######### EXCLUDING DATA #########
-# Note that data excluded will still be displayed in by subj plots
-# By subj plots are more of a sanity check than presentable results
-
-#Replace RT with nan in resp was quicker than 0.05 secs, also replace pm acc with nan
-#Cut off based on findings from "Eye Movements and Visual Encoding during Scene Perception"
-#Rayner et al., 2009
-for trial in all_df.index: 
-	if all_df.loc[trial, 'meanTrial_rt'] < 0.05: 
-		## print all_df_minusBase.loc[trial, 'meanTrial_rt']
-		all_df.at[trial, 'meanTrial_rt'] = np.nan
-		all_df.at[trial, 'pm_acc'] = np.nan
-
-
-######### DATAFRAMES for MnM and Maintain + Monitor #########
-
-# Combine everything
-new_df = all_df.groupby(['subj','blockType']).mean().reset_index(drop=False)
-
-# Make a dataframe of just Maintain blocks and Monitor trials
-combine_df = new_df[(new_df['blockType'] == 'Monitor') |(new_df['blockType']=='Maintain')]
-# Add maintain plus monitor for each subject
-combine_df = combine_df.groupby('subj').sum()
-combine_df = combine_df.reset_index()
-combine_df['type'] = 'Maintain + Monitor'
-
-# Make a dataframe of just MnM trials
-mnm_df = new_df[(new_df['blockType'] == 'MnM')]
-mnm_df = mnm_df.groupby('subj').sum() 
-mnm_df = mnm_df.reset_index()
-mnm_df['type'] = 'MnM'  
-
-# Make a dataframe of with a column for Maintain + Monitor alongside column
-# for MnM for each subject
-#both_pm = combine_df.pm_cost  
-#mnm_pm = mnm_df.pm_cost 
-##all_pm_df = pd.concat([combine_df, mnm_df], axis=0, sort=False)
-all_pm_df = pd.concat([combine_df, mnm_df], axis=0)
-#all_pm_df.columns = 'maintain_monitor', 'mnm' 
-#all_pm_df = all_pm_df.reset_index() 
-
-# Pull out PM cost
-both_pm = combine_df.pm_cost  
-mnm_pm = mnm_df.pm_cost 
-##all_2 = pd.concat([both_pm, mnm_pm], axis=1, sort=False)
-
-# Make a dataframe of just PM cost
-all_2 = pd.concat([both_pm, mnm_pm], axis=1)
-all_2.columns = 'maintain_monitor', 'mnm' 
-
-
-
-######### ALL BLOCKS FIGURES #########
-
-## Custom color palette
-my_pal = ['#aedea7', #Green
-		'#abd0e6', #Blue 
-		##'#3787c0', #Blue 
-		'#fca082', #Red 
-		##'#e32f27', #Red
-		'#c6c7e1', #Purple
-		##'#796eb2', #Purple
-		##'#37a055'  #Green
-		  ]
-
-#### Export dataframes to CSVs
-CSV_PATH = FIGURE_PATH + 'csvs'
-
-
-######### EXPORT CSVs #########
-## All DFs
-all_df_averaged = all_df.groupby(['subj', 'blockType']).mean().reset_index(drop = False)
-pmCost_df_averaged = pmCost_df.groupby(['subj', 'blockType']).mean().reset_index(drop = False)
-
-fname_all = os.path.join(CSV_PATH, 'ALL.csv')
-all_df_averaged.to_csv(fname_all, index = False)
-fname_pm = os.path.join(CSV_PATH, 'PM_COST.csv')
-pmCost_df_averaged.to_csv(fname_pm, index = False)
-
-fname_all_byTrial = os.path.join(CSV_PATH, 'ALL_BYTRIAL.csv')
-all_df.to_csv(fname_all_byTrial, index = False)
-
-
-
-#fname_all_df = os.path.join(CSV_PATH, 'all_bySubj.csv')
-#all_df.to_csv(fname_all_df, index = False)
-
-### Baseline DF
-#baseline_df = all_df[all_df['blockType'] == 'Baseline']
-#fname_baseline_df = os.path.join(CSV_PATH, 'baseline.csv')
-#baseline_df.to_csv(fname_baseline_df, index = False)
-
-### Maintain DF
-#maintain_df = all_df[all_df['blockType'] == 'Maintain']
-#fname_maintain_df = os.path.join(CSV_PATH, 'maintain.csv')
-#maintain_df.to_csv(fname_maintain_df, index = False)
-
-### Monitor DF
-#monitor_df = all_df[all_df['blockType'] == 'Monitor']
-#fname_monitor_df = os.path.join(CSV_PATH, 'monitor.csv')
-#monitor_df.to_csv(fname_monitor_df, index = False)
-
-### MNM DF
-#mnm_df = all_df[all_df['blockType'] == 'MnM']
-#fname_mnm_df = os.path.join(CSV_PATH, 'mnm.csv')
-#mnm_df.to_csv(fname_mnm_df, index = False)
-
-
-## PM cost DFs
-#fname_pmCost_df = os.path.join(CSV_PATH, 'pm_cost_bySubj.csv')
-#pmCost_df.to_csv(fname_pmCost_df, index = False)
-
-### Baseline DF - PM cost
-#baseline_df_pmCost = pmCost_df[pmCost_df['blockType'] == 'Baseline']
-#fname_baseline_PM_df = os.path.join(CSV_PATH, 'baseline_PM.csv')
-#baseline_df_pmCost.to_csv(fname_baseline_PM_df, index = False)
-
-### Maintain DF - PM cost
-#maintain_df_pmCost = pmCost_df[pmCost_df['blockType'] == 'Maintain']
-#fname_maintain_PM_df = os.path.join(CSV_PATH, 'maintain_PM.csv')
-#maintain_df_pmCost.to_csv(fname_maintain_PM_df, index = False)
-
-### Monitor DF - PM cost
-#monitor_df_pmCost = pmCost_df[pmCost_df['blockType'] == 'Monitor']
-#fname_monitor_PM_df = os.path.join(CSV_PATH, 'monitor_PM.csv')
-#monitor_df_pmCost.to_csv(fname_monitor_PM_df, index = False)
-
-### MnM DF - PM cost
-#mnm_df_pmCost = pmCost_df[pmCost_df['blockType'] == 'MnM']
-#fname_mnm_PM_df = os.path.join(CSV_PATH, 'mnm_PM.csv')
-#mnm_df_pmCost.to_csv(fname_mnm_PM_df, index = False)
-
-
-#### FUNCTIONS to create figures
+################################
+######### Functions to #########
+######## create figures ########
+################################
 
 ## PM accuracy
 def allSubj_pmAcc():
@@ -453,7 +406,25 @@ def allSubj_pmCompare_pointPlusViolin():
 	plt.savefig(FIGURE_PATH + 'allSubj_pmCompare_point_violin.png', dpi = 600)
 	plt.close()
 
-#### CREATE figures for all subjects
+
+
+
+################################
+######### Figures for ##########
+######### all subjects #########
+################################
+
+## Custom color palette
+my_pal = ['#aedea7', #Green
+		'#abd0e6', #Blue 
+		##'#3787c0', #Blue 
+		'#fca082', #Red 
+		##'#e32f27', #Red
+		'#c6c7e1', #Purple
+		##'#796eb2', #Purple
+		##'#37a055'  #Green
+		  ]
+
 allSubj_pmAcc()
 allSubj_ogAcc()
 allSubj_rt()
@@ -485,28 +456,25 @@ plt.close()
 
 
 
-######### ALL BLOCKS FIGURES #########
+################################
+######### Export CSVs ##########
+################################
 
-import pingouin as pg
-post_hoc = pg.ttest(all_2.maintain_monitor, all_2.mnm, paired=True)
+#### Export dataframes to CSVs
+CSV_PATH = FIGURE_PATH + 'csvs'
 
+## All DFs
+all_df_averaged = all_df.groupby(['subj', 'blockType']).mean().reset_index(drop = False)
+pmCost_df_averaged = pmCost_df.groupby(['subj', 'blockType']).mean().reset_index(drop = False)
 
+fname_all = os.path.join(CSV_PATH, 'ALL.csv')
+all_df_averaged.to_csv(fname_all, index = False)
+fname_pm = os.path.join(CSV_PATH, 'PM_COST.csv')
+pmCost_df_averaged.to_csv(fname_pm, index = False)
 
-
-
-sea.pointplot(x = 'type', y = 'pm_cost', hue = 'subj', data = all_pm_df)  
-
-ax = sea.pointplot(x = 'type', y = 'pm_cost', hue = 'subj', data = all_pm_df)
-plt.xlabel('Block type')
-plt.ylabel('PM cost')
-plt.savefig(FIGURE_PATH + 'pm_compare.eps', dpi = 600)
-
-sea.violinplot(x = all_pm_df.type, y = all_pm_df.pm_cost)     
-sea.pointplot(x = 'type', y = 'pm_cost', hue = 'subj', data = all_pm_df, color = '0.5')
-all_pm_df.groupby('subj').mean()
-
+fname_all_byTrial = os.path.join(CSV_PATH, 'ALL_BYTRIAL.csv')
+all_df.to_csv(fname_all_byTrial, index = False)
 
 
-fig, ax = plt.subplots() 
-for i, j in all_pm_df.iterrows():
-	sea.pointplot(x='type', y='pm_cost', data = all_pm_df[(all_pm_df['subj' == j.subj)], ax = ax, kind = "line") 
+
+
