@@ -18,6 +18,8 @@ import seaborn as sea
 import matplotlib.pyplot as plt
 import math
 
+from sklearn.linear_model import LinearRegression
+
 #import bootstrapped.bootstrap as baseline
 #import bootstrapped.stats_functions as bs_stats
 
@@ -212,7 +214,7 @@ subj_list = all_df_byTrial.subj.unique()
 
 
 
-def bootstrapped(trial_df, subj_list, n_iterations, x, y, type):
+def bootstrapped(trial_df, subj_list, n_iterations, x, y, type, color):
 
 	trial_dict = dict()
 	for k, v in trial_df.groupby('subj'):
@@ -242,6 +244,7 @@ def bootstrapped(trial_df, subj_list, n_iterations, x, y, type):
 
 		bootstrap_data = resampled_df.groupby(['subj']).mean()
 		bootstrap_lr = pg.linear_regression(bootstrap_data[x], bootstrap_data[y])
+
 		boot_dict[i] = bootstrap_lr
 
 	# Create df of linear regression results - include intercept and coefficient for each bootstrap iteration
@@ -253,30 +256,12 @@ def bootstrapped(trial_df, subj_list, n_iterations, x, y, type):
 
 
 	# Plot betas	
-	sea.distplot(betas.coef) 
+	sea.distplot(betas.coef, color = color) 
 	plt.xlabel('Coefficient')
 	plt.savefig(FIGURE_PATH + type + '_bootstrap.png', dpi = 600)
 	plt.close()
 
 	return betas;
-
-
-
-maintain_maintain_betas = bootstrapped(maintainCost_maintainAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_maintain')
-monitor_monitor_betas = bootstrapped(monitorCost_monitorAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_monitor')
-mnm_mnm_betas = bootstrapped(mnmCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'mnm_mnm')
-
-maintain_mnm_betas = bootstrapped(maintainCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_mnm')
-monitor_mnm_betas = bootstrapped(monitorCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_mnm')
-
-
-
-
-
-
-
-
-##################
 
 
 # Does maintenance cost predict combined performance? 
@@ -299,6 +284,77 @@ mnm_results = mnm_trials.groupby(['subj']).mean().reset_index()
 mnm_cost = mnm_results.drop(columns=['pm_acc', 'meanTrial_rt','og_acc', 'pm_probe_rt'], axis=1)
 mnm_acc = mnm_results.drop(columns=['subj', 'pm_cost', 'meanTrial_rt','og_acc', 'pm_probe_rt'], axis=1) 
 mnm_pmRT = maintain_results.drop(columns=['subj', 'pm_cost', 'meanTrial_rt', 'og_acc', 'pm_acc'])
+
+## Combine DFs - cost and accuracy
+
+# Maintain cost versus combined performance
+mainCost_combineAcc = pd.concat([maintain_cost, mnm_acc], axis = 1, sort = False)
+# Monitor cost versus combined performance
+monCost_combineAcc = pd.concat([monitor_cost, mnm_acc], axis = 1, sort = False)
+# Combined cost versus combined performance
+combineCost_combineAcc = pd.concat([mnm_cost, mnm_acc], axis = 1, sort = False)
+
+# Maintain cost versus maintain performance
+mainCost_mainAcc = pd.concat([maintain_cost, maintain_acc], axis = 1, sort = False)
+# Monitor cost versus monitor performance
+monCost_monAcc = pd.concat([monitor_cost, monitor_acc], axis = 1, sort = False)
+
+# Maintain cost + Monitor cost
+combined_cost = maintain_cost.pm_cost + monitor_cost.pm_cost
+# Combined cost (above) versus combined performance
+mplusmCost_combineAcc = pd.concat([combined_cost, mnm_acc], axis=1, sort=False) 
+
+
+## ** Currently working here today 
+
+## Create a df with everything - for each subj, a column for maintain cost, monitor cost, mnm cost, maintain acc, etc.
+mainCost = maintain_cost.rename(columns = {"pm_cost" : "main_cost"})
+monCost = monitor_cost.rename(columns = {"pm_cost" : "mon_cost"}).drop(columns=['subj'])
+mnmCost = mnm_cost.rename(columns = {"pm_cost" : "mnm_cost"}).drop(columns=['subj'])
+
+mainAcc = maintain_acc.rename(columns = {"pm_acc":"main_acc"}) 
+monAcc = monitor_acc.rename(columns = {"pm_acc":"mon_acc"}) 
+mnmAcc = mnm_acc.rename(columns = {"pm_acc":"mnm_acc"}) 
+
+cost_acc_df = pd.concat([mainCost, monCost, mnmCost, mainAcc, monAcc, mnmAcc], axis=1)
+# Save to CSV for R
+fname_df = os.path.join(CSV_PATH, 'cost_acc.csv')
+cost_acc_df.to_csv(fname_df, index = False)
+
+
+# Don't do this! If it's maintain vs mnm or monitor vs mnm, it won't work
+# You can't correlate maintain trial 1 to mnm trial 1, you must take averages
+#maintain_maintain_betas = bootstrapped(maintainCost_maintainAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_maintain')
+#monitor_monitor_betas = bootstrapped(monitorCost_monitorAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_monitor')
+#mnm_mnm_betas = bootstrapped(mnmCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'mnm_mnm')
+
+#maintain_mnm_betas = bootstrapped(maintainCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_mnm')
+#monitor_mnm_betas = bootstrapped(monitorCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_mnm')
+
+
+maintain_mnm_betas = bootstrapped(mainCost_combineAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_mnm', 'b')
+monitor_mnm_betas = bootstrapped(monCost_combineAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_mnm', 'r')
+
+maintain_maintain_betas = bootstrapped(mainCost_mainAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_maintain', 'b')
+monitor_monitor_betas = bootstrapped(monCost_monAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_monitor', 'r')
+mnm_mnm_betas = bootstrapped(combineCost_combineAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'mnm_mnm', 'purple')
+
+
+
+fname_maintain_mnm = os.path.join(CSV_PATH, 'maintainCost_mnmAcc.csv') 
+mainCost_combineAcc.to_csv(fname_maintain_mnm, index=False)   
+
+
+x_lr = np.array(mainCost_combineAcc.pm_cost).reshape((-1,1))
+y_lr = np.array(mainCost_combineAcc.pm_acc)
+model = LinearRegression().fit(x_lr, y_lr)
+
+
+
+
+
+##################
+
 
 
 ##############
@@ -329,24 +385,7 @@ monitor_pmRT = findOutliers(monitor_pmRT, monitor_pmRT.pm_probe_rt)
 mnm_pmRT = findOutliers(mnm_pmRT, mnm_pmRT.pm_probe_rt)
 
 
-## Combine DFs - cost and accuracy
 
-# Maintain cost versus combined performance
-mainCost_combineAcc = pd.concat([maintain_cost, mnm_acc], axis = 1, sort = False)
-# Monitor cost versus combined performance
-monCost_combineAcc = pd.concat([monitor_cost, mnm_acc], axis = 1, sort = False)
-# Combined cost versus combined performance
-combineCost_combineAcc = pd.concat([mnm_cost, mnm_acc], axis = 1, sort = False)
-
-# Maintain cost versus maintain performance
-mainCost_mainAcc = pd.concat([maintain_cost, maintain_acc], axis = 1, sort = False)
-# Monitor cost versus monitor performance
-monCost_monAcc = pd.concat([monitor_cost, monitor_acc], axis = 1, sort = False)
-
-# Maintain cost + Monitor cost
-combined_cost = maintain_cost.pm_cost + monitor_cost.pm_cost
-# Combined cost (above) versus combined performance
-mplusmCost_combineAcc = pd.concat([combined_cost, mnm_acc], axis=1, sort=False) 
 
 ## Combine DFs - cost and RT
 

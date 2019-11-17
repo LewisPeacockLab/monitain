@@ -7,6 +7,7 @@ setwd('/Users/krh2382/monitain/analysis/output/csvs')
 
 # Load data
 data_bytrial=read.csv("ALL_BYTRIAL.csv")
+data_cost_acc = read.csv("cost_acc.csv")
 
 # Find total number of subjects (takes excluded subjs into account)
 n_subjs = length(levels(data_bytrial$subj))
@@ -36,7 +37,44 @@ lm1_mnm <- glmer(pm_acc ~ pm_cost + (1 + pm_cost | subj), data = mnm_trials, fam
 lm2_mnm <- glmer(pm_acc ~ pm_cost + (1 | subj), data = mnm_trials, family=binomial(link="logit") )
 mnm_anova = anova(lm1_mnm, lm2_mnm)
 
-# Run ANOVA on 2 models
+
+
+### MAINTAIN COST V MNM ACC
+# Fit a linear model for each 1) include interaction terms so x1 + x2 + x1*x2, 2) x1+x2, 3) x1
+lm1_maintainCost_mnmAcc <- lm(mnm_acc ~ main_cost + mon_cost + main_cost*mon_cost, data = data_cost_acc) 
+lm2_maintainCost_mnmAcc <- lm(mnm_acc ~ main_cost + mon_cost, data = data_cost_acc)
+lm3_maintainCost_mnmAcc <- lm(mnm_acc ~ main_cost, data = data_cost_acc)
+
+# Find AIC for each model
+aic_main_mnm1 = AIC(lm1_maintainCost_mnmAcc)
+aic_main_mnm2 = AIC(lm2_maintainCost_mnmAcc)
+aic_main_mnm3 = AIC(lm3_maintainCost_mnmAcc)
+
+# Run an ANOVA between each linear model fit
+main_mnm_anova_12 = anova(lm1_maintainCost_mnmAcc, lm2_maintainCost_mnmAcc)
+main_mnm_anova_13 = anova(lm1_maintainCost_mnmAcc, lm3_maintainCost_mnmAcc)
+main_mnm_anova_23 = anova(lm2_maintainCost_mnmAcc, lm3_maintainCost_mnmAcc)
+
+
+
+### MONITOR COST V MNM ACC
+# Fit a linear model for each 1) include interaction terms so x1 + x2 + x1*x2, 2) x1+x2, 3) x1
+lm1_monCost_mnmAcc <- lm(mnm_acc ~ mon_cost + main_cost + mon_cost*main_cost, data = data_cost_acc) 
+lm2_monCost_mnmAcc <- lm(mnm_acc ~ mon_cost + main_cost, data = data_cost_acc)
+lm3_monCost_mnmAcc <- lm(mnm_acc ~ mon_cost, data = data_cost_acc)
+
+# Find AIC for each model
+aic_mon_mnm1 = AIC(lm1_monCost_mnmAcc)
+aic_mon_mnm2 = AIC(lm2_monCost_mnmAcc)
+aic_mon_mnm3 = AIC(lm3_monCost_mnmAcc)
+
+# Run an ANOVA between each linear model fit
+mon_mnm_anova_12 = anova(lm1_monCost_mnmAcc, lm2_monCost_mnmAcc)
+mon_mnm_anova_13 = anova(lm1_monCost_mnmAcc, lm3_monCost_mnmAcc)
+mon_mnm_anova_23 = anova(lm2_monCost_mnmAcc, lm3_monCost_mnmAcc)
+
+
+
 
 # Not sure what to do with below stuff yet, may not keep 
 subj1 = read.csv('subj1.csv')
