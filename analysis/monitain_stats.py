@@ -240,14 +240,22 @@ def bootstrapped(trial_df, subj_list, n_iterations, x, y, type, color):
 			if value is None: 
 
 				print(key)
-		resampled_df = pd.concat(resampled_dict.values(), ignore_index = False) 
+		# Ignore index = True so that it resets the index so it goes from 0 to x, rather than random number to random number
+		resampled_df = pd.concat(resampled_dict.values(), ignore_index = True)
 
-		bootstrap_data = resampled_df.groupby(['subj']).mean()
-		bootstrap_lr = pg.linear_regression(bootstrap_data[x], bootstrap_data[y])
+		# Don't run the below line if you don't care about by subject
+		#bootstrap_data = resampled_df.groupby(['subj']).mean()
+
+		#logistic regression, monitor cost by monitor accuracy 
+		#bootstrap_lr = pg.linear_regression(bootstrap_data[x], bootstrap_data[y])
+
+		# drop rows where at least one element is missing
+		resampled_df = resampled_df.dropna()
+		bootstrap_lr = pg.logistic_regression(resampled_df[x], resampled_df[y])
 
 		boot_dict[i] = bootstrap_lr
 
-	# Create df of linear regression results - include intercept and coefficient for each bootstrap iteration
+	# Create df of regression results - include intercept and coefficient for each bootstrap iteration
 	betas = pd.DataFrame(columns = ['intercept', 'coef'])
 	for key in boot_dict: 
 		intercept = boot_dict.get(key).coef[0]
@@ -321,6 +329,33 @@ cost_acc_df = pd.concat([mainCost, monCost, mnmCost, mainAcc, monAcc, mnmAcc], a
 fname_df = os.path.join(CSV_PATH, 'cost_acc.csv')
 cost_acc_df.to_csv(fname_df, index = False)
 
+maintain_maintain_betas = bootstrapped(maintainCost_maintainAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_maintain', 'b')
+monitor_monitor_betas = bootstrapped(monitorCost_monitorAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_monitor', 'r')
+
+main_main = mainCost_mainAcc_all.dropna()
+mon_mon = monitorCost_monitorAcc_all.dropna()
+
+
+
+fig, (ax1, ax2) = plt.subplots(ncols=2, sharey=True)
+
+sea.regplot(x = 'pm_cost', y = 'pm_acc', data = main_main, color = 'b', logistic=True, ax = ax1)
+ax1.set_xlabel('Maintain cost')
+ax1.set_ylabel('Maintain performance') 
+
+sea.regplot(x = 'pm_cost', y = 'pm_acc', data = mon_mon, color = 'r', logistic=True, ax = ax2)
+ax2.set_xlabel('Monitor cost')
+ax2.set_ylabel('Monitor performance') 
+
+plt.savefig(FIGURE_PATH + 'logreg_compare.png', dpi = 600)
+plt.close()
+
+
+
+
+
+# Code to plot logistic regression
+sea.lmplot(x=x, y = y, data = resampled_df, logistic=True) 
 
 # Don't do this! If it's maintain vs mnm or monitor vs mnm, it won't work
 # You can't correlate maintain trial 1 to mnm trial 1, you must take averages

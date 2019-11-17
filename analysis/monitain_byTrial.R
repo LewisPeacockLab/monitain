@@ -41,27 +41,29 @@ mnm_anova = anova(lm1_mnm, lm2_mnm)
 
 ### MAINTAIN COST V MNM ACC
 # Fit a linear model for each 1) include interaction terms so x1 + x2 + x1*x2, 2) x1+x2, 3) x1
-lm1_maintainCost_mnmAcc <- lm(mnm_acc ~ main_cost + mon_cost + main_cost*mon_cost, data = data_cost_acc) 
-lm2_maintainCost_mnmAcc <- lm(mnm_acc ~ main_cost + mon_cost, data = data_cost_acc)
-lm3_maintainCost_mnmAcc <- lm(mnm_acc ~ main_cost, data = data_cost_acc)
+lm1_mainCost_mnmAcc <- lm(mnm_acc ~ main_cost + mon_cost + main_cost:mon_cost, data = data_cost_acc) 
+lm2_mainCost_mnmAcc <- lm(mnm_acc ~ main_cost + mon_cost, data = data_cost_acc)
+lm3_mainCost_mnmAcc <- lm(mnm_acc ~ main_cost, data = data_cost_acc)
 
 # Find AIC for each model
-aic_main_mnm1 = AIC(lm1_maintainCost_mnmAcc)
-aic_main_mnm2 = AIC(lm2_maintainCost_mnmAcc)
-aic_main_mnm3 = AIC(lm3_maintainCost_mnmAcc)
+aic_main_mnm1 = AIC(lm1_mainCost_mnmAcc)
+aic_main_mnm2 = AIC(lm2_mainCost_mnmAcc)
+aic_main_mnm3 = AIC(lm3_mainCost_mnmAcc)
 
 # Run an ANOVA between each linear model fit
-main_mnm_anova_12 = anova(lm1_maintainCost_mnmAcc, lm2_maintainCost_mnmAcc)
-main_mnm_anova_13 = anova(lm1_maintainCost_mnmAcc, lm3_maintainCost_mnmAcc)
-main_mnm_anova_23 = anova(lm2_maintainCost_mnmAcc, lm3_maintainCost_mnmAcc)
+main_mnm_anova_12 = anova(lm1_mainCost_mnmAcc, lm2_mainCost_mnmAcc)
+main_mnm_anova_13 = anova(lm1_mainCost_mnmAcc, lm3_mainCost_mnmAcc)
+main_mnm_anova_23 = anova(lm2_mainCost_mnmAcc, lm3_mainCost_mnmAcc)
 
 
 
 ### MONITOR COST V MNM ACC
 # Fit a linear model for each 1) include interaction terms so x1 + x2 + x1*x2, 2) x1+x2, 3) x1
-lm1_monCost_mnmAcc <- lm(mnm_acc ~ mon_cost + main_cost + mon_cost*main_cost, data = data_cost_acc) 
+lm1_monCost_mnmAcc <- lm(mnm_acc ~ mon_cost + main_cost + mon_cost:main_cost, data = data_cost_acc) 
 lm2_monCost_mnmAcc <- lm(mnm_acc ~ mon_cost + main_cost, data = data_cost_acc)
 lm3_monCost_mnmAcc <- lm(mnm_acc ~ mon_cost, data = data_cost_acc)
+
+lm4_monCost_mnmAcc <- lm(mnm_acc ~ 1, data = data_cost_acc)
 
 # Find AIC for each model
 aic_mon_mnm1 = AIC(lm1_monCost_mnmAcc)
@@ -73,7 +75,26 @@ mon_mnm_anova_12 = anova(lm1_monCost_mnmAcc, lm2_monCost_mnmAcc)
 mon_mnm_anova_13 = anova(lm1_monCost_mnmAcc, lm3_monCost_mnmAcc)
 mon_mnm_anova_23 = anova(lm2_monCost_mnmAcc, lm3_monCost_mnmAcc)
 
+data_cost_acc$noEffPred=predict(lm4_monCost_mnmAcc)
+data_cost_acc$monPred=predict(lm3_monCost_mnmAcc)
 
+# Create a function 
+sum.of.squares <- function(x,y) {
+  x^2 + y^2
+}
+
+n_iterations = 1000
+subj_list = 
+
+bootstrapped <- function(subj_list, n_iterations, x, y) {
+  for (subj in levels(data_cost_acc$subj)) {
+    
+    
+    
+  }
+}
+
+##### ignore stuff below for now
 
 
 # Not sure what to do with below stuff yet, may not keep 
