@@ -7,9 +7,6 @@
 ######### November 2019 ##########
 ##################################
 
-### This script will: 
-# run repeated measure ANOVAs and post hoc t-tests 
-
 import os
 import pingouin as pg
 import pandas as pd
@@ -22,6 +19,10 @@ from sklearn.linear_model import LinearRegression
 
 #import bootstrapped.bootstrap as baseline
 #import bootstrapped.stats_functions as bs_stats
+
+################################
+##### Import data & setup ######
+################################
 
 ## Set paths for where files will be opened from or saved
 PATH = os.path.expanduser('~')
@@ -39,6 +40,13 @@ all_df_averaged_minusBase = all_df_averaged[all_df_averaged.blockType != 'Baseli
 
 # If you needed to remove a specific subject, do this and change 's18'
 ##all_df_averaged = all_df_averaged[(all_df_averaged['subj'] != 's18')]
+
+
+
+
+################################
+##### ANOVA and Post-hoc #######
+################################
 
 ## og acc
 aov_og = pg.rm_anova(dv='og_acc', within = 'blockType', subject = 'subj', data=all_df_averaged, detailed = True)
@@ -134,9 +142,9 @@ ttest_df.to_csv(fname_ttest)
 
 ##### BY SUBJECT 
 
-X = all_df_byTrial.pm_cost
-y = all_df_byTrial.pm_acc
-pg.logistic_regression(X, y, remove_na=True)  
+#X = all_df_byTrial.pm_cost
+#y = all_df_byTrial.pm_acc
+#pg.logistic_regression(X, y, remove_na=True)  
 
 ## create scatter plot of x = pm cost and y = pm acc
 # ax = sea.barplot(x="pm_acc", y = "pm_cost", data=all_df_byTrial) 
@@ -146,6 +154,12 @@ pg.logistic_regression(X, y, remove_na=True)
 # plt.close()
 
 ############
+
+
+################################
+###### Create dataframes #######
+######## of all trials #########
+################################
 
 # dfs of alllll trials by block type
 maintain_all = all_df_byTrial[(all_df_byTrial['blockType'] == 'Maintain')]
@@ -172,13 +186,18 @@ mnm_acc_all = mnm_all.drop(columns=acc_columns_drop, axis=1).reset_index(drop=Tr
 
 
 
-def matchingSubjs(df1, df2):
-	assert len(df1) == len(df2)
-	for row, index in df1.iterrows():
-		if df1.loc[row].subj != df2.loc[row].subj:
-			print("the subjects do not match up in the two dataframes")
-	df2_drop = df2.drop(columns = ['subj'])
-	return df2_drop	
+# def matchingSubjs(df1, df2):
+# 	assert len(df1) == len(df2)
+# 	for row, index in df1.iterrows():
+# 		if df1.loc[row].subj != df2.loc[row].subj:
+# 			print("the subjects do not match up in the two dataframes")
+# 	df2_drop = df2.drop(columns = ['subj'])
+# 	return df2_drop	
+
+
+################################
+##### Combine dataframes #######
+################################
 
 # 2s added because subj eliminated after running through maintainSubjs in second df
 # want to keep that to double check s01 is combined with s01 and so on
@@ -205,72 +224,10 @@ monitorCost_mnmAcc_all = pd.concat([monitor_cost_all, mnm_acc_all2], axis = 1)
 
 
 
-
-
-
-
-# Array of all of the subjects
-subj_list = all_df_byTrial.subj.unique() 
-
-
-
-def bootstrapped(trial_df, subj_list, n_iterations, x, y, type, color):
-
-	trial_dict = dict()
-	for k, v in trial_df.groupby('subj'):
-		trial_dict[k] = v
-
-	# Create dictionary to store bootstrap results
-	boot_dict = dict()
-
-	for i in range(n_iterations):
-		# Create a new random subject list
-		resampled_subjList = np.random.choice(subj_list, size = len(subj_list), replace = True)
-
-		# Create a dictionary for the new resampled subject list
-		resampled_dict = dict()
-
-		# For each subject in new subject list, add all of their data
-		for subj in resampled_subjList: 
-			resampled_dict[subj] = trial_dict.get(subj)
-
-		resampled_df = pd.DataFrame()
-		# Merge all of the values from the dictionary together so there is one big dataframe of all new subject data
-		for key, value in trial_dict.items(): 
-			if value is None: 
-
-				print(key)
-		# Ignore index = True so that it resets the index so it goes from 0 to x, rather than random number to random number
-		resampled_df = pd.concat(resampled_dict.values(), ignore_index = True)
-
-		# Don't run the below line if you don't care about by subject
-		#bootstrap_data = resampled_df.groupby(['subj']).mean()
-
-		#logistic regression, monitor cost by monitor accuracy 
-		#bootstrap_lr = pg.linear_regression(bootstrap_data[x], bootstrap_data[y])
-
-		# drop rows where at least one element is missing
-		resampled_df = resampled_df.dropna()
-		bootstrap_lr = pg.logistic_regression(resampled_df[x], resampled_df[y])
-
-		boot_dict[i] = bootstrap_lr
-
-	# Create df of regression results - include intercept and coefficient for each bootstrap iteration
-	betas = pd.DataFrame(columns = ['intercept', 'coef'])
-	for key in boot_dict: 
-		intercept = boot_dict.get(key).coef[0]
-		coef = boot_dict.get(key).coef[1]
-		betas.loc[key] = [intercept, coef]
-
-
-	# Plot betas	
-	sea.distplot(betas.coef, color = color) 
-	plt.xlabel('Coefficient')
-	plt.savefig(FIGURE_PATH + type + '_bootstrap.png', dpi = 600)
-	plt.close()
-
-	return betas;
-
+################################
+###### Create dataframes #######
+###### by block averages #######
+################################
 
 # Does maintenance cost predict combined performance? 
 maintain_trials = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')] # maintain block trials
@@ -293,7 +250,12 @@ mnm_cost = mnm_results.drop(columns=['pm_acc', 'meanTrial_rt','og_acc', 'pm_prob
 mnm_acc = mnm_results.drop(columns=['subj', 'pm_cost', 'meanTrial_rt','og_acc', 'pm_probe_rt'], axis=1) 
 mnm_pmRT = maintain_results.drop(columns=['subj', 'pm_cost', 'meanTrial_rt', 'og_acc', 'pm_acc'])
 
-## Combine DFs - cost and accuracy
+
+
+
+################################
+##### Combine dataframes #######
+################################
 
 # Maintain cost versus combined performance
 mainCost_combineAcc = pd.concat([maintain_cost, mnm_acc], axis = 1, sort = False)
@@ -313,7 +275,12 @@ combined_cost = maintain_cost.pm_cost + monitor_cost.pm_cost
 mplusmCost_combineAcc = pd.concat([combined_cost, mnm_acc], axis=1, sort=False) 
 
 
-## ** Currently working here today 
+
+
+################################
+###### Create dataframes #######
+####### with everything ########
+################################
 
 ## Create a df with everything - for each subj, a column for maintain cost, monitor cost, mnm cost, maintain acc, etc.
 mainCost = maintain_cost.rename(columns = {"pm_cost" : "main_cost"})
@@ -329,13 +296,48 @@ cost_acc_df = pd.concat([mainCost, monCost, mnmCost, mainAcc, monAcc, mnmAcc], a
 fname_df = os.path.join(CSV_PATH, 'cost_acc.csv')
 cost_acc_df.to_csv(fname_df, index = False)
 
-maintain_maintain_betas = bootstrapped(maintainCost_maintainAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_maintain', 'b')
-monitor_monitor_betas = bootstrapped(monitorCost_monitorAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_monitor', 'r')
+
+
+
+################################
+########## Drop NaNs ###########
+################################
+
+mainCost_combineAcc = mainCost_combineAcc.dropna()
+monCost_combineAcc = monCost_combineAcc.dropna()
+combineCost_combineAcc = combineCost_combineAcc.dropna()
+
+mainCost_mainAcc = mainCost_mainAcc.dropna()
+monCost_monAcc = monCost_monAcc.dropna()
+
+mplusmCost_combineAcc = mplusmCost_combineAcc.dropna()
+
+
+
+
+################################
+######### Correlations #########
+################################
+
+pearsonr(cost_acc_df.main_cost, cost_acc_df.main_acc) 
+pearsonr(cost_acc_df.mon_cost, cost_acc_df.mon_acc) 
+
+pearsonr(cost_acc_df.main_cost, cost_acc_df.mnm_cost) 
+pearsonr(cost_acc_df.mon_cost, cost_acc_df.mnm_cost) 
+
+pearsonr(cost_acc_df.main_cost, cost_acc_df.mnm_acc) 
+pearsonr(cost_acc_df.mon_cost, cost_acc_df.mnm_acc) 
+pearsonr(cost_acc_df.mnm_cost, cost_acc_df.mnm_acc) 
+
+
+
+
+################################
+########## Regression ##########
+################################
 
 main_main = mainCost_mainAcc_all.dropna()
 mon_mon = monitorCost_monitorAcc_all.dropna()
-
-
 
 fig, (ax1, ax2) = plt.subplots(ncols=2, sharey=True)
 
@@ -349,154 +351,6 @@ ax2.set_ylabel('Monitor performance')
 
 plt.savefig(FIGURE_PATH + 'logreg_compare.png', dpi = 600)
 plt.close()
-
-
-
-
-
-# Code to plot logistic regression
-sea.lmplot(x=x, y = y, data = resampled_df, logistic=True) 
-
-# Don't do this! If it's maintain vs mnm or monitor vs mnm, it won't work
-# You can't correlate maintain trial 1 to mnm trial 1, you must take averages
-#maintain_maintain_betas = bootstrapped(maintainCost_maintainAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_maintain')
-#monitor_monitor_betas = bootstrapped(monitorCost_monitorAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_monitor')
-#mnm_mnm_betas = bootstrapped(mnmCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'mnm_mnm')
-
-#maintain_mnm_betas = bootstrapped(maintainCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_mnm')
-#monitor_mnm_betas = bootstrapped(monitorCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_mnm')
-
-
-maintain_mnm_betas = bootstrapped(mainCost_combineAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_mnm', 'b')
-monitor_mnm_betas = bootstrapped(monCost_combineAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_mnm', 'r')
-
-maintain_maintain_betas = bootstrapped(mainCost_mainAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_maintain', 'b')
-monitor_monitor_betas = bootstrapped(monCost_monAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_monitor', 'r')
-mnm_mnm_betas = bootstrapped(combineCost_combineAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'mnm_mnm', 'purple')
-
-
-
-fname_maintain_mnm = os.path.join(CSV_PATH, 'maintainCost_mnmAcc.csv') 
-mainCost_combineAcc.to_csv(fname_maintain_mnm, index=False)   
-
-
-x_lr = np.array(mainCost_combineAcc.pm_cost).reshape((-1,1))
-y_lr = np.array(mainCost_combineAcc.pm_acc)
-model = LinearRegression().fit(x_lr, y_lr)
-
-
-
-
-
-##################
-
-
-
-##############
-
-### LOOKING FOR OUTLIERS
-
-# Find outliers and remove only for specific analyses
-
-def findOutliers(cost, measure): 
-	q1 = measure.quantile(0.25)
-	q3 = measure.quantile(0.75)
-	iqr = q3 - q1
-	return cost[~(measure < (q1 - 1.5 * iqr)) | (measure > (q3 + 1.5 * iqr)) ]
-
-## Outliers - PM cost
-maintain_cost = findOutliers(maintain_cost, maintain_cost.pm_cost)
-monitor_cost = findOutliers(monitor_cost, monitor_cost.pm_cost)
-mnm_cost = findOutliers(mnm_cost, mnm_cost.pm_cost)
-
-## Outliers - Accuracy for last probe
-maintain_acc = findOutliers(maintain_acc, maintain_acc.pm_acc)
-monitor_acc = findOutliers(monitor_acc, monitor_acc.pm_acc)
-mnm_acc = findOutliers(mnm_acc, mnm_acc.pm_acc)
-
-## Outliers - RT for last probe
-maintain_pmRT = findOutliers(maintain_pmRT, maintain_pmRT.pm_probe_rt)
-monitor_pmRT = findOutliers(monitor_pmRT, monitor_pmRT.pm_probe_rt)
-mnm_pmRT = findOutliers(mnm_pmRT, mnm_pmRT.pm_probe_rt)
-
-
-
-
-## Combine DFs - cost and RT
-
-# Maintain cost versus combined RT
-mainCost_combineRT = pd.concat([maintain_cost, mnm_pmRT], axis = 1, sort = False)
-# Monitor cost versus combined RT
-monCost_combineRT = pd.concat([monitor_cost, mnm_pmRT], axis = 1, sort = False)
-# Combined cost versus combined RT
-combineCost_combineRT = pd.concat([mnm_cost, mnm_pmRT], axis = 1, sort = False)
-
-# Maintain cost versus maintain RT
-mainCost_mainRT = pd.concat([maintain_cost, maintain_pmRT], axis = 1, sort = False)
-# Monitor cost versus monitor RT
-monCost_monRT = pd.concat([monitor_cost, monitor_pmRT], axis = 1, sort = False)
-
-# Maintain cost + Monitor cost
-combined_cost = maintain_cost.pm_cost + monitor_cost.pm_cost
-# Combined cost (above) versus combined RT
-mplusmCost_combineRT = pd.concat([combined_cost, mnm_pmRT], axis=1, sort=False)
-
-
-
-# Don't look at subjects where PM cost was removed for being an outlier
-def removeOutliers(df): 
-	for index, row in df.iterrows(): 
-		if (math.isnan(row.pm_cost) or math.isnan(row.pm_acc)): 
-			print(index)
-			df = df.drop([index])
-	return df
-
-def removeOutliers_RT(df): 
-	for index, row in df.iterrows(): 
-		if (math.isnan(row.pm_cost) or math.isnan(row.pm_probe_rt)): 
-			print(index)
-			df = df.drop([index])
-	return df
-
-## Remove outliers - cost and accuracy 	
-
-mainCost_combineAcc = removeOutliers(mainCost_combineAcc)
-monCost_combineAcc = removeOutliers(monCost_combineAcc)
-combineCost_combineAcc = removeOutliers(combineCost_combineAcc)
-
-mainCost_mainAcc = removeOutliers(mainCost_mainAcc)
-monCost_monAcc = removeOutliers(monCost_monAcc)
-
-# Drop NaNs
-mainCost_combineAcc = mainCost_combineAcc.dropna()
-monCost_combineAcc = monCost_combineAcc.dropna()
-combineCost_combineAcc = combineCost_combineAcc.dropna()
-
-mainCost_mainAcc = mainCost_mainAcc.dropna()
-monCost_monAcc = monCost_monAcc.dropna()
-
-mplusmCost_combineAcc = mplusmCost_combineAcc.dropna()
-
-
-## Remove outliers - cost and RT
-
-mainCost_combineRT = removeOutliers_RT(mainCost_combineRT)
-monCost_combineRT = removeOutliers_RT(monCost_combineRT)
-combineCost_combineRT = removeOutliers_RT(combineCost_combineRT)
-
-mainCost_mainRT = removeOutliers_RT(mainCost_mainRT)
-monCost_monRT = removeOutliers_RT(monCost_monRT)
-
-# Drop NaNs
-mainCost_combineRT = mainCost_combineRT.dropna()
-monCost_combineRT = monCost_combineRT.dropna()
-combineCost_combineRT = combineCost_combineRT.dropna()
-
-mainCost_mainRT = mainCost_mainRT.dropna()
-monCost_monRT = monCost_monRT.dropna()
-
-mplusmCost_combineRT = mplusmCost_combineRT.dropna()
-
 
 
 def regPlot(combinedData, x_label, y_label, color, y_data): 
@@ -588,6 +442,213 @@ plt.close()
 
 combine_combine_lr = pg.linear_regression(combineCost_combineAcc.pm_cost, combineCost_combineAcc.pm_acc)
 
+
+
+
+################################
+########## Bootstrap ###########
+################################
+
+# Array of all of the subjects
+subj_list = all_df_byTrial.subj.unique() 
+
+def bootstrapped(trial_df, subj_list, n_iterations, x, y, type, color):
+
+	trial_dict = dict()
+	for k, v in trial_df.groupby('subj'):
+		trial_dict[k] = v
+
+	# Create dictionary to store bootstrap results
+	boot_dict = dict()
+
+	for i in range(n_iterations):
+		# Create a new random subject list
+		resampled_subjList = np.random.choice(subj_list, size = len(subj_list), replace = True)
+
+		# Create a dictionary for the new resampled subject list
+		resampled_dict = dict()
+
+		# For each subject in new subject list, add all of their data
+		for subj in resampled_subjList: 
+			resampled_dict[subj] = trial_dict.get(subj)
+
+		resampled_df = pd.DataFrame()
+		# Merge all of the values from the dictionary together so there is one big dataframe of all new subject data
+		for key, value in trial_dict.items(): 
+			if value is None: 
+
+				print(key)
+		# Ignore index = True so that it resets the index so it goes from 0 to x, rather than random number to random number
+		resampled_df = pd.concat(resampled_dict.values(), ignore_index = True)
+
+		# Don't run the below line if you don't care about by subject
+		#bootstrap_data = resampled_df.groupby(['subj']).mean()
+
+		#logistic regression, monitor cost by monitor accuracy 
+		#bootstrap_lr = pg.linear_regression(bootstrap_data[x], bootstrap_data[y])
+
+		# drop rows where at least one element is missing
+		resampled_df = resampled_df.dropna()
+		bootstrap_lr = pg.logistic_regression(resampled_df[x], resampled_df[y])
+
+		boot_dict[i] = bootstrap_lr
+
+	# Create df of regression results - include intercept and coefficient for each bootstrap iteration
+	betas = pd.DataFrame(columns = ['intercept', 'coef'])
+	for key in boot_dict: 
+		intercept = boot_dict.get(key).coef[0]
+		coef = boot_dict.get(key).coef[1]
+		betas.loc[key] = [intercept, coef]
+
+
+	# Plot betas	
+	sea.distplot(betas.coef, color = color) 
+	plt.xlabel('Coefficient')
+	plt.savefig(FIGURE_PATH + type + '_bootstrap.png', dpi = 600)
+	plt.close()
+
+	return betas;
+
+
+# Bootstrap results
+maintain_maintain_betas = bootstrapped(maintainCost_maintainAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_maintain', 'b')
+monitor_monitor_betas = bootstrapped(monitorCost_monitorAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_monitor', 'r')
+
+
+# Don't do this! If it's maintain vs mnm or monitor vs mnm, it won't work
+# You can't correlate maintain trial 1 to mnm trial 1, you must take averages
+#maintain_maintain_betas = bootstrapped(maintainCost_maintainAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_maintain')
+#monitor_monitor_betas = bootstrapped(monitorCost_monitorAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_monitor')
+#mnm_mnm_betas = bootstrapped(mnmCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'mnm_mnm')
+
+#maintain_mnm_betas = bootstrapped(maintainCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_mnm')
+#monitor_mnm_betas = bootstrapped(monitorCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_mnm')
+
+
+maintain_mnm_betas = bootstrapped(mainCost_combineAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_mnm', 'b')
+monitor_mnm_betas = bootstrapped(monCost_combineAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_mnm', 'r')
+
+maintain_maintain_betas = bootstrapped(mainCost_mainAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_maintain', 'b')
+monitor_monitor_betas = bootstrapped(monCost_monAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_monitor', 'r')
+mnm_mnm_betas = bootstrapped(combineCost_combineAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'mnm_mnm', 'purple')
+
+ 
+
+
+################################
+###### Look for outliers #######
+################################
+
+# Find outliers and remove only for specific analyses
+
+def findOutliers(cost, measure): 
+	q1 = measure.quantile(0.25)
+	q3 = measure.quantile(0.75)
+	iqr = q3 - q1
+	return cost[~(measure < (q1 - 1.5 * iqr)) | (measure > (q3 + 1.5 * iqr)) ]
+
+## Outliers - PM cost
+#maintain_cost = findOutliers(maintain_cost, maintain_cost.pm_cost)
+#monitor_cost = findOutliers(monitor_cost, monitor_cost.pm_cost)
+#mnm_cost = findOutliers(mnm_cost, mnm_cost.pm_cost)
+
+## Outliers - Accuracy for last probe
+#maintain_acc = findOutliers(maintain_acc, maintain_acc.pm_acc)
+#monitor_acc = findOutliers(monitor_acc, monitor_acc.pm_acc)
+#mnm_acc = findOutliers(mnm_acc, mnm_acc.pm_acc)
+
+## Outliers - RT for last probe
+#maintain_pmRT = findOutliers(maintain_pmRT, maintain_pmRT.pm_probe_rt)
+#monitor_pmRT = findOutliers(monitor_pmRT, monitor_pmRT.pm_probe_rt)
+#mnm_pmRT = findOutliers(mnm_pmRT, mnm_pmRT.pm_probe_rt)
+
+
+
+
+################################
+####### Remove outliers ########
+################################
+
+# Don't look at subjects where PM cost was removed for being an outlier
+def removeOutliers(df): 
+	for index, row in df.iterrows(): 
+		if (math.isnan(row.pm_cost) or math.isnan(row.pm_acc)): 
+			print(index)
+			df = df.drop([index])
+	return df
+
+def removeOutliers_RT(df): 
+	for index, row in df.iterrows(): 
+		if (math.isnan(row.pm_cost) or math.isnan(row.pm_probe_rt)): 
+			print(index)
+			df = df.drop([index])
+	return df
+
+# ## Remove outliers - cost and accuracy 	
+
+# mainCost_combineAcc = removeOutliers(mainCost_combineAcc)
+# monCost_combineAcc = removeOutliers(monCost_combineAcc)
+# combineCost_combineAcc = removeOutliers(combineCost_combineAcc)
+
+# mainCost_mainAcc = removeOutliers(mainCost_mainAcc)
+# monCost_monAcc = removeOutliers(monCost_monAcc)
+
+
+
+
+
+
+
+
+
+##########################################
+#Don't run below unless you care about RT#
+##########################################
+
+
+################################
+###### Combine dataframes ######
+######### cost and RT ##########
+################################
+
+# Maintain cost versus combined RT
+mainCost_combineRT = pd.concat([maintain_cost, mnm_pmRT], axis = 1, sort = False)
+# Monitor cost versus combined RT
+monCost_combineRT = pd.concat([monitor_cost, mnm_pmRT], axis = 1, sort = False)
+# Combined cost versus combined RT
+combineCost_combineRT = pd.concat([mnm_cost, mnm_pmRT], axis = 1, sort = False)
+
+# Maintain cost versus maintain RT
+mainCost_mainRT = pd.concat([maintain_cost, maintain_pmRT], axis = 1, sort = False)
+# Monitor cost versus monitor RT
+monCost_monRT = pd.concat([monitor_cost, monitor_pmRT], axis = 1, sort = False)
+
+# Maintain cost + Monitor cost
+combined_cost = maintain_cost.pm_cost + monitor_cost.pm_cost
+# Combined cost (above) versus combined RT
+mplusmCost_combineRT = pd.concat([combined_cost, mnm_pmRT], axis=1, sort=False)
+
+## Remove outliers - cost and RT
+
+mainCost_combineRT = removeOutliers_RT(mainCost_combineRT)
+monCost_combineRT = removeOutliers_RT(monCost_combineRT)
+combineCost_combineRT = removeOutliers_RT(combineCost_combineRT)
+
+mainCost_mainRT = removeOutliers_RT(mainCost_mainRT)
+monCost_monRT = removeOutliers_RT(monCost_monRT)
+
+# Drop NaNs
+mainCost_combineRT = mainCost_combineRT.dropna()
+monCost_combineRT = monCost_combineRT.dropna()
+combineCost_combineRT = combineCost_combineRT.dropna()
+
+mainCost_mainRT = mainCost_mainRT.dropna()
+monCost_monRT = monCost_monRT.dropna()
+
+mplusmCost_combineRT = mplusmCost_combineRT.dropna()
+
+
+
 ### Cost v RT
 regPlot(combineCost_combineRT, 'MnM cost (s)','Combined PM probe RT', 'purple', 'pm_probe_rt')
 plt.savefig(FIGURE_PATH + 'mnmCost_v_pmRT.png', dpi = 600)
@@ -612,56 +673,6 @@ plt.close()
 mplusm_combine_RT_lr = pg.linear_regression(mplusmCost_combineRT.pm_cost, mplusmCost_combineRT.pm_probe_rt)
 
 
-#### BOOTSTRAP
-
-# Make a dictionary for each type of block - Maintain, Monitor, MnM
-# Key = subj, value = data from all_df
-# Use these dictionaries to pull individual data when looking to build new dataframes for bootstrapping
-
-maintain_dict = dict()
-for k, v in maintain_all.groupby('subj'):
-	maintain_dict[k] = v
-
-monitor_dict = dict()
-for k, v in monitor_all.groupby('subj'):
-	monitor_dict[k] = v
-
-mnm_dict = dict()
-for k, v in mnm_all.groupby('subj'):
-	mnm_dict[k] = v
-
-# Array of all of the subjects
-subj_list = all_df.subj.unique() 
-
-n_iterations = 1000
-
-maintain_boot_dict = dict()
-
-for i in range(n_iterations):
-	# Create a new random subject list
-	resampled_subjList = np.random.choice(subj_list, size = len(subj_list), replace = True)
-
-	# Create a dictionary for the new resampled subject list
-	resampled_maintain_dict = dict()
-
-	# For each subject in new subject list, add all of their data
-	for subj in resampled_subjList: 
-		resampled_maintain_dict[subj] = maintain_dict.get(subj)
-
-	# Merge all of the values from the dictionary together so there is one big dataframe of all new subject data
-	resampled_maintain_df = pd.concat(resampled_maintain_dict.values(), ignore_index = True) 
-
-	maintain_bootstrap_data = resampled_maintain_df.groupby(['subj']).mean()
-	maintain_bootstrap_lr = pg.linear_regression(maintain_bootstrap_data.pm_cost, maintain_bootstrap_data.pm_acc)
-	maintain_boot_dict[i] = maintain_bootstrap_lr
-
-#
-maintain_betas = pd.DataFrame(columns = ['intercept', 'coef'])
-for key in maintain_boot_dict: 
-	intercept = maintain_boot_dict.get(key).coef[0]
-	coef = maintain_boot_dict.get(key).coef[1]
-	maintain_betas.loc[key] = [intercept, coef]
-
 regPlot(maintain_bootstrap_data, 'Maintain cost (s) - bootstrapped', 'Maintain performance - bootstrapped', 'b', 'pm_acc')
 plt.savefig(FIGURE_PATH + 'maintain_bootstrap.png', dpi = 600)
 plt.close()
@@ -685,62 +696,88 @@ maintain_maintain_RT_lr = pg.linear_regression(mainCost_mainRT.pm_cost, mainCost
 
 
 
+################################
+########### OLD CODE ###########
+################################
 
 
+# maintain_cost = maintain_trials.pm_cost
+# monitor_cost = monitor_trials.pm_cost
+# mnm_cost = mnm_trials.pm_cost
 
-maintain_cost = maintain_trials.pm_cost
-monitor_cost = monitor_trials.pm_cost
-mnm_cost = mnm_trials.pm_cost
+# # returns array of [bootstrapped_mean, lower_ci, upper_ci]
+# boot_maintain = bootstrapped_old(1000, maintain_cost)
+# boot_monitor = bootstrapped_old(1000, monitor_cost)
+# boot_mnm = bootstrapped_old(1000, mnm_cost)
 
-# returns array of [bootstrapped_mean, lower_ci, upper_ci]
-boot_maintain = bootstrapped_old(1000, maintain_cost)
-boot_monitor = bootstrapped_old(1000, monitor_cost)
-boot_mnm = bootstrapped_old(1000, mnm_cost)
+# def bootstrapped_old(num_iterations, values):
+# 	n_iterations = num_iterations
+# 	resampled_means = []
 
-def bootstrapped_old(num_iterations, values):
-	n_iterations = num_iterations
-	resampled_means = []
+# 	# "bootstrap" 95% confidence intervals around mean
+# 	for i in range(n_iterations): 
+# 		## default: np.random.choice(a, size=None, replace=True, p=None)
+# 		# resample with replacement
+# 		resampled_sample = np.random.choice(values, size = len(values), replace=True)
+# 		resampled_mean = np.mean(resampled_sample)
+# 		resampled_means.append(resampled_mean)
 
-	# "bootstrap" 95% confidence intervals around mean
-	for i in range(n_iterations): 
-		## default: np.random.choice(a, size=None, replace=True, p=None)
-		# resample with replacement
-		resampled_sample = np.random.choice(values, size = len(values), replace=True)
-		resampled_mean = np.mean(resampled_sample)
-		resampled_means.append(resampled_mean)
+# 	# make sure you have the expected amount of values in list
+# 	# prints 'AssertionError' if it is not true
+# 	assert len(resampled_means) == n_iterations
 
-	# make sure you have the expected amount of values in list
-	# prints 'AssertionError' if it is not true
-	assert len(resampled_means) == n_iterations
+# 	bootstrapped_mean = np.mean(resampled_means)
+# 	upper_ci = np.percentile(resampled_means, 97.5)
+# 	lower_ci = np.percentile(resampled_means, 2.5)
 
-	bootstrapped_mean = np.mean(resampled_means)
-	upper_ci = np.percentile(resampled_means, 97.5)
-	lower_ci = np.percentile(resampled_means, 2.5)
+# 	return [bootstrapped_mean, lower_ci, upper_ci]
+#### BOOTSTRAP
 
-	return [bootstrapped_mean, lower_ci, upper_ci]
+# Make a dictionary for each type of block - Maintain, Monitor, MnM
+# Key = subj, value = data from all_df
+# Use these dictionaries to pull individual data when looking to build new dataframes for bootstrapping
 
+# maintain_dict = dict()
+# for k, v in maintain_all.groupby('subj'):
+# 	maintain_dict[k] = v
 
-#### BY TRIAL 
+# monitor_dict = dict()
+# for k, v in monitor_all.groupby('subj'):
+# 	monitor_dict[k] = v
 
-maintain_perform_byTrial = all_df_byTrial[(all_df_byTrial['blockType'] == 'Maintain')]
-monitor_perform_byTrial = all_df_byTrial[(all_df_byTrial['blockType'] == 'Monitor')]
-mnm_pm_perform_byTrial = all_df_byTrial[(all_df_byTrial['blockType'] == 'MnM')]
+# mnm_dict = dict()
+# for k, v in mnm_all.groupby('subj'):
+# 	mnm_dict[k] = v
 
+# # Array of all of the subjects
+# subj_list = all_df.subj.unique() 
 
-## not sure what these are for
-##maintain_array = maintain_cost.array
-##monitor_array = monitor_cost.array
-##mnm_pm_array = mnm_pm_perform.array
+# n_iterations = 1000
 
+# maintain_boot_dict = dict()
 
-## not sure about this either
-##ax = sea.pointplot(x=all_df_averaged[(all_df_averaged['blockType'].pm_cost == 'Maintain')], y = all_df_averaged[(all_df_averaged['blockType'].pm_acc == 'MnM')], data = all_df_averaged) 
+# for i in range(n_iterations):
+# 	# Create a new random subject list
+# 	resampled_subjList = np.random.choice(subj_list, size = len(subj_list), replace = True)
 
+# 	# Create a dictionary for the new resampled subject list
+# 	resampled_maintain_dict = dict()
 
+# 	# For each subject in new subject list, add all of their data
+# 	for subj in resampled_subjList: 
+# 		resampled_maintain_dict[subj] = maintain_dict.get(subj)
 
+# 	# Merge all of the values from the dictionary together so there is one big dataframe of all new subject data
+# 	resampled_maintain_df = pd.concat(resampled_maintain_dict.values(), ignore_index = True) 
 
+# 	maintain_bootstrap_data = resampled_maintain_df.groupby(['subj']).mean()
+# 	maintain_bootstrap_lr = pg.linear_regression(maintain_bootstrap_data.pm_cost, maintain_bootstrap_data.pm_acc)
+# 	maintain_boot_dict[i] = maintain_bootstrap_lr
 
-
-
-# Does monitoring cost predict combined performance? 
+# #
+# maintain_betas = pd.DataFrame(columns = ['intercept', 'coef'])
+# for key in maintain_boot_dict: 
+# 	intercept = maintain_boot_dict.get(key).coef[0]
+# 	coef = maintain_boot_dict.get(key).coef[1]
+# 	maintain_betas.loc[key] = [intercept, coef]
 
