@@ -231,26 +231,30 @@ monitorCost_mnmAcc_all = pd.concat([monitor_cost_all, mnm_acc_all2], axis = 1)
 ###### by block averages #######
 ################################
 
+cost_all_dropColumns = ['pm_acc', 'meanTrial_rt','og_acc', 'pm_probe_rt']
+result_all_dropColumns = ['subj', 'pm_cost', 'meanTrial_rt','og_acc', 'pm_probe_rt']
+pmRT_all_dropColumns = ['subj', 'pm_cost', 'meanTrial_rt', 'og_acc', 'pm_acc']
+
 # Does maintenance cost predict combined performance? 
 maintain_trials = all_df_averaged[(all_df_averaged['blockType'] == 'Maintain')] # maintain block trials
 monitor_trials = all_df_averaged[(all_df_averaged['blockType'] == 'Monitor')] # monitor block trials
 mnm_trials = all_df_averaged[(all_df_averaged['blockType'] == 'MnM')] # mnm block trials
 
 maintain_results = maintain_trials.groupby(['subj']).mean().reset_index()
-maintain_cost = maintain_results.drop(columns=['pm_acc', 'meanTrial_rt','og_acc', 'pm_probe_rt'], axis=1)
-maintain_acc = maintain_results.drop(columns=['subj', 'pm_cost', 'meanTrial_rt','og_acc', 'pm_probe_rt'], axis=1) 
-maintain_pmRT = maintain_results.drop(columns=['subj', 'pm_cost', 'meanTrial_rt', 'og_acc', 'pm_acc'])
+maintain_cost = maintain_results.drop(columns=cost_all_dropColumns, axis=1)
+maintain_acc = maintain_results.drop(columns=result_all_dropColumns , axis=1) 
+maintain_pmRT = maintain_results.drop(columns=pmRT_all_dropColumns, axis = 1)
 # Remove 'subj' column if you need a subj num indication in accuracy df
 
 monitor_results = monitor_trials.groupby(['subj']).mean().reset_index()
-monitor_cost = monitor_results.drop(columns=['pm_acc', 'meanTrial_rt','og_acc', 'pm_probe_rt'], axis=1)
-monitor_acc = monitor_results.drop(columns=['subj', 'pm_cost', 'meanTrial_rt','og_acc', 'pm_probe_rt'], axis=1) 
-monitor_pmRT = monitor_results.drop(columns=['subj', 'pm_cost', 'meanTrial_rt', 'og_acc', 'pm_acc'])
+monitor_cost = monitor_results.drop(columns=cost_all_dropColumns, axis=1)
+monitor_acc = monitor_results.drop(columns=result_all_dropColumns , axis=1) 
+monitor_pmRT = monitor_results.drop(columns=pmRT_all_dropColumns, axis = 1)
 
 mnm_results = mnm_trials.groupby(['subj']).mean().reset_index()
-mnm_cost = mnm_results.drop(columns=['pm_acc', 'meanTrial_rt','og_acc', 'pm_probe_rt'], axis=1)
-mnm_acc = mnm_results.drop(columns=['subj', 'pm_cost', 'meanTrial_rt','og_acc', 'pm_probe_rt'], axis=1) 
-mnm_pmRT = maintain_results.drop(columns=['subj', 'pm_cost', 'meanTrial_rt', 'og_acc', 'pm_acc'])
+mnm_cost = mnm_results.drop(columns=cost_all_dropColumns, axis=1)
+mnm_acc = mnm_results.drop(columns=result_all_dropColumns , axis=1) 
+mnm_pmRT = maintain_results.drop(columns=pmRT_all_dropColumns, axis = 1)
 
 
 
@@ -387,11 +391,11 @@ plt.close()
 maintain_maintain_lr = pg.linear_regression(mainCost_mainAcc.pm_cost, mainCost_mainAcc.pm_acc) 
 
 ### Cost v RT
-regPlot(mainCost_mainRT, 'Maintain cost (s)', 'Maintain PM probe RT', 'b', 'pm_probe_rt')
-plt.savefig(FIGURE_PATH + 'maintainCost_v_maintainRT.png', dpi = 600)
-plt.close()
+#regPlot(mainCost_mainRT, 'Maintain cost (s)', 'Maintain PM probe RT', 'b', 'pm_probe_rt')
+#plt.savefig(FIGURE_PATH + 'maintainCost_v_maintainRT.png', dpi = 600)
+#plt.close()
 
-maintain_maintain_RT_lr = pg.linear_regression(mainCost_mainRT.pm_cost, mainCost_mainRT.pm_probe_rt)
+#maintain_maintain_RT_lr = pg.linear_regression(mainCost_mainRT.pm_cost, mainCost_mainRT.pm_probe_rt)
 
 
 ### Cost v accuracy
@@ -403,11 +407,11 @@ plt.close()
 monitor_monitor_lr = pg.linear_regression(monCost_monAcc.pm_cost, monCost_monAcc.pm_acc)
 
 ### Cost v RT
-regPlot(monCost_monRT, 'Monitor cost (s)', 'Monitor PM probe RT', 'r', 'pm_probe_rt')
-plt.savefig(FIGURE_PATH + 'monitorCost_v_monitorRT.png', dpi = 600)
-plt.close()
+#regPlot(monCost_monRT, 'Monitor cost (s)', 'Monitor PM probe RT', 'r', 'pm_probe_rt')
+#plt.savefig(FIGURE_PATH + 'monitorCost_v_monitorRT.png', dpi = 600)
+#plt.close()
 
-monitor_monitor_RT_lr = pg.linear_regression(monCost_monRT.pm_cost, monCost_monRT.pm_probe_rt)
+#monitor_monitor_RT_lr = pg.linear_regression(monCost_monRT.pm_cost, monCost_monRT.pm_probe_rt)
 
 
 
@@ -420,11 +424,11 @@ plt.close()
 maintain_combine_lr = pg.linear_regression(mainCost_combineAcc.pm_cost, mainCost_combineAcc.pm_acc)
 
 ### Cost v RT
-regPlot(mainCost_combineRT, 'Maintain cost (s)','Combined PM probe RT', 'b', 'pm_probe_rt')
-plt.savefig(FIGURE_PATH + 'maintainCost_v_pmRT.png', dpi = 600)
-plt.close()
+#regPlot(mainCost_combineRT, 'Maintain cost (s)','Combined PM probe RT', 'b', 'pm_probe_rt')
+#plt.savefig(FIGURE_PATH + 'maintainCost_v_pmRT.png', dpi = 600)
+#plt.close()
 
-maintain_combine_RT_lr = pg.linear_regression(mainCost_combineRT.pm_cost, mainCost_combineRT.pm_probe_rt)
+#maintain_combine_RT_lr = pg.linear_regression(mainCost_combineRT.pm_cost, mainCost_combineRT.pm_probe_rt)
 
 
 ### Cost v accuracy
@@ -436,11 +440,11 @@ plt.close()
 monitor_combine_lr = pg.linear_regression(monCost_combineAcc.pm_cost, monCost_combineAcc.pm_acc)
 
 ### Cost v RT
-regPlot(monCost_combineRT, 'Monitor cost (s)','Combined PM probe RT', 'r', 'pm_probe_rt')
-plt.savefig(FIGURE_PATH + 'monitorCost_v_pmRT.png', dpi = 600)
-plt.close()
+#regPlot(monCost_combineRT, 'Monitor cost (s)','Combined PM probe RT', 'r', 'pm_probe_rt')
+#plt.savefig(FIGURE_PATH + 'monitorCost_v_pmRT.png', dpi = 600)
+#plt.close()
 
-monitor_combine_RT_lr = pg.linear_regression(monCost_combineRT.pm_cost, monCost_combineRT.pm_probe_rt)
+#monitor_combine_RT_lr = pg.linear_regression(monCost_combineRT.pm_cost, monCost_combineRT.pm_probe_rt)
 
 
 ### Cost v accuracy
@@ -451,6 +455,16 @@ plt.close()
 
 combine_combine_lr = pg.linear_regression(combineCost_combineAcc.pm_cost, combineCost_combineAcc.pm_acc)
 
+
+
+
+### Cost v accuracy
+## How does maintenance cost + monitoring cost relate to performance when maintaining AND monitoring?
+regPlot(mplusmCost_combineAcc, 'Maintainence + Monitoring cost (s)','Combined performance', 'purple', 'pm_acc')
+plt.savefig(FIGURE_PATH + 'mplusmCost_v_combine_pmAcc.png', dpi = 600)
+plt.close()
+
+mplusm_combine_lr = pg.linear_regression(mplusmCost_combineAcc.pm_cost, mplusmCost_combineAcc.pm_acc)
 
 
 
