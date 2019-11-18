@@ -15,7 +15,9 @@ import seaborn as sea
 import matplotlib.pyplot as plt
 import math
 
-from sklearn.linear_model import LinearRegression
+from scipy.stats import pearsonr
+
+#from sklearn.linear_model import LinearRegression
 
 #import bootstrapped.bootstrap as baseline
 #import bootstrapped.stats_functions as bs_stats
@@ -186,13 +188,13 @@ mnm_acc_all = mnm_all.drop(columns=acc_columns_drop, axis=1).reset_index(drop=Tr
 
 
 
-# def matchingSubjs(df1, df2):
-# 	assert len(df1) == len(df2)
-# 	for row, index in df1.iterrows():
-# 		if df1.loc[row].subj != df2.loc[row].subj:
-# 			print("the subjects do not match up in the two dataframes")
-# 	df2_drop = df2.drop(columns = ['subj'])
-# 	return df2_drop	
+def matchingSubjs(df1, df2):
+	assert len(df1) == len(df2)
+	for row, index in df1.iterrows():
+		if df1.loc[row].subj != df2.loc[row].subj:
+			print("the subjects do not match up in the two dataframes")
+	df2_drop = df2.drop(columns = ['subj'])
+	return df2_drop	
 
 
 ################################
@@ -329,14 +331,21 @@ pearsonr(cost_acc_df.main_cost, cost_acc_df.mnm_acc)
 pearsonr(cost_acc_df.mon_cost, cost_acc_df.mnm_acc) 
 pearsonr(cost_acc_df.mnm_cost, cost_acc_df.mnm_acc) 
 
-
+ax = sea.scatterplot(x = 'main_cost', y = 'mon_cost', data = cost_acc_df, hue= 'mnm_acc', size = 'mnm_acc', sizes = (20, 200))
+ax.set_xlabel('Maintain cost')
+ax.set_ylabel('Monitor cost')  
+handles, labels = ax.get_legend_handles_labels()
+ax.legend(handles = handles[1:], labels = labels[1:])
+ax.legend(handles=handles[1:], labels=['0.3', '0.6', '0.9'], title="PM accuracy", loc = 'lower right')
+plt.savefig(FIGURE_PATH + 'mainCost_v_monCost.eps', dpi = 600)
+plt.close()
 
 
 ################################
 ########## Regression ##########
 ################################
 
-main_main = mainCost_mainAcc_all.dropna()
+main_main = maintainCost_maintainAcc_all.dropna()
 mon_mon = monitorCost_monitorAcc_all.dropna()
 
 fig, (ax1, ax2) = plt.subplots(ncols=2, sharey=True)
