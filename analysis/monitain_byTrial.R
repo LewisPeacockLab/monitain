@@ -91,16 +91,11 @@ subj_list = levels(data_cost_acc$subj)
 aic_cost_mnm.data <- data.frame(
   cost_mnm_interact = rep(0,n_iterations), 
   cost_mnm_noInteract = rep(0,n_iterations),
-  main_mnm = rep(0,n_iterations)
-  mon_mnn = rep(0, n_iterations)
-)
-aic_mon_mnm.data <- data.frame(
-  mon_mnm1 = rep(0,n_iterations), 
-  mon_mnm2 = rep(0,n_iterations),
-  mon_mnm3 = rep(0,n_iterations), 
-  mon_mnm4 = rep(0,n_iterations)
+  main_mnm = rep(0,n_iterations),
+  mon_mnm = rep(0, n_iterations), 
   one_mnm = rep(0, n_iterations)
 )
+
 
 
 for (it in 1:n_iterations) {
@@ -140,8 +135,8 @@ for (it in 1:n_iterations) {
   
   
 }
-write.csv(aic_main_mnm.data, 'aic_main_mnm.csv')
-write.csv(aic_mon_mnm.data, 'aic_mon_mnm.csv')
+write.csv(aic_cost_mnm.data, 'aic_cost_mnm.csv')
+
 
 
 

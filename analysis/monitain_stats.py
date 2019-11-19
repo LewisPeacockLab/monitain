@@ -366,10 +366,12 @@ plt.savefig(FIGURE_PATH + 'logreg_compare.png', dpi = 600)
 plt.close()
 
 
-def regPlot(combinedData, x_label, y_label, color, y_data): 
-	sea.regplot(x='pm_cost', y = y_data, data = combinedData, color = color) 
+def regPlot(combinedData, x_label, y_label, color, y_data, xLimit, yLimit): 
+	ax = sea.regplot(x='pm_cost', y = y_data, data = combinedData, color = color, scatter = False) 
 	plt.xlabel(x_label)
 	plt.ylabel(y_label)
+	ax.set_xlim(xLimit)
+	ax.set_ylim(yLimit)
 
 def residPlot(combinedData, x_label, y_label, color):
 	sea.residplot(x = 'pm_cost', y = 'pm_acc', data = main_V_main, color = color, scatter_kws = {"s": 80}) 
@@ -384,7 +386,8 @@ def residPlot(combinedData, x_label, y_label, color):
 
 ### Cost v accuracy
 ## How does maintainance cost affect performance when only maintaining?
-regPlot(mainCost_mainAcc, 'Maintain cost (s)', 'Maintain performance', 'b', 'pm_acc')
+regPlot(mainCost_mainAcc, 'Maintain cost (s)', 'Maintain performance', 'b', 'pm_acc', [-0.1,0.35], [-.1,1])
+
 plt.savefig(FIGURE_PATH + 'maintainCost_v_maintainPerf.png', dpi = 600)
 plt.close()
 
@@ -400,7 +403,7 @@ maintain_maintain_lr = pg.linear_regression(mainCost_mainAcc.pm_cost, mainCost_m
 
 ### Cost v accuracy
 ## How does monitoring cost affect performance when only monitoring?
-regPlot(monCost_monAcc, 'Monitor cost (s)', 'Monitor performance', 'r', 'pm_acc')
+regPlot(monCost_monAcc, 'Monitor cost (s)', 'Monitor performance', 'r', 'pm_acc', [-0.1,0.35], [-.1,1])
 plt.savefig(FIGURE_PATH + 'monitorCost_v_monitorPerf.png', dpi = 600)
 plt.close()
 
@@ -417,7 +420,7 @@ monitor_monitor_lr = pg.linear_regression(monCost_monAcc.pm_cost, monCost_monAcc
 
 ### Cost v accuracy
 ## How does maintaining cost affect PM performance?
-regPlot(mainCost_combineAcc, 'Maintain cost (s)','Combined performance', 'b', 'pm_acc')
+regPlot(mainCost_combineAcc, 'Maintain cost (s)','Combined performance', 'b', 'pm_acc', [-0.1,0.35], [-.1,1])
 plt.savefig(FIGURE_PATH + 'maintainCost_v_pmAcc.png', dpi = 600)
 plt.close()
 
@@ -433,7 +436,7 @@ maintain_combine_lr = pg.linear_regression(mainCost_combineAcc.pm_cost, mainCost
 
 ### Cost v accuracy
 ## How does monitoring cost affect PM performance?
-regPlot(monCost_combineAcc, 'Monitor cost (s)','Combined performance', 'r', 'pm_acc')
+regPlot(monCost_combineAcc, 'Monitor cost (s)','Combined performance', 'r', 'pm_acc', [-0.1,0.35], [-.1,1])
 plt.savefig(FIGURE_PATH + 'monitorCost_v_pmAcc.png', dpi = 600)
 plt.close()
 
@@ -449,12 +452,15 @@ monitor_combine_lr = pg.linear_regression(monCost_combineAcc.pm_cost, monCost_co
 
 ### Cost v accuracy
 ## How does PM cost affect performance when maintaining AND monitoring?
-regPlot(combineCost_combineAcc, 'MnM cost (s)','Combined performance', 'purple', 'pm_acc')
+regPlot(combineCost_combineAcc, 'Combined cost (s)','Combined performance', 'purple', 'pm_acc',[-0.,0.5], [-.1,1])
 plt.savefig(FIGURE_PATH + 'mnmCost_v_pmAcc.png', dpi = 600)
 plt.close()
 
 combine_combine_lr = pg.linear_regression(combineCost_combineAcc.pm_cost, combineCost_combineAcc.pm_acc)
 
+regPlot(combineCost_combineAcc, 'Combined cost (s)','Combined performance', 'purple', 'pm_acc',[-0.,0.5], [-.1,1])
+regPlot(monCost_combineAcc, 'Monitor cost (s)','Combined performance', 'r', 'pm_acc', [-0.,0.5], [-.1,1])
+regPlot(mainCost_combineAcc, 'Reaction time cost (s)','Combined performance', 'b', 'pm_acc', [-0.,0.5], [-.1,1])
 
 
 
@@ -592,19 +598,15 @@ def findOutliers(cost, measure):
 ########## Plot AICs ###########
 ################################
 aic_cost_mnm = pd.read_csv(FIGURE_PATH+'/csvs/aic_cost_mnm.csv')
-aic_axes = (ax1, ax2, ax3, ax4, ax5)
+
 fig, aic_axes = plt.subplots(nrows=5, ncols=1,  sharex = True, sharey=True, gridspec_kw={'hspace':0})
 sea.violinplot(aic_cost_mnm.main_mnm, color = 'b', ax = aic_axes[0])
 sea.violinplot(aic_cost_mnm.mon_mnm, color = 'r', ax = aic_axes[1])
 sea.violinplot(aic_cost_mnm.cost_mnm_noInteract, color = 'violet', ax = aic_axes[2])
 sea.violinplot(aic_cost_mnm.cost_mnm_interact, color = 'mediumvioletred', ax = aic_axes[3])
 sea.violinplot(aic_cost_mnm.one_mnm, color = 'g', ax = aic_axes[4])
-for ax in aic_axes: 
-	ax.label_outer()
 
-
-sea.distplot(betas.coef, color = color) 
-plt.xlabel('Coefficient')
+plt.xlabel("AIC values") 
 plt.savefig(FIGURE_PATH + 'modelfits.eps', dpi = 600)
 plt.close()
 
@@ -694,7 +696,7 @@ mplusmCost_combineRT = mplusmCost_combineRT.dropna()
 
 
 ### Cost v RT
-regPlot(combineCost_combineRT, 'MnM cost (s)','Combined PM probe RT', 'purple', 'pm_probe_rt')
+regPlot(combineCost_combineRT, 'Combined cost (s)','Combined PM probe RT', 'purple', 'pm_probe_rt')
 plt.savefig(FIGURE_PATH + 'mnmCost_v_pmRT.png', dpi = 600)
 plt.close()
 
