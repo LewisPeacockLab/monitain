@@ -548,12 +548,12 @@ monitor_monitor_betas = bootstrapped(monitorCost_monitorAcc_all, subj_list, 1000
 #monitor_mnm_betas = bootstrapped(monitorCost_mnmAcc_all, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_mnm')
 
 
-maintain_mnm_betas = bootstrapped(mainCost_combineAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_mnm', 'b')
-monitor_mnm_betas = bootstrapped(monCost_combineAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_mnm', 'r')
+#maintain_mnm_betas = bootstrapped(mainCost_combineAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_mnm', 'b')
+#monitor_mnm_betas = bootstrapped(monCost_combineAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_mnm', 'r')
 
-maintain_maintain_betas = bootstrapped(mainCost_mainAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_maintain', 'b')
-monitor_monitor_betas = bootstrapped(monCost_monAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_monitor', 'r')
-mnm_mnm_betas = bootstrapped(combineCost_combineAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'mnm_mnm', 'purple')
+#maintain_maintain_betas = bootstrapped(mainCost_mainAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'maintain_maintain', 'b')
+#monitor_monitor_betas = bootstrapped(monCost_monAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'monitor_monitor', 'r')
+#mnm_mnm_betas = bootstrapped(combineCost_combineAcc, subj_list, 1000, 'pm_cost', 'pm_acc', 'mnm_mnm', 'purple')
 
  
 
@@ -586,6 +586,27 @@ def findOutliers(cost, measure):
 #mnm_pmRT = findOutliers(mnm_pmRT, mnm_pmRT.pm_probe_rt)
 
 
+
+
+################################
+########## Plot AICs ###########
+################################
+aic_cost_mnm = pd.read_csv(FIGURE_PATH+'/csvs/aic_cost_mnm.csv')
+aic_axes = (ax1, ax2, ax3, ax4, ax5)
+fig, aic_axes = plt.subplots(nrows=5, ncols=1,  sharex = True, sharey=True, gridspec_kw={'hspace':0})
+sea.violinplot(aic_cost_mnm.main_mnm, color = 'b', ax = aic_axes[0])
+sea.violinplot(aic_cost_mnm.mon_mnm, color = 'r', ax = aic_axes[1])
+sea.violinplot(aic_cost_mnm.cost_mnm_noInteract, color = 'violet', ax = aic_axes[2])
+sea.violinplot(aic_cost_mnm.cost_mnm_interact, color = 'mediumvioletred', ax = aic_axes[3])
+sea.violinplot(aic_cost_mnm.one_mnm, color = 'g', ax = aic_axes[4])
+for ax in aic_axes: 
+	ax.label_outer()
+
+
+sea.distplot(betas.coef, color = color) 
+plt.xlabel('Coefficient')
+plt.savefig(FIGURE_PATH + 'modelfits.eps', dpi = 600)
+plt.close()
 
 
 ################################

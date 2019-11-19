@@ -5,6 +5,8 @@ library(ggplot2)
 # Set directory
 setwd('/Users/krh2382/monitain/analysis/output/csvs')
 
+CSV_PATH = getwd()
+
 # Load data
 data_bytrial=read.csv("ALL_BYTRIAL.csv")
 data_cost_acc = read.csv("cost_acc.csv")
@@ -83,16 +85,66 @@ sum.of.squares <- function(x,y) {
   x^2 + y^2
 }
 
+## Bootstrap
 n_iterations = 1000
-subj_list = 
+subj_list = levels(data_cost_acc$subj)
+aic_cost_mnm.data <- data.frame(
+  cost_mnm_interact = rep(0,n_iterations), 
+  cost_mnm_noInteract = rep(0,n_iterations),
+  main_mnm = rep(0,n_iterations)
+  mon_mnn = rep(0, n_iterations)
+)
+aic_mon_mnm.data <- data.frame(
+  mon_mnm1 = rep(0,n_iterations), 
+  mon_mnm2 = rep(0,n_iterations),
+  mon_mnm3 = rep(0,n_iterations), 
+  mon_mnm4 = rep(0,n_iterations)
+  one_mnm = rep(0, n_iterations)
+)
 
-bootstrapped <- function(subj_list, n_iterations, x, y) {
-  for (subj in levels(data_cost_acc$subj)) {
-    
-    
-    
+
+for (it in 1:n_iterations) {
+  # Create list of subjects for each iteration
+  sampled_subjs = sample(subj_list, size = length(subj_list), replace=T)
+  for (data_i in 1:length(sampled_subjs)) {
+    if (data_i == 1) {
+      bootstrap = data_cost_acc[data_cost_acc$subj == sampled_subjs[data_i],]
+    } else {
+      bootstrap = rbind(bootstrap, data_cost_acc[data_cost_acc$subj == sampled_subjs[data_i],])
+    }
   }
+  
+  # Maintenance cost vs MnM accuracy
+  lm1_cost_mnmAcc_interact <- lm(mnm_acc ~ main_cost + mon_cost + main_cost:mon_cost, data = bootstrap) 
+  lm2_cost_mnmAcc <- lm(mnm_acc ~ main_cost + mon_cost, data = bootstrap)
+  lm3_mainCost_mnmAcc <- lm(mnm_acc ~ main_cost, data = bootstrap)
+  lm3_monCost_mnmAcc <- lm(mnm_acc ~ mon_cost, data = bootstrap)
+  lm4_monCost_mnmAcc <- lm(mnm_acc ~ 1, data = bootstrap)
+  aic_cost_mnm1 = AIC(lm1_cost_mnmAcc_interact)
+  aic_cost_mnm2 = AIC(lm2_cost_mnmAcc)
+  aic_main_mnm3 = AIC(lm3_mainCost_mnmAcc)
+  aic_mon_mnm3 = AIC(lm3_monCost_mnmAcc)
+  aic_mon_mnm4 = AIC(lm4_monCost_mnmAcc)
+  aic_cost_mnm.data[it, ]<- c(aic_cost_mnm1, aic_cost_mnm2, aic_main_mnm3, aic_mon_mnm3, aic_mon_mnm4)
+  
+  # Monitor cost vs MnM accuracy
+  #lm1_monCost_mnmAcc <- lm(mnm_acc ~ mon_cost + main_cost + mon_cost:main_cost, data = bootstrap) 
+  #lm2_monCost_mnmAcc <- lm(mnm_acc ~ mon_cost + main_cost, data = bootstrap)
+  
+  
+  #aic_mon_mnm1 = AIC(lm1_monCost_mnmAcc)
+  #aic_mon_mnm2 = AIC(lm2_monCost_mnmAcc)
+  
+  #aic_mon_mnm.data[it, ] <- c(aic_mon_mnm1, aic_mon_mnm2, aic_mon_mnm3, aic_mon_mnm4)
+  
+  
+  
 }
+write.csv(aic_main_mnm.data, 'aic_main_mnm.csv')
+write.csv(aic_mon_mnm.data, 'aic_mon_mnm.csv')
+
+
+
 
 ##### ignore stuff below for now
 
