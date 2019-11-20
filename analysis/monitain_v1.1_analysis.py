@@ -402,7 +402,7 @@ def allSubj_pmCompare_pointPlusViolin():
 	ax = sea.violinplot(x = all_pm_df.type, y = all_pm_df.pm_cost, palette="Purples")
 	plt.xlabel('Block type');
 	plt.ylabel('PM cost');
-	plt.savefig(FIGURE_PATH + 'allSubj_pmCompare_point_violin.eps', dpi = 600)
+	plt.savefig(FIGURE_PATH + 'allSubj_pmCompare_point_violin.png', dpi = 600)
 	plt.close()
 
 

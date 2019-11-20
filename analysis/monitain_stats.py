@@ -485,7 +485,7 @@ ax.set_xlim([-0.2,0.5])
 ax.set_ylim([-0.2,0.5])
 ax = sea.regplot(x='mplusm_cost', y = 'mnm_cost', data = mplusmCost_mnmCost, color = 'purple', scatter = True) 
 plt.xlabel('Maintainence + Monitoring cost (s)')
-plt.ylabel('Combined performance')
+plt.ylabel('Combined cost (s)')
 plt.savefig(FIGURE_PATH + 'mplusmCost_v_combineCost.png', dpi = 600)
 plt.close()
 
