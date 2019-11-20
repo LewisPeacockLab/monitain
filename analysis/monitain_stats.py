@@ -352,6 +352,18 @@ plt.close()
 main_main = maintainCost_maintainAcc_all.dropna()
 mon_mon = monitorCost_monitorAcc_all.dropna()
 
+def regPlot(combinedData, x_label, y_label, color, y_data, xLimit, yLimit): 
+	ax = sea.regplot(x='pm_cost', y = y_data, data = combinedData, color = color, scatter = True) 
+	plt.xlabel(x_label)
+	plt.ylabel(y_label)
+	ax.set_xlim(xLimit)
+	ax.set_ylim(yLimit)
+
+def residPlot(combinedData, x_label, y_label, color):
+	sea.residplot(x = 'pm_cost', y = 'pm_acc', data = main_V_main, color = color, scatter_kws = {"s": 80}) 
+	plt.xlabel(x_label)
+	plt.ylabel(y_label)
+
 fig, (ax1, ax2) = plt.subplots(ncols=2, sharey=True)
 
 sea.regplot(x = 'pm_cost', y = 'pm_acc', data = main_main, color = 'b', logistic=True, ax = ax1)
@@ -366,17 +378,7 @@ plt.savefig(FIGURE_PATH + 'logreg_compare.png', dpi = 600)
 plt.close()
 
 
-def regPlot(combinedData, x_label, y_label, color, y_data, xLimit, yLimit): 
-	ax = sea.regplot(x='pm_cost', y = y_data, data = combinedData, color = color, scatter = False) 
-	plt.xlabel(x_label)
-	plt.ylabel(y_label)
-	ax.set_xlim(xLimit)
-	ax.set_ylim(yLimit)
 
-def residPlot(combinedData, x_label, y_label, color):
-	sea.residplot(x = 'pm_cost', y = 'pm_acc', data = main_V_main, color = color, scatter_kws = {"s": 80}) 
-	plt.xlabel(x_label)
-	plt.ylabel(y_label)
 
 ##TODO: Change file extension based on what the image is for
 # png for Slack
@@ -452,13 +454,15 @@ monitor_combine_lr = pg.linear_regression(monCost_combineAcc.pm_cost, monCost_co
 
 ### Cost v accuracy
 ## How does PM cost affect performance when maintaining AND monitoring?
-regPlot(combineCost_combineAcc, 'Combined cost (s)','Combined performance', 'purple', 'pm_acc',[-0.,0.5], [-.1,1])
+regPlot(combineCost_combineAcc, 'Combined cost (s)','Combined performance', 'purple', 'pm_acc',[-0.,0.55], [-.1,1])
 plt.savefig(FIGURE_PATH + 'mnmCost_v_pmAcc.png', dpi = 600)
 plt.close()
 
 combine_combine_lr = pg.linear_regression(combineCost_combineAcc.pm_cost, combineCost_combineAcc.pm_acc)
 
-regPlot(combineCost_combineAcc, 'Combined cost (s)','Combined performance', 'purple', 'pm_acc',[-0.,0.5], [-.1,1])
+# Plot all three of maintain, monitor, and combined on top of one another
+# Set Scatter = False in function if you don't want scatter points
+regPlot(combineCost_combineAcc, 'Combined cost (s)','Combined performance', 'purple', 'pm_acc',[-0.17,0.5], [-.1,1])
 regPlot(monCost_combineAcc, 'Monitor cost (s)','Combined performance', 'r', 'pm_acc', [-0.,0.5], [-.1,1])
 regPlot(mainCost_combineAcc, 'Reaction time cost (s)','Combined performance', 'b', 'pm_acc', [-0.,0.5], [-.1,1])
 
@@ -466,11 +470,45 @@ regPlot(mainCost_combineAcc, 'Reaction time cost (s)','Combined performance', 'b
 
 ### Cost v accuracy
 ## How does maintenance cost + monitoring cost relate to performance when maintaining AND monitoring?
-regPlot(mplusmCost_combineAcc, 'Maintainence + Monitoring cost (s)','Combined performance', 'purple', 'pm_acc')
+regPlot(mplusmCost_combineAcc, 'Maintainence + Monitoring cost (s)','Combined performance', 'mediumvioletred', 'pm_acc', [-0.2,0.5], [0,1])
 plt.savefig(FIGURE_PATH + 'mplusmCost_v_combine_pmAcc.png', dpi = 600)
 plt.close()
 
 mplusm_combine_lr = pg.linear_regression(mplusmCost_combineAcc.pm_cost, mplusmCost_combineAcc.pm_acc)
+
+### Cost v cost
+## How does maintenance cost + monitoring cost relate to MnM cost?
+mplusmCost_mnmCost = pd.concat([combined_cost, mnmCost], axis=1, sort=False)
+mplusmCost_mnmCost = mplusmCost_mnmCost.rename(columns = {"pm_cost":"mplusm_cost"}) 
+
+ax.set_xlim([-0.2,0.5])
+ax.set_ylim([-0.2,0.5])
+ax = sea.regplot(x='mplusm_cost', y = 'mnm_cost', data = mplusmCost_mnmCost, color = 'purple', scatter = True) 
+plt.xlabel('Maintainence + Monitoring cost (s)')
+plt.ylabel('Combined performance')
+plt.savefig(FIGURE_PATH + 'mplusmCost_v_combineCost.png', dpi = 600)
+plt.close()
+
+cost_mplusm_combine_lr = pg.linear_regression(mplusmCost_mnmCost.mplusm_cost, mplusmCost_mnmCost.mnm_cost )
+
+
+regPlot(mplusmCost_mnmCost, 'RT cost (s)','Combined performance', 'purple', 'pm_acc', [-0.2,0.5], [0,1])
+plt.savefig(FIGURE_PATH + 'mplusmCost_v_combine_pmAcc.png', dpi = 600)
+plt.close()
+
+mplusm_combine_lr = pg.linear_regression(mplusmCost_combineAcc.pm_cost, mplusmCost_combineAcc.pm_acc)
+
+
+
+# Plot Maintain + Monitor on top of MnM
+# Set scatter to false
+f, ax = plt.subplots() 
+ax.set(xlim=[-0.2,0.55], ylim = [0,1])
+regPlot(mplusmCost_combineAcc, 'Maintainence + Monitoring cost (s)','Combined performance', 'mediumvioletred', 'pm_acc', [-0.2,0.55], [0,1])
+regPlot(combineCost_combineAcc, 'RT cost (s)','Combined performance', 'purple', 'pm_acc',[-0.2,0.55], [0,1])
+plt.savefig(FIGURE_PATH + 'mplusmCost_mnm_noScatter.png', dpi = 600)
+plt.close()
+
 
 
 
