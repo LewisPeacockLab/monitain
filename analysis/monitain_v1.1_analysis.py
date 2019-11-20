@@ -375,7 +375,7 @@ def allSubj_rt():
 def allSubj_pmCost():
 	ax = sea.barplot(x='blockType', y= 'pm_cost', data=pmCost_df, palette = my_pal[1:])
 	plt.xlabel('Block type')
-	plt.ylabel('PM cost (s)')
+	plt.ylabel('RT cost (s)')
 	sea.despine()
 	#plt.title('Average PM cost by block type')
 	plt.savefig(FIGURE_PATH + 'allSubj_PMCOST.eps', dpi = 600)
@@ -399,10 +399,10 @@ def allSubj_pmCompare_pointPlusViolin():
 	fig, ax = plt.subplots() 
 	for i, j in all_pm_df.iterrows():
 		sea.pointplot(x = 'type', y = 'pm_cost', data = all_pm_df[(all_pm_df['subj'] == j.subj)], color = '0.25', scale = 0.5, ax = ax)
-	ax = sea.violinplot(x = all_pm_df.type, y = all_pm_df.pm_cost, palette="Purples")
+	ax = sea.violinplot(x = all_pm_df.type, y = all_pm_df.pm_cost, palette=['palevioletred', 'mediumpurple'])
 	plt.xlabel('Block type');
 	plt.ylabel('PM cost');
-	plt.savefig(FIGURE_PATH + 'allSubj_pmCompare_point_violin.png', dpi = 600)
+	plt.savefig(FIGURE_PATH + 'allSubj_pmCompare_point_violin.eps', dpi = 600)
 	plt.close()
 
 

@@ -282,6 +282,11 @@ mplusmCost_combineAcc = pd.concat([combined_cost, mnm_acc], axis=1, sort=False)
 
 
 
+# Add somewhere: 
+all_df_short = all_df_minusBase.drop(columns = ['block', 'meanTrial_rt', 'og_acc']).reset_index(drop=True) 
+all_df_short['main_cost'] = cost_acc_df.main_cost 
+
+
 
 ################################
 ###### Create dataframes #######
@@ -353,11 +358,14 @@ main_main = maintainCost_maintainAcc_all.dropna()
 mon_mon = monitorCost_monitorAcc_all.dropna()
 
 def regPlot(combinedData, x_label, y_label, color, y_data, xLimit, yLimit): 
+	fig, ax = plt.subplots()
+	ax.set_xlim(xLimit)
+	ax.set_ylim(yLimit)	
 	ax = sea.regplot(x='pm_cost', y = y_data, data = combinedData, color = color, scatter = True) 
 	plt.xlabel(x_label)
 	plt.ylabel(y_label)
-	ax.set_xlim(xLimit)
-	ax.set_ylim(yLimit)
+
+
 
 def residPlot(combinedData, x_label, y_label, color):
 	sea.residplot(x = 'pm_cost', y = 'pm_acc', data = main_V_main, color = color, scatter_kws = {"s": 80}) 
@@ -388,9 +396,9 @@ plt.close()
 
 ### Cost v accuracy
 ## How does maintainance cost affect performance when only maintaining?
-regPlot(mainCost_mainAcc, 'Maintain cost (s)', 'Maintain performance', 'b', 'pm_acc', [-0.1,0.35], [-.1,1])
+regPlot(mainCost_mainAcc, 'Maintain cost (s)', 'Maintain performance', 'b', 'pm_acc', [-0.2,0.6], [-.1,1])
 
-plt.savefig(FIGURE_PATH + 'maintainCost_v_maintainPerf.png', dpi = 600)
+plt.savefig(FIGURE_PATH + 'maintainCost_v_maintainPerf.eps', dpi = 600)
 plt.close()
 
 maintain_maintain_lr = pg.linear_regression(mainCost_mainAcc.pm_cost, mainCost_mainAcc.pm_acc) 
@@ -405,7 +413,7 @@ maintain_maintain_lr = pg.linear_regression(mainCost_mainAcc.pm_cost, mainCost_m
 
 ### Cost v accuracy
 ## How does monitoring cost affect performance when only monitoring?
-regPlot(monCost_monAcc, 'Monitor cost (s)', 'Monitor performance', 'r', 'pm_acc', [-0.1,0.35], [-.1,1])
+regPlot(monCost_monAcc, 'Monitor cost (s)', 'Monitor performance', 'r', 'pm_acc', [-0.2,0.6], [-.1,1])
 plt.savefig(FIGURE_PATH + 'monitorCost_v_monitorPerf.png', dpi = 600)
 plt.close()
 
@@ -422,7 +430,7 @@ monitor_monitor_lr = pg.linear_regression(monCost_monAcc.pm_cost, monCost_monAcc
 
 ### Cost v accuracy
 ## How does maintaining cost affect PM performance?
-regPlot(mainCost_combineAcc, 'Maintain cost (s)','Combined performance', 'b', 'pm_acc', [-0.1,0.35], [-.1,1])
+regPlot(mainCost_combineAcc, 'Maintain cost (s)','Combined performance', 'b', 'pm_acc', [-0.2,0.6], [-.1,1])
 plt.savefig(FIGURE_PATH + 'maintainCost_v_pmAcc.png', dpi = 600)
 plt.close()
 
@@ -438,7 +446,7 @@ maintain_combine_lr = pg.linear_regression(mainCost_combineAcc.pm_cost, mainCost
 
 ### Cost v accuracy
 ## How does monitoring cost affect PM performance?
-regPlot(monCost_combineAcc, 'Monitor cost (s)','Combined performance', 'r', 'pm_acc', [-0.1,0.35], [-.1,1])
+regPlot(monCost_combineAcc, 'Monitor cost (s)','Combined performance', 'r', 'pm_acc', [-0.2,0.6], [-.1,1])
 plt.savefig(FIGURE_PATH + 'monitorCost_v_pmAcc.png', dpi = 600)
 plt.close()
 
@@ -454,7 +462,7 @@ monitor_combine_lr = pg.linear_regression(monCost_combineAcc.pm_cost, monCost_co
 
 ### Cost v accuracy
 ## How does PM cost affect performance when maintaining AND monitoring?
-regPlot(combineCost_combineAcc, 'Combined cost (s)','Combined performance', 'purple', 'pm_acc',[-0.,0.55], [-.1,1])
+regPlot(combineCost_combineAcc, 'Combined cost (s)','Combined performance', 'purple', 'pm_acc',[-0.2,0.6], [-.1,1])
 plt.savefig(FIGURE_PATH + 'mnmCost_v_pmAcc.png', dpi = 600)
 plt.close()
 
@@ -462,9 +470,18 @@ combine_combine_lr = pg.linear_regression(combineCost_combineAcc.pm_cost, combin
 
 # Plot all three of maintain, monitor, and combined on top of one another
 # Set Scatter = False in function if you don't want scatter points
-regPlot(combineCost_combineAcc, 'Combined cost (s)','Combined performance', 'purple', 'pm_acc',[-0.17,0.5], [-.1,1])
-regPlot(monCost_combineAcc, 'Monitor cost (s)','Combined performance', 'r', 'pm_acc', [-0.,0.5], [-.1,1])
-regPlot(mainCost_combineAcc, 'Reaction time cost (s)','Combined performance', 'b', 'pm_acc', [-0.,0.5], [-.1,1])
+regPlot(combineCost_combineAcc, 'Combined cost (s)','Combined performance', 'purple', 'pm_acc',[-0.2,0.6], [-.1,1])
+regPlot(monCost_combineAcc, 'Monitor cost (s)','Combined performance', 'r', 'pm_acc', [-0.2,0.6], [-.1,1])
+regPlot(mainCost_combineAcc, 'Reaction time cost (s)','Combined performance', 'b', 'pm_acc', [-0.2,0.6], [-.1,1])
+
+fig, ax = plt.subplots()
+ax.set_xlim([-0.2,0.6])
+ax.set_ylim([-.1,1])
+ax = sea.regplot(x='pm_cost', y = 'pm_acc', data = combineCost_combineAcc, color = 'purple', scatter = False) 
+ax = sea.regplot(x='pm_cost', y = 'pm_acc', data = monCost_combineAcc, color = 'r', scatter = False) 
+ax = sea.regplot(x='pm_cost', y = 'pm_acc', data = mainCost_combineAcc, color = 'b', scatter = False) 
+plt.xlabel('RT cost (s)')
+plt.ylabel('Combined perfomrance')
 
 
 
@@ -481,9 +498,10 @@ mplusm_combine_lr = pg.linear_regression(mplusmCost_combineAcc.pm_cost, mplusmCo
 mplusmCost_mnmCost = pd.concat([combined_cost, mnmCost], axis=1, sort=False)
 mplusmCost_mnmCost = mplusmCost_mnmCost.rename(columns = {"pm_cost":"mplusm_cost"}) 
 
-ax.set_xlim([-0.2,0.5])
-ax.set_ylim([-0.2,0.5])
-ax = sea.regplot(x='mplusm_cost', y = 'mnm_cost', data = mplusmCost_mnmCost, color = 'purple', scatter = True) 
+fig, ax = plt.subplots() 
+ax.set_xlim([-0.2,0.6])
+ax.set_ylim([-0.2,0.6])
+ax = sea.regplot(x='mplusm_cost', y = 'mnm_cost', data = mplusmCost_mnmCost, color = 'mediumvioletred', scatter = True) 
 plt.xlabel('Maintainence + Monitoring cost (s)')
 plt.ylabel('Combined cost (s)')
 plt.savefig(FIGURE_PATH + 'mplusmCost_v_combineCost.png', dpi = 600)
@@ -492,7 +510,16 @@ plt.close()
 cost_mplusm_combine_lr = pg.linear_regression(mplusmCost_mnmCost.mplusm_cost, mplusmCost_mnmCost.mnm_cost )
 
 
-regPlot(mplusmCost_mnmCost, 'RT cost (s)','Combined performance', 'purple', 'pm_acc', [-0.2,0.5], [0,1])
+regPlot(mplusmCost_mnmCost, 'RT cost (s)','Combined performance', 'purple', 'pm_acc', [-0.2,0.6], [0,1])
+plt.savefig(FIGURE_PATH + 'mplusmCost_v_combine_pmAcc.png', dpi = 600)
+plt.close()
+
+fig, ax = plt.subplots()
+ax.set_xlim([-0.2,0.6])
+ax.set_ylim([0,1])	
+ax = sea.regplot(x='pm_cost', y = 'pm_acc', data = mplusmCost_combineAcc, color = 'palevioletred', scatter = True) 
+plt.xlabel('Maintain cost + Monitor cost (s)')
+plt.ylabel('Combined performance')
 plt.savefig(FIGURE_PATH + 'mplusmCost_v_combine_pmAcc.png', dpi = 600)
 plt.close()
 
@@ -504,10 +531,18 @@ mplusm_combine_lr = pg.linear_regression(mplusmCost_combineAcc.pm_cost, mplusmCo
 # Set scatter to false
 f, ax = plt.subplots() 
 ax.set(xlim=[-0.2,0.55], ylim = [0,1])
-regPlot(mplusmCost_combineAcc, 'Maintainence + Monitoring cost (s)','Combined performance', 'mediumvioletred', 'pm_acc', [-0.2,0.55], [0,1])
-regPlot(combineCost_combineAcc, 'RT cost (s)','Combined performance', 'purple', 'pm_acc',[-0.2,0.55], [0,1])
+regPlot(mplusmCost_combineAcc, 'Maintainence + Monitoring cost (s)','Combined performance', 'mediumvioletred', 'pm_acc', [-0.2,0.6], [0,1])
+regPlot(combineCost_combineAcc, 'RT cost (s)','Combined performance', 'purple', 'pm_acc',[-0.2,0.6], [0,1])
 plt.savefig(FIGURE_PATH + 'mplusmCost_mnm_noScatter.png', dpi = 600)
 plt.close()
+
+fig, ax = plt.subplots()
+ax.set_xlim([-0.2,0.6])
+ax.set_ylim([0,1])	
+ax = sea.regplot(x='pm_cost', y = 'pm_acc', data = mplusmCost_combineAcc, color = 'palevioletred', scatter = False) 
+ax = sea.regplot(x='pm_cost', y = 'pm_acc', data = combineCost_combineAcc, color = 'purple', scatter = False) 
+plt.xlabel('RT cost (s)')
+plt.ylabel('Combined performance')
 
 
 
@@ -569,10 +604,12 @@ def bootstrapped(trial_df, subj_list, n_iterations, x, y, type, color):
 
 
 	# Plot betas	
-	sea.distplot(betas.coef, color = color) 
+	ax = sea.distplot(betas.coef, color = color) 
+	ax.set_xlim([-4,4])
+	plt.legend(labels = ['Maintenance betas', 'Monitoring betas'])
 	plt.xlabel('Coefficient')
-	plt.savefig(FIGURE_PATH + type + '_bootstrap.png', dpi = 600)
-	plt.close()
+	#plt.savefig(FIGURE_PATH + type + '_bootstrap.eps', dpi = 600)
+	#plt.close()
 
 	return betas;
 

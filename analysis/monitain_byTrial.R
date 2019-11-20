@@ -96,21 +96,39 @@ aic_cost_mnm.data <- data.frame(
   one_mnm = rep(0, n_iterations)
 )
 
-
+result <- glmer(pm_acc ~ pm_cost + blockType + (1|subj), data = data_bytrial, family=binomial(link="logit"))
+summary(result)
 
 for (it in 1:n_iterations) {
   # Create list of subjects for each iteration
   sampled_subjs = sample(subj_list, size = length(subj_list), replace=T)
   for (data_i in 1:length(sampled_subjs)) {
     if (data_i == 1) {
-      bootstrap = data_cost_acc[data_cost_acc$subj == sampled_subjs[data_i],]
+      bootstrap = data_bytrial[data_bytrial$subj == sampled_subjs[data_i],]
     } else {
-      bootstrap = rbind(bootstrap, data_cost_acc[data_cost_acc$subj == sampled_subjs[data_i],])
+      bootstrap = rbind(bootstrap, data_bytrial[data_bytrial$subj == sampled_subjs[data_i],])
     }
   }
+  glmer1_cost_mnmAcc_interact <- glmer(mnm_acc ~ main_cost + mon_cost + (1|subj) + main_cost:mon_cost, data = bootstrap, family = binomial(link="logit"))
+  
+}
+  
+  for (it in 1:n_iterations) {
+    # Create list of subjects for each iteration
+    sampled_subjs = sample(subj_list, size = length(subj_list), replace=T)
+    for (data_i in 1:length(sampled_subjs)) {
+      if (data_i == 1) {
+        bootstrap = data_cost_acc[data_cost_acc$subj == sampled_subjs[data_i],]
+      } else {
+        bootstrap = rbind(bootstrap, data_cost_acc[data_cost_acc$subj == sampled_subjs[data_i],])
+      }
+    }
   
   # Maintenance cost vs MnM accuracy
   lm1_cost_mnmAcc_interact <- lm(mnm_acc ~ main_cost + mon_cost + main_cost:mon_cost, data = bootstrap) 
+  
+  glmer1_cost_mnmAcc_interact <- glmer(mnm_acc ~ main_cost + mon_cost + (1|subj) + main_cost:mon_cost, data = bootstrap, family = binomial(link="logit"))
+  
   lm2_cost_mnmAcc <- lm(mnm_acc ~ main_cost + mon_cost, data = bootstrap)
   lm3_mainCost_mnmAcc <- lm(mnm_acc ~ main_cost, data = bootstrap)
   lm3_monCost_mnmAcc <- lm(mnm_acc ~ mon_cost, data = bootstrap)
