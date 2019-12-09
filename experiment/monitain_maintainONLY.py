@@ -53,7 +53,6 @@ args = parser.parse_args()
 
 SUBJ = args.subj
 SCRN = args.scrn
-BLOCKSTRUCT = args.blockStruct
 
 global DEBUG 
 DEBUG = SUBJ in ['debug']
@@ -157,23 +156,23 @@ practDict = OrderedDict([
 
 
 # Put .txt files into dataframes
-words_df = pd.read_table("words.csv", header=-1)
+words_df = pd.read_table("words.csv", header=None)
 words_df = words_df.rename(columns={0:'stimuli'})
 words_df['type'] = 1
 words_df = shuffle(words_df)
 
-nonwords_df = pd.read_table("nonwords.csv", header=-1)
+nonwords_df = pd.read_table("nonwords.csv", header=None)
 nonwords_df = nonwords_df.rename(columns={0:'stimuli'})
 nonwords_df['type'] = 2
 nonwords_df = shuffle(nonwords_df)
 
 # Practice stimuli 
-pract_words_df = pd.read_table("pract_words.csv", header=-1)
+pract_words_df = pd.read_table("pract_words.csv", header=None)
 pract_words_df = pract_words_df.rename(columns={0:'stimuli'})
 pract_words_df['type'] = 1
 pract_words_df = shuffle(pract_words_df)
 
-pract_nonwords_df = pd.read_table("pract_nonwords.csv", header=-1)
+pract_nonwords_df = pd.read_table("pract_nonwords.csv", header=None)
 pract_nonwords_df = pract_nonwords_df.rename(columns={0:'stimuli'})
 pract_nonwords_df['type'] = 2
 pract_nonwords_df = shuffle(pract_nonwords_df)
@@ -215,28 +214,29 @@ pract_df = pd.DataFrame(columns = df_columns, index = df_index)
 ## DF - Subject 
 df['subj'] = SUBJ
 
+block_list = list(blockDict.items()) 
 ## DF - Block
 for index, row in df.iterrows(): 
 	if index in range(0,106): 
-		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[0] 
+		df.iloc[index, df.columns.get_loc('block')] = block_list[0] 
 		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[0] 
 	elif index in range(106,126): 
-		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[1] 
+		df.iloc[index, df.columns.get_loc('block')] = block_list[1] 
 		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[1]
 	elif index in range(126,146): 
-		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[2] 		
+		df.iloc[index, df.columns.get_loc('block')] = block_list[2] 		
 		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[2]
 	elif index in range(146,166): 
-		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[3] 
+		df.iloc[index, df.columns.get_loc('block')] = block_list[3] 
 		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[3]
 	elif index in range(166,186): 
-		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[4] 
+		df.iloc[index, df.columns.get_loc('block')] = block_list[4] 
 	elif index in range(186,206): 
-		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[5] 
+		df.iloc[index, df.columns.get_loc('block')] = block_list[5] 
 	elif index in range(206,226): 
-		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[6] 
+		df.iloc[index, df.columns.get_loc('block')] = block_list[6] 
 	elif index in range(226,332): 
-		df.iloc[index, df.columns.get_loc('block')] = blockDict.items()[7] 
+		df.iloc[index, df.columns.get_loc('block')] = block_list[7] 
 
 #df.block[x][0] gives block type
 #df.block[x][1] gives block num
