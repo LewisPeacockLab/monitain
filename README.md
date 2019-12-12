@@ -16,7 +16,7 @@ The scripts to run the experiment using PsychoPy and the necessary supplemental 
 
 ## Analysis
 
-In behavioral experiments, PM performance is usually analyzed using a behavioral etric called **PM cost**. PM cost is the reaction time on a baseline task where you are just performing an ongoing task subtracted from the reaction time for the same ongoing task except the participant is holding onto a PM memory target. This difference in reaction time can inform us what the 'cost' to reaction time is to hold onto that memory item. Here we used PM cost in our analysis. 
+In behavioral experiments, PM performance is usually analyzed using a behavioral metric called **PM cost**. PM cost is the reaction time on a baseline task where you are just performing an ongoing task subtracted from the reaction time for the same ongoing task except the participant is holding onto a PM memory target. This difference in reaction time can inform us what the 'cost' to reaction time is to hold onto that memory item. Here we used PM cost in our analysis. 
 
 PM cost is useful for predicting errors. Because of this we wanted to tease apart PM cost for just maintaining and just monitoring before looking at them together. Following this train of thought, we were able to see if maintenance or monitoring on their own were useful for predicting performance or if it was the combination of the two that was necessary for prediction. 
 
