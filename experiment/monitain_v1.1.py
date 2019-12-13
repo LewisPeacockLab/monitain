@@ -75,12 +75,7 @@ if data_path_exists:
 full_filename = filename
 
 ## Set up Slack notificaitons
-SLACK = dict(
-	channel = '#katieshooks', 
-	botname = '{:s}'.format(SUBJ), 
-	emoji = ':person_climbing:', 
-	url = 'https://hooks.slack.com/services/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'
-	)
+## Add Slack code back here
 
 # Colors
 color_white = [255,255, 255] #[1,1,1]
@@ -963,12 +958,7 @@ def instructionSlides(block_type):
 		win.flip()
 		pressSpace()		
 
-def slackMessage(block, slack_msg): #thank you again, Remy
-	if SLACK: 
-		payload = dict(text=slack_msg, channel = SLACK['channel'], username=SLACK['botname'], icon_emoji=SLACK['emoji'])
-		try: requests.post(json=payload, url=SLACK['url'])
-		except ConnectionError: print('Slack messaging failed, no internet')
-
+## ADD SLACK FUNCTION HERE 
 
 ####################################
  
@@ -1093,10 +1083,10 @@ def mnm(trial_i, block, dframe):
 ###########  EXPERIMENT  ###########
 ####################################
 
-
+# Uncomment to add Slack hooks back in
 # Let Slack know experiment is starting
-slack_msg = 'Starting experiment'
-slackMessage(1, slack_msg)
+#slack_msg = 'Starting experiment'
+#slackMessage(1, slack_msg)
 
 
 for trial_i in range(N_TOTAL_TRIALS): 
@@ -1117,8 +1107,8 @@ for trial_i in range(N_TOTAL_TRIALS):
 		win.color = color_black
 		win.flip()
 		instructionSlides(block_type)
-		slack_msg = 'Starting block {:d}'.format(block)
-		slackMessage(block, slack_msg)
+		#slack_msg = 'Starting block {:d}'.format(block)
+		#slackMessage(block, slack_msg)
 		df.to_csv(full_filename)
 	win.color = color_gray
 	win.flip()
@@ -1186,8 +1176,8 @@ for trial_i in range(N_TOTAL_TRIALS):
 # End of expt instruction slide
 presentSlides(22)
 
-slack_msg = 'Experiment finished'
-slackMessage(block, slack_msg)
+#slack_msg = 'Experiment finished'
+#slackMessage(block, slack_msg)
 
 # Save output at the end
 df.to_csv(full_filename)
