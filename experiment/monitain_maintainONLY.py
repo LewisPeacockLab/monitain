@@ -210,28 +210,22 @@ pract_df = pd.DataFrame(columns = df_columns, index = df_index)
 df['subj'] = SUBJ
 
 block_list = list(blockDict.items()) 
+pract_list = list(practDict.items())
 ## DF - Block
 for index, row in df.iterrows(): 
 	if index in range(0,106): 
 		df.iloc[index, df.columns.get_loc('block')] = block_list[0] 
-		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[0] 
+		pract_df.iloc[index, pract_df.columns.get_loc('block')] = pract_list[0]  
 	elif index in range(106,126): 
 		df.iloc[index, df.columns.get_loc('block')] = block_list[1] 
-		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[1]
+		pract_df.iloc[index, pract_df.columns.get_loc('block')] = pract_list[1]
 	elif index in range(126,146): 
 		df.iloc[index, df.columns.get_loc('block')] = block_list[2] 		
-		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[2]
+		pract_df.iloc[index, pract_df.columns.get_loc('block')] = pract_list[2]
 	elif index in range(146,166): 
 		df.iloc[index, df.columns.get_loc('block')] = block_list[3] 
-		pract_df.iloc[index, pract_df.columns.get_loc('block')] = practDict.items()[3]
-	elif index in range(166,186): 
-		df.iloc[index, df.columns.get_loc('block')] = block_list[4] 
-	elif index in range(186,206): 
-		df.iloc[index, df.columns.get_loc('block')] = block_list[5] 
-	elif index in range(206,226): 
-		df.iloc[index, df.columns.get_loc('block')] = block_list[6] 
-	elif index in range(226,332): 
-		df.iloc[index, df.columns.get_loc('block')] = block_list[7] 
+		pract_df.iloc[index, pract_df.columns.get_loc('block')] = pract_list[3]
+
 
 #df.block[x][0] gives block type
 #df.block[x][1] gives block num
@@ -267,8 +261,8 @@ def pickProbes(n_blocks, catch_range, N_CATCH_PER_BLOCK):
 		np.random.shuffle(probe_set)
 		probe_count_list.append(probe_set)
 	probe_size = np.ravel(probe_count_list).size
-	probe_ravel_1 = np.ravel(probe_count_list)[:probe_size/2]
-	probe_ravel_2 = np.ravel(probe_count_list)[probe_size/2:]
+	probe_ravel_1 = np.ravel(probe_count_list)[:probe_size//2]
+	probe_ravel_2 = np.ravel(probe_count_list)[probe_size//2:]
 	return (probe_ravel_1, probe_ravel_2)
 
 # Practice probes
@@ -282,10 +276,12 @@ pract_df['n_probes'] = pract_df.n_probes.apply(pickProbes_pract)
 baseline_probe_range = np.repeat([1],106)
 df.iloc[0:106, df.columns.get_loc('n_probes')] = baseline_probe_range
 
-#BLOCK 8 probe num
-df.iloc[226:332, df.columns.get_loc('n_probes')] = baseline_probe_range
 
 #BLOCKS 2-7 probe num
+(maintainProbes1, maintainProbes2) = pickProbes(N_BLOCKS_MAINTAIN_1, catch_range, N_CATCH_PER_BLOCK)
+(maintainProbes, maintainProbes2) = pickProbes(N_BLOCKS_MAINTAIN_2, catch_range, N_CATCH_PER_BLOCK)
+(maintainProbes1, maintainProbes2) = pickProbes(N_BLOCKS_MAINTAIN_3, catch_range, N_CATCH_PER_BLOCK)
+
 (maintainProbes1, maintainProbes2) = pickProbes(N_BLOCKS_MAINTAIN, catch_range, N_CATCH_PER_BLOCK)
 (monitorProbes1, monitorProbes2) = pickProbes(N_BLOCKS_MON, catch_range, N_CATCH_PER_BLOCK)
 (mnmProbes1, mnmProbes2) = pickProbes(N_BLOCKS_MnM, catch_range, N_CATCH_PER_BLOCK)
