@@ -261,9 +261,8 @@ def pickProbes(n_blocks, catch_range, N_CATCH_PER_BLOCK):
 		np.random.shuffle(probe_set)
 		probe_count_list.append(probe_set)
 	probe_size = np.ravel(probe_count_list).size
-	probe_ravel_1 = np.ravel(probe_count_list)[:probe_size//2]
-	probe_ravel_2 = np.ravel(probe_count_list)[probe_size//2:]
-	return (probe_ravel_1, probe_ravel_2)
+	probe_ravel = np.ravel(probe_count_list)
+	return probe_ravel
 
 # Practice probes
 practProbes = np.array(range(2,16))
@@ -277,15 +276,10 @@ baseline_probe_range = np.repeat([1],106)
 df.iloc[0:106, df.columns.get_loc('n_probes')] = baseline_probe_range
 
 
-#BLOCKS 2-7 probe num
-(maintainProbes1, maintainProbes2) = pickProbes(N_BLOCKS_MAINTAIN_1, catch_range, N_CATCH_PER_BLOCK)
-(maintainProbes, maintainProbes2) = pickProbes(N_BLOCKS_MAINTAIN_2, catch_range, N_CATCH_PER_BLOCK)
-(maintainProbes1, maintainProbes2) = pickProbes(N_BLOCKS_MAINTAIN_3, catch_range, N_CATCH_PER_BLOCK)
-
-(maintainProbes1, maintainProbes2) = pickProbes(N_BLOCKS_MAINTAIN, catch_range, N_CATCH_PER_BLOCK)
-(monitorProbes1, monitorProbes2) = pickProbes(N_BLOCKS_MON, catch_range, N_CATCH_PER_BLOCK)
-(mnmProbes1, mnmProbes2) = pickProbes(N_BLOCKS_MnM, catch_range, N_CATCH_PER_BLOCK)
-
+#BLOCKS 2-4 probe num
+maintainProbes1 = pickProbes(N_BLOCKS_MAINTAIN_1, catch_range, N_CATCH_PER_BLOCK)
+maintainProbes2 = pickProbes(N_BLOCKS_MAINTAIN_2, catch_range, N_CATCH_PER_BLOCK)
+maintainProbes3 = pickProbes(N_BLOCKS_MAINTAIN_3, catch_range, N_CATCH_PER_BLOCK)
 
 df.iloc[106:126, df.columns.get_loc('n_probes')] = maintainProbes1
 df.iloc[126:146, df.columns.get_loc('n_probes')] = maintainProbes2
@@ -316,23 +310,21 @@ pract_len = 5 #5 trials of practice for each condition
 targProb_other = np.repeat([0,1], blockOther_len/2)
 pract_targProb_other = np.repeat([0,1], pract_len/2 + 1)
 
-for block_other in range(2): 
+# One for each maintain1, maintain2, maintain3
+for block_other in range(3): 
 	np.random.shuffle(targProb_other)
 	np.random.shuffle(pract_targProb_other)
 	pract_targProb_other = pract_targProb_other[:5]
 
-	if BLCKSTR == 'interleaved': 
-		if block_other == 0: #block 2
-			df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targProb_other
-			pract_df.iloc[106:111, pract_df.columns.get_loc('targOrNoTarg')] = pract_targProb_other
-		elif block_other == 1: #block 5
-			df.iloc[166:186, df.columns.get_loc('targOrNoTarg')] = targProb_other
-	elif blockstr == 'blocked': 
-		if block_other == 0: #block2 
-			df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targProb_other
-			pract_df.iloc[106:111, pract_df.columns.get_loc('targOrNoTarg')] = pract_targProb_other
-		elif block_other == 1: #block 3
-			df.iloc[126:146, df.columns.get_loc('targOrNoTarg')] = targProb_other
+	if block_other == 0:
+		df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targProb_other
+		pract_df.iloc[106:111, pract_df.columns.get_loc('targOrNoTarg')] = pract_targProb_other
+	elif block_other == 1:
+		df.iloc[126:146, df.columns.get_loc('targOrNoTarg')] = targProb_other
+		pract_df.iloc[126:131, pract_df.columns.get_loc('targOrNoTarg')] = pract_targProb_other
+	elif block_other == 2:
+		df.iloc[146:166, df.columns.get_loc('targOrNoTarg')] = targProb_other
+		pract_df.iloc[146:151, pract_df.columns.get_loc('targOrNoTarg')] = pract_targProb_other
 
 # Double check that half are ones and half are zeros
 # pd.value_counts(df['targOrNoTarg'].values, sort=False) 
@@ -347,10 +339,13 @@ nonword_list = list(nonwords_df['stimuli'])
 pract_word_list = list(pract_words_df['stimuli'])
 pract_nonword_list = list(pract_nonwords_df['stimuli'])
 
-pract_trials_maintain = list(range(106,111))
-pract_trials_monitor = list(range(126,131))
-pract_trials_mnm = list(range(146,151))
-pract_trial_list = list(itertools.chain(pract_trials_maintain, pract_trials_monitor, pract_trials_mnm))
+pract_trials_maintain1 = list(range(106,111))
+pract_trials_maintain2 = list(range(126,131))
+pract_trials_maintain3 = list(range(146,151))
+pract_trial_list = list(itertools.chain(pract_trials_maintain1, pract_trials_maintain2, pract_trials_maintain3))
+
+
+## PICK BACK UP HERE
 
 # Fill in the rest of df and pract_df
 for dataf in range(2): 
