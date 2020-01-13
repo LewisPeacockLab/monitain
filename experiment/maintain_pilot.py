@@ -119,8 +119,8 @@ N_BLOCKS = 4
 
 # if you want to change number of blocks of each type, change here
 N_BLOCKS_MAINTAIN_1 = 1
-N_BLOCKS_MAINTAIN_1 = 1
-N_BLOCKS_MAINTAIN_1 = 1
+N_BLOCKS_MAINTAIN_2 = 1
+N_BLOCKS_MAINTAIN_3 = 1
 
 N_TRIALS = range(N_MIN_PROBES, N_MAX_PROBES+1)
 
@@ -129,6 +129,8 @@ MAINTAIN_TRIALS = 20
 
 N_TOTAL_TRIALS = (BASELINE_TRIALS*2) + (MAINTAIN_TRIALS*3)
 N_TOTAL_TRIALS_PRACT = 5 * N_BLOCKS # 5 for each baseline, maintain1, maintain2, maintain3
+
+BLOCK_STRUCT = [106, 20, 20, 20]
 
 # colors
 color_white = [255,255, 255] #[1,1,1]
@@ -245,3 +247,53 @@ text = visual.TextStim(
 	font='Calibri',
 	)
 
+
+### Utility functions
+
+### Event functions
+
+def baseline(): 
+
+def maintain_1(): 
+
+def maintain_2():
+
+def maintain_3():
+
+## Add below functions back if running entire experiment
+#def monitor():
+#def mnm():
+
+
+### Experiment
+block_starts = [0, 106, 126, 146]
+#block_starts = [0, 106, 126, 146, 166, 186, 206, 226]
+pract_starts = [106, 126, 146]
+
+for trial_i in range(N_TOTAL_TRIALS):
+	block_type = df.block[trial_i][0]
+	block = df.block[trial_i][1]
+
+	#if trial_i in block_starts:
+
+
+	## BASELINE
+	if block == 1: 
+		baseline()
+
+	## MAINTAIN 1
+	elif block == 2: 
+		maintain1()
+
+	## MAINTAIN 2
+	elif block == 3:
+		maintain2()
+
+	## MAINTAIN 3
+	elif block == 4: 
+		maintain3()
+
+# Save output at end
+df.to_csv(DATA_FNAME)
+
+win.close()
