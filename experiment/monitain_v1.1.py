@@ -1,4 +1,4 @@
-#BLOCK 1 probe num##################################
+##BLOCK 1 probe num##################################
 ##################################
 ######### monitain v1.1 ##########
 ######## Katie Hedgpeth ##########
@@ -539,6 +539,7 @@ win = visual.Window(
 
 windowSize = win.size
 
+# create a dictionary using list comprehension
 stim_dict = { fn.split('/')[-1].split('.')[0]: visual.ImageStim(win=win, image=fn)for fn in glob.glob("stimuli/grayscale/*.png") }
 
 

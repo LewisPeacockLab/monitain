@@ -27,13 +27,29 @@ from sklearn.utils import shuffle
 from psychopy import visual, core, event, monitors
 from psychopy.iohub import launchHubServer
 
+# screen size options
+SCREENS = {
+    'animal':          dict(distance_cm= 60,width_cm=47.3,pixel_dims=[1920,1080]),
+    'beauregard':      dict(distance_cm= 60,width_cm=47.3,pixel_dims=[1920,1080]),
+    'camilla':         dict(distance_cm= 60,width_cm=47.3,pixel_dims=[1920,1080]),
+    'scooter':         dict(distance_cm= 67,width_cm=28.5,pixel_dims=[1440,900]),
+    'misspiggy_main':  dict(distance_cm= 67,width_cm=68.58,pixel_dims=[2560,1440]),
+    'misspiggy_side':  dict(distance_cm= 67,width_cm=50.8,pixel_dims=[1680,1050]),
+    'swedishchef':     dict(distance_cm= 67,width_cm=33.0,pixel_dims=[1440,900]),
+    'alice':           dict(distance_cm= 67,width_cm=28.5,pixel_dims=[1440,900]),
+}
+
 # get subject num from entry at command line
 # default is s999
+# default is camilla (testing room comp)
 parser = argparse.ArgumentParser(description='Monitain experimental display')
 parser.add_argument('--subj', default='s999', type=str, help='sXXX format')
+parser.add_argument('--scrn', default='misspiggy_main', type=str, choices=SCREENS.keys(), 
+	help='computer used for experiment')
 args = parser.parse_args()
 
 SUBJ = args.subj
+SCRN = args.scrn
 
 ### Set up Slack ###
 
@@ -49,9 +65,9 @@ def slack(msg):
 	try: 
 		requests.post(SLACK['url'], json=payload)
 	except ConnectionError: 
-		print 'Slack messaging failed - no internet connection'
+		print('Slack messaging failed - no internet connection')
 
-	print msg
+	print(msg)
 
 
 ### Directories and import data ## 
@@ -62,12 +78,12 @@ if os.path.exists(DATA_FNAME):
 	sys.exit('Filename ' + DATA_FNAME + " already exists!")
 
 # import images
-images = glob.glob('stimuli/grayscale/*.png')
+images = glob.glob('stimuli/grayscale/frac_*.png')
 
-word_file = 'words.csv'
-nonword_file = 'nonwords.csv'
-pract_word_file = 'pract_words.csv'
-pract_nonword_file = 'pract_nonwords.csv'
+word_file = 'stimuli/words.csv'
+nonword_file = 'stimuli/nonwords.csv'
+pract_word_file = 'stimuli/pract_words.csv'
+pract_nonword_file = 'stimuli/pract_nonwords.csv'
 
 def read_csv(filename):
 	export_list = []
@@ -123,6 +139,12 @@ color_green = [0,255,0] #[0,1,0]
 color_red = [255,0,0] #[1,0,0]
 color_blue = [0,0,255]
 
+FRACTAL_SIZE = [128, 128] # default that images came at
+
+TOP_POS = [0, 150]
+MID_POS = [0, 0]
+BOT_POS = [0, -150]
+
 # event timings
 TIMINGS = {
 	'target': 		2,
@@ -141,4 +163,85 @@ BLOCK_ORDER = {
 
 ### Master dataframe
 
+
+##### COME BACK AND WORK ON THIS LATER
+
+
+
+### Set up PsychPy
+
+clock = core.Clock()
+
+# monitor calibration
+mon = monitors.Monitor('testMonitor')
+mon.setWidth(SCREENS[SCRN]['width_cm'])
+mon.setSizePix(SCREENS[SCRN]['pixel_dims'])
+
+# window set up
+
+fullscreen = False if SUBJ='s999' else True # smaller screen when debugging
+win = visual.Window(
+	mon=mon, 
+	colorspace='rgb255',
+	units='pix',
+	fullscrn=fullscreen,
+	)
+
+# create a dictionary of fractals using list comprehension
+image_dict = { file.split('/')[-1].split('.')[0]: visual.ImageStim(win=win, image=file) 
+	for file in glob.glob("stimuli/grayscale/frac_*.png") }
+
+
+
+### Make PsychoPy stims
+
+## IMAGES
+
+# images for instructions
+instructImage = visual.ImageStim(
+	win=win, 
+	size=win.size/2),
+	)
+
+# fractal positions - top, middle, bottom
+stim_fractal = visual.ImageStim(
+	win=win, 
+	mask='circle', 
+	units='pix', 
+	size=fractal_size,
+	)
+
+# feedback behind fractals
+feedback_circle = visual.Circle(
+	win=win, 
+	units='pix', 
+	radius=70, 
+	lineColor=None, 
+	fillColorSpace='rgb255',
+	)
+
+stim_top = stim_fractal
+stim_top.pos = TOP_POS
+feedback_top = feedback_circle
+feedback_top.pos = TOP_POS
+
+stim_mid = stim_fractal
+stim_mid.pos = MID_POS
+feedback_mid = feedback_circle
+feedback_mid.pos = MID_POS
+
+stim_bot = stim_fractal
+stim_bot.pos = BOT_POS
+feedback_bot = feedback_circle
+feedback_bot.pos = BOT_POS
+
+## TEXT 
+
+text = visual.TextStim(
+	win=win, 
+	color=color_cyan, 
+	colorSpace='rgb255', 
+	height=40.0, 
+	font='Calibri',
+	)
 
