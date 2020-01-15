@@ -165,6 +165,142 @@ BLOCK_ORDER = {
 
 ### Master dataframe
 
+# create an empty dataframe that will hold all parameters for every trial
+# start by creating column names
+columns = ['subj', #subject id 
+	'block', #block 
+	'targTheta', #angle for memory target
+	'targTheta2', #angle for updated memory target (BLOCK 4 ONLY)
+	'n_probes',  #num of probes in trial 
+	'probeTheta_loc', #where target probe is on last probe
+	'targOrNoTarg', #is target present on final probe?
+	'acc', #acc for target probe for trial
+	'pm_acc' #pm acc for trial based on target probe
+	]
+
+# column for each possible word/nonword probe
+word_cols = ['word{:d}'.format(i) for i in range(N_MAX_PROBES)]
+
+# whether stimuli is a word or nonword
+wordCond_cols = ['word{:d}_cond'.format(i) for i in range(N_MAX_PROBES)]
+
+# fractal num for top image
+topTheta_cols = ['topTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
+
+#fractal num for bottom image
+botTheta_cols = ['botTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
+
+df_columns = columns + word_cols + wordCond_cols + topTheta_cols + botTheta_cols
+df_index = range(N_TOTAL_TRIALS)
+
+# actually create the empty dataframe
+df = pd.DataFrame(columns = df_columns, index = df_index)
+
+## DF - Subject 
+df['subj'] = SUBJ
+
+block_list = list(BLOCK_ORDER.keys()) 
+
+## DF - Block
+# set the block number for each trial
+for index, row in df.iterrows(): 
+	if index in range(0,106): 
+		df.iloc[index, df.columns.get_loc('block')] = block_list[0] 
+		pract_df.iloc[index, pract_df.columns.get_loc('block')] = pract_list[0]  
+	elif index in range(106,126): 
+		df.iloc[index, df.columns.get_loc('block')] = block_list[1] 
+		pract_df.iloc[index, pract_df.columns.get_loc('block')] = pract_list[1]
+	elif index in range(126,146): 
+		df.iloc[index, df.columns.get_loc('block')] = block_list[2] 		
+		pract_df.iloc[index, pract_df.columns.get_loc('block')] = pract_list[2]
+	elif index in range(146,166): 
+		df.iloc[index, df.columns.get_loc('block')] = block_list[3] 
+		pract_df.iloc[index, pract_df.columns.get_loc('block')] = pract_list[3]
+
+## DF - Target fractal/theta
+# 20 possible thetas to pick from
+possible_thetas = np.array(range(1,21))
+np.random.choice(possible_thetas)
+
+## add more
+
+## DF - Number of probes
+
+# catch range is the number of probes that are too low to count
+catch_range = range(LOWER_CATCH_TRIAL, UPPER_CATCH_TRIAL+ 1)
+
+# trials may range from min num of probes and max num of probes
+possible_probes = range(N_MIN_PROBES, N_MAX_PROBES+1) 
+
+# create array of two of each probe num to pick from when populating 
+# df for each block
+# this helps ensure that you don't have a block with way more of one num of probes 
+# for example, a block with almost all trials of length 8 probes
+possible_probes = np.repeat(probes, 2)
+
+# number of catch trials per block
+N_CATCH_PER_BLOCK = N_PROBES_PER_BLOCK - possible_probes.size
+
+# create a numpy array to hold all possible probe nums for each block 
+new_range = np.append(catch_range, possible_probes)
+
+# pick probes to populate each block type in dataframe
+def pickProbes(n_blocks, catch_range, N_CATCH_PER_BLOCK):
+	probe_count_list = []
+	for block in range(n_blocks - 1): 
+		# randomly pick num of probes for catch trials
+		catch_subset = np.random.choice(catch_range, size = N_CATCH_PER_BLOCK)
+		probe_set = np.append(catch_subset, possible_probes)
+		np.random.shuffle(probe_set)
+		probe_count_list.append(probe_set)
+	probe_size = np.ravel(probe_count_list).size
+	probe_ravel = np.ravel(probe_count_list) # array of num of probes for trial
+	return probe_ravel
+
+#BLOCK 1 probe num
+baseline_probe_range = np.repeat([1],106)
+df.iloc[0:106, df.columns.get_loc('n_probes')] = baseline_probe_range
+
+#BLOCKS 2-4 probe num
+maintainProbes1 = pickProbes(N_BLOCKS_MAINTAIN_1, catch_range, N_CATCH_PER_BLOCK)
+maintainProbes2 = pickProbes(N_BLOCKS_MAINTAIN_2, catch_range, N_CATCH_PER_BLOCK)
+maintainProbes3 = pickProbes(N_BLOCKS_MAINTAIN_3, catch_range, N_CATCH_PER_BLOCK)
+
+# set probe num for each trial and each block in df
+df.iloc[106:126, df.columns.get_loc('n_probes')] = maintainProbes1
+df.iloc[126:146, df.columns.get_loc('n_probes')] = maintainProbes2
+df.iloc[146:166, df.columns.get_loc('n_probes')] = maintainProbes3
+
+## DF - Probe fractal/theta location 
+# Will the top or bottom be probed?
+
+def pickProbeLoc():
+	# list that repeats 'top', 'bot', ..., for total num trials
+	location_list = np.repeat(['top', 'bot'], N_TOTAL_TRIALS/2)
+	np.random.shuffle(location_list)
+	np.ravel(location_list)
+	return location_list
+
+df['probeTheta_loc'] = pickProbeLoc()
+
+## DF - Target or no target
+df['targOrNoTarg'] = np.nan
+
+# set target present for half of maintain blocks, not present for other half
+targetOutcome = np.repeat([0,1], MAINTAIN_TRIALS)
+
+def targetPresent(block_start, block_end, block_num): 
+	np.random.shuffle(targetOutcome)
+	df.iloc[block_start, block_end, df.columns.get_loc('targOrNoTarg')] = targetOutcome
+
+# assign target presence (0 or 1/no or yes) for each block
+targetPresent(106,126)
+targetPresent(126,146)
+targetPresent(146,166)
+
+
+### need to add: block to update on
+
 
 ##### COME BACK AND WORK ON THIS LATER
 
