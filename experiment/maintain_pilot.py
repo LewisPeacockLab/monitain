@@ -127,7 +127,7 @@ N_TRIALS = range(N_MIN_PROBES, N_MAX_PROBES+1)
 BASELINE_TRIALS = 106
 MAINTAIN_TRIALS = 20
 
-N_TOTAL_TRIALS = (BASELINE_TRIALS*2) + (MAINTAIN_TRIALS*3)
+N_TOTAL_TRIALS = (BASELINE_TRIALS*1) + (MAINTAIN_TRIALS*3)
 N_TOTAL_TRIALS_PRACT = 5 * N_BLOCKS # 5 for each baseline, maintain1, maintain2, maintain3
 
 BLOCK_STRUCT = [106, 20, 20, 20]
@@ -205,22 +205,26 @@ block_list = list(BLOCK_ORDER.keys())
 # set the block number for each trial
 for index, row in df.iterrows(): 
 	if index in range(0,106): 
-		df.iloc[index, df.columns.get_loc('block')] = block_list[0] 
-		pract_df.iloc[index, pract_df.columns.get_loc('block')] = pract_list[0]  
+		df.iloc[index, df.columns.get_loc('block')] = block_list[0]  
 	elif index in range(106,126): 
 		df.iloc[index, df.columns.get_loc('block')] = block_list[1] 
-		pract_df.iloc[index, pract_df.columns.get_loc('block')] = pract_list[1]
 	elif index in range(126,146): 
 		df.iloc[index, df.columns.get_loc('block')] = block_list[2] 		
-		pract_df.iloc[index, pract_df.columns.get_loc('block')] = pract_list[2]
 	elif index in range(146,166): 
 		df.iloc[index, df.columns.get_loc('block')] = block_list[3] 
-		pract_df.iloc[index, pract_df.columns.get_loc('block')] = pract_list[3]
 
 ## DF - Target fractal/theta
 # 20 possible thetas to pick from
+# before the stimuli were called theta so I'm sticking
+# with that in my code and with my naming convention
 possible_thetas = np.array(range(1,21))
-np.random.choice(possible_thetas)
+def pickTheta(x): 
+	return np.random.choice(possible_thetas)
+
+# apply function to df
+df['targTheta'] = df.targTheta.apply(pickTheta)
+
+
 
 ## add more
 
@@ -230,13 +234,13 @@ np.random.choice(possible_thetas)
 catch_range = range(LOWER_CATCH_TRIAL, UPPER_CATCH_TRIAL+ 1)
 
 # trials may range from min num of probes and max num of probes
-possible_probes = range(N_MIN_PROBES, N_MAX_PROBES+1) 
+probe_range = range(N_MIN_PROBES, N_MAX_PROBES+1) 
 
 # create array of two of each probe num to pick from when populating 
 # df for each block
 # this helps ensure that you don't have a block with way more of one num of probes 
 # for example, a block with almost all trials of length 8 probes
-possible_probes = np.repeat(probes, 2)
+possible_probes = np.repeat(probe_range, 2)
 
 # number of catch trials per block
 N_CATCH_PER_BLOCK = N_PROBES_PER_BLOCK - possible_probes.size
@@ -247,7 +251,7 @@ new_range = np.append(catch_range, possible_probes)
 # pick probes to populate each block type in dataframe
 def pickProbes(n_blocks, catch_range, N_CATCH_PER_BLOCK):
 	probe_count_list = []
-	for block in range(n_blocks - 1): 
+	for block in range(n_blocks): 
 		# randomly pick num of probes for catch trials
 		catch_subset = np.random.choice(catch_range, size = N_CATCH_PER_BLOCK)
 		probe_set = np.append(catch_subset, possible_probes)
@@ -287,17 +291,107 @@ df['probeTheta_loc'] = pickProbeLoc()
 df['targOrNoTarg'] = np.nan
 
 # set target present for half of maintain blocks, not present for other half
-targetOutcome = np.repeat([0,1], MAINTAIN_TRIALS)
+targetOutcome = np.repeat([0,1], MAINTAIN_TRIALS/2)
 
-def targetPresent(block_start, block_end, block_num): 
+def targetPresent(block_start, block_end): 
 	np.random.shuffle(targetOutcome)
-	df.iloc[block_start, block_end, df.columns.get_loc('targOrNoTarg')] = targetOutcome
+	df.iloc[block_start:block_end, df.columns.get_loc('targOrNoTarg')] = targetOutcome
 
 # assign target presence (0 or 1/no or yes) for each block
 targetPresent(106,126)
 targetPresent(126,146)
 targetPresent(146,166)
 
+## DF - wordx / nonwordx and topTheta/botTheta
+# assign word/nonwords stimuli that will appear in each trial 
+# based on how many probes that trial will have
+# also assign which images will appear on the top or bottom
+
+def assignTheta(probe_num, possible_thetas_minusTarg):
+	top_theta = np.random.choice(possible_thetas_minusTarg)
+	bot_theta = np.random.choice(possible_thetas_minusTarg)
+	# reassign if top and bottom are the same
+	if top_theta == bot_theta: 
+		new_bot_theta = [x for x in possible_thetas_minusTarg if x not in [top_theta]]
+		bot_theta = np.random.choice(new_bot_theta)
+	return top_theta, bot_theta
+
+# assign the memory target to top or bottom, based on the trial's parameters
+def assignMemTarg(probe_num, possible_thetas_minusTarg):
+	if probe_loc == 'top':
+		top_theta = memTarg
+		bot_theta = np.random.choice(possible_thetas_minusTarg)
+	elif probe_loc == 'bot':
+		top_theta = np.random.choice(possible_thetas_minusTarg)
+		bot_theta = memTarg
+
+
+
+for trial in range(N_TOTAL_TRIALS):
+	# set variables for each trial to reference as 
+	# you progress through the loop
+	n_probes = df.loc[trial, 'n_probes']
+	probe_loc = df.loc[trial, 'probeTheta_loc']
+	memTarg = df.loc[trial, 'targTheta']
+	memTarg2 = df.loc[trial, 'targTheta2']
+	currentBlock = df.block[trial]
+	possible_thetas_minusTarg = [x for x in possible_thetas if x not in [memTarg, memTarg2]]
+
+	# for every trial, there are a series of probes that need
+	# info updated so the experiment knows 
+	# which stimuli to put on the screen for each probe
+	for probe in range(n_probes):
+		# assign words/nonwords for each probe
+		condition = np.random.choice(['word', 'nonword']) 
+		col_name = 'word{:d}'.format(probe)
+		col_name_cond = 'word{:d}'.format(probe)
+
+		# set words and nonwords
+		if condition == 'word':
+			random_word = word_list.pop(0)
+		elif condition == 'nonword':
+			random_word = nonword_list.pop(0)
+
+		df.loc[trial, col_name] = random_word
+		df.loc[trial, col_name_cond] = condition
+
+		# set top and bottom image stimuli 
+		thetaTop_col = 'topTheta{:d}'.format(probe)
+		thetaBot_col = 'botTheta{:d}'.format(probe)
+
+		targOrNah = df.iloc[trial, df.columns.get_loc('targOrNoTarg')]
+
+		# probe+1 != n_probes are probes before the final probe
+		if probe+1 != n_probes: 
+			top_theta, bot_theta = assignTheta(probe, possible_thetas_minusTarg)
+		elif probe+1 == n_probes: 
+			if targOrNah == 0: # target not present for MAINTAIn
+				top_theta, bot_theta = assignTheta(probe, possible_thetas_minusTarg)
+			elif targOrNah == 1: #target present for MAINTAIN
+				assignMemTarg(probe, possible_thetas_minusTarg)
+			# else: # fill in if you end up adding monitor and mnm later
+		else:
+			# you shouldn't get to this point but if you do, something went wrong
+			raise Warning('Nooooo') 
+
+		# assign images that will appear on top and bottom to df for trial
+		df.loc[trial, thetaTop_col] = top_theta
+		df.loc[trial, thetaBot_col] = bot_theta
+
+		# set up columns for resp, rt, acc based on how many 
+		# probes there are for that specific trial 
+		resp_probe = 'respProbe{:d}'.format(probe)
+		rt_probe = 'rtProbe{:d}'.format(probe)
+		acc_probe = 'probe{:d}_acc'.format(probe)
+
+		# fill them all with nan, will be filled in when 
+		# subject participates
+		df.loc[trial, resp_probe] = np.nan
+		df.loc[trial, rt_probe] = np.nan
+		df.loc[trial, acc_probe] = np.nan
+
+# Columns in DF that will be filled in as subjects participate: 
+# acc, pm acc
 
 ### need to add: block to update on
 
