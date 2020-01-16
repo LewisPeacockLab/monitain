@@ -146,6 +146,10 @@ color_blue = [0,0,255]
 
 FRACTAL_SIZE = [128, 128] # default that images came at
 
+KEYS_WORD = ['1', '2'] # 1 = word, 2 = nonword
+KEYS_TARGET = ['3']
+KEYS_NONTARGET = ['4']
+
 TOP_POS = [0, 150]
 MID_POS = [0, 0]
 BOT_POS = [0, -150]
@@ -377,6 +381,7 @@ for trial in range(N_TOTAL_TRIALS):
 			# else: # fill in if you end up adding monitor and mnm later
 		else:
 			# you shouldn't get to this point but if you do, something went wrong
+			print('ISSUE')
 			raise Warning('Nooooo') 
 
 		# assign images that will appear on top and bottom to df for trial
@@ -438,7 +443,7 @@ image_dict = { file.split('/')[-1].split('.')[0]: visual.ImageStim(win=win, imag
 # images for instructions
 instructImage = visual.ImageStim(
 	win=win, 
-	size=win.size/2),
+	size=win.size/2,
 	)
 
 # fractal positions - top, middle, bottom
@@ -484,9 +489,191 @@ text = visual.TextStim(
 	)
 
 
-### Utility functions
+###
+### Utilitiy functions
+###
 
-### Event functions
+def clear(): 
+	clock.reset()
+
+def pressSpace():
+	while 1: 
+		for key in event.getKeys():
+			if key == 'space':
+				win.color = color_black
+				win.flip()
+				return
+
+def drawTwoStims(trial_i, probe_n):
+	topLoc = df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))]
+	stim_top.image = image_dict['frac_{:d}'.format(topLoc)].image
+	stim_top.draw()
+
+	botLoc = df.iloc[trial_i, df.columns.get_loc('botTheta{:d}'.format(probe_n))]
+	stim_bot.image = image_dict['frac_{:d}'.format(botLoc)].image
+	stim_bot.draw()
+
+
+def feedback_text(trial_i, probe_n, acc):
+	# set correct or incorrect in df
+	df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = acc
+	if acc == 1: 
+		text.color = color_green
+	else: 
+		text.color = color_red
+	text.draw()
+	win.flip()
+
+def feedback_circles(trial_i, probe_n, acc, target_present):
+	# set correct or incorrect in df
+	df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = acc
+	if acc == 1: 
+		circle_top.fillColor = color_green
+		circle_bot.fillColor = color_green
+		circle_top.draw()
+		circle_bot.draw()
+		drawTwoStims(trial_i, probe_n)
+		win.flip()
+
+
+def getResp(trial_i, probe_n, stimDraw):
+	allResp = [] # array to record all button presses made
+	respRT = [] # array to hold corresponding RTS for presses
+	responded = False 
+	duration = TIMINGS.get('probe')
+
+	# participants only have a certain amount of time to respond
+	while clock.getTime() < duration: 
+		stim_top.autoDraw = stimDraw # only draw if stimDraw is true  
+		stim_bot.autoDraw = stimDraw
+
+		if not responded:
+			for key, rt in event.getKeys(timeStamped=clock):
+				allResp += key
+				respRT += rt
+				firstKey = allResp[0] # record all resps but only first resp really matters
+				
+				if lastProbe: 
+					getResp_targ(trial_i, probe_n, stimDraw)
+
+				else: 
+					if firstKey in KEYS_WORD: 
+						stim_type = df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))]
+						
+						# hit word for word or nonword for nonword
+						if (firstKey == '1' and stim_type == 'word') or (firstKey == '2' and stim_type == 'nonword'): 
+							feedback_text(trial_i, probe_n, 1) # 1 for CORRECT 
+						# hit word for nonword or nonword for word
+						elif (firstKey == '1' and stim_type != 'word') or (firstKey == '2' and stim_type != 'nonword': # hit nonword for word
+							feedback_text(trial_i, probe_n, 0) # 0 for INCORRECT
+
+					# function for feedback if not baseline
+					### add more if adding monitoring and mnm back in 
+					# would need to handle case of response is 3, which 
+					# isn't allowed for maintenance and monitoring
+
+					else:
+						# picked nothing or a key that wasn't a 1 or 2
+						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0 
+						
+				# record resp and rt
+				df.at[trial_i, 'respProbe{:d}'.format(probe_n)] == allResp[0]
+				df.at[trial_i, 'rtProbe{:d}'.format(probe_n)] == respRT[0]
+	
+	else: 
+		stim_top.autoDraw = False
+		stim_bot.autoDraw = False
+		
+
+def getResp_targ(trial_i, probe_n, stimDraw):
+	keysPossible = KEYS_TARGET + KEYS_NONTARGET 
+	target_present = df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]
+	# if adding monitor and mnm, add if/else statements because
+	# those blocks only allow KEYS_TARGET
+
+	if firstKey in keysPossible: 
+		text.draw()
+
+		if (firstKey == '3'): # hit target
+			if (target_present == 1):
+				feedback_circles(trial_i, probe_n, 1) # CORRECT
+				drawTwoStims(trial_i, probe_n)
+			elif (target_present == 0)
+				feedback_circles(trial_i, probe_n, 0) # INCORRECT
+				drawTwoStims(trial_i, probe_n)
+		elif (firstKey == '4'):
+			if (target_present == 0):
+				feedback_circles(trial_i, probe_n, 1) # CORRECT
+				drawTwoStims(trial_i, probe_n)
+			elif (target_present == 1):
+				feedback_circles(trial_i, probe_n, 0)
+				drawTwoStims(trial_i, probe_n)
+		win.flip()
+		
+	elif firstKey in KEYS_WORD: # picked a word when should have hit target or nontarget
+		df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
+		text.color = color_blue
+		text.draw()
+		win.flip()
+
+	else: 
+		df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
+
+	# set pm acc = to last probe acc
+	df.iloc[trial_i, df.columns.get_loc('pm_acc')] = 
+		df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
+
+
+
+
+
+
+###
+### Task functions
+###
+
+# draw target onto middle of the screen
+def target(trial_i):
+	win.color = color_white
+	win.flip()
+
+	# draw target onto middle of screen
+	stim_mid.pos = MID_POS
+	stim_mid.image = image_dict['frac_{:d}'.format(df.iloc[trial_i, 
+		df.columns.get_loc('targTheta')])].image
+
+# just like target() except increased load, so 2 targets - 
+# one on top and one on bottom
+def target_2():
+	win.color = color_white
+	win.flip()
+
+	# draw targets onto top and bottom of screen
+	stim_top.pos = TOP_POS
+	stim_top.image = image_dict['frac_{:d}'.format(df.iloc[trial_i, 
+		df.columns.get_loc('targTheta')])].image
+	stim_bot.pos = BOT_POS
+	stim_bot.image = image_dict['frac_{:d}'.format(df.iloc[trial_i, 
+		df.columns.get_loc('targTheta2')])].image
+
+def delay():
+	win.color = color_gray
+	win.flip()
+	win.flip()
+	core.wait(TIMINGS.get('delay'))
+
+def ogProbe():
+	win.flip()
+	win.color = color_gray
+
+
+
+
+def iti():
+def resetTrail():
+
+
+### Block functions
 
 def baseline(): 
 
