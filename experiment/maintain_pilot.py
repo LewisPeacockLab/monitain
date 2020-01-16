@@ -51,7 +51,10 @@ args = parser.parse_args()
 SUBJ = args.subj
 SCRN = args.scrn
 
-### Set up Slack ###
+
+###
+### Set up Slack 
+###
 
 # set to false because github respository is public
 SLACK = False
@@ -163,7 +166,9 @@ BLOCK_ORDER = {
 }
 
 
+###
 ### Master dataframe
+###
 
 # create an empty dataframe that will hold all parameters for every trial
 # start by creating column names
@@ -399,8 +404,9 @@ for trial in range(N_TOTAL_TRIALS):
 ##### COME BACK AND WORK ON THIS LATER
 
 
-
+###
 ### Set up PsychPy
+###
 
 clock = core.Clock()
 
