@@ -378,7 +378,10 @@ for trial in range(N_TOTAL_TRIALS):
 				top_theta, bot_theta = assignTheta(probe, possible_thetas_minusTarg)
 			elif targOrNah == 1: #target present for MAINTAIN
 				assignMemTarg(probe, possible_thetas_minusTarg)
-			# else: # fill in if you end up adding monitor and mnm later
+			else: # targOrNah = np.nan in monitor and mnm
+				# REWRITE this if adding in monitor and mnm
+				top_theta = np.nan
+				bot_theta = np.nan
 		else:
 			# you shouldn't get to this point but if you do, something went wrong
 			print('ISSUE')
@@ -495,6 +498,10 @@ text = visual.TextStim(
 
 def clear(): 
 	clock.reset()
+
+def resetTrial():
+	text.color = color_cyan
+	text.size = 40.0
 
 def pressSpace():
 	while 1: 
@@ -623,7 +630,33 @@ def getResp_targ(trial_i, probe_n, stimDraw):
 	df.iloc[trial_i, df.columns.get_loc('pm_acc')] = 
 		df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
 
+def breakMessage(block): 
+	# Insert message instead of PPT image so it's easier to change
+	# display of block number
+	breakText = 'This is the end of block {:d}. \
+		\nPlease hold down the space bar to move onto the next section.'.format(block-1)
 
+	text.text = breakText
+	text.height = 40.0
+	text.color = color_white
+	text.draw()
+
+	win.color = color_black
+	win.flip()
+
+	pressContinue = False
+	while not pressContinue: 
+		keyPress = event.waitKeys()
+		if keyPress == ['space']:
+			pressContinue = True
+			break
+	win.flip()
+
+def presentSlides(slide): 
+	instructImage.image = 'exptInstruct_v1.1/exptInstruct.{:d}.png'.format(slide)
+	instructImage.draw()
+	win.flip()
+	pressSpace()
 
 
 
@@ -641,6 +674,10 @@ def target(trial_i):
 	stim_mid.pos = MID_POS
 	stim_mid.image = image_dict['frac_{:d}'.format(df.iloc[trial_i, 
 		df.columns.get_loc('targTheta')])].image
+	stim_mid.draw()
+	
+	win.flip()
+	core.wait(TIMINGS.get['target'])
 
 # just like target() except increased load, so 2 targets - 
 # one on top and one on bottom
@@ -655,6 +692,11 @@ def target_2():
 	stim_bot.pos = BOT_POS
 	stim_bot.image = image_dict['frac_{:d}'.format(df.iloc[trial_i, 
 		df.columns.get_loc('targTheta2')])].image
+	stim_top.draw()
+	stim_bot.draw()
+
+	win.flip()
+	core.wait(TIMINGS.get['target'])
 
 def delay():
 	win.color = color_gray
@@ -665,6 +707,22 @@ def delay():
 def ogProbe():
 	win.flip()
 	win.color = color_gray
+
+	text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
+	text.draw()
+
+	stim_top.draw()
+	stim_bot.draw()
+
+	win.flip()
+	clear()
+	getResp(trial_i, probe_n, stimDraw=True)
+	resetTrial()
+
+def targetProbe(trial_i, probe_n, lastProbe):
+	win.flip()
+	win.color = color_gray
+	text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
 
 
 
