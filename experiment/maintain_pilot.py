@@ -353,7 +353,7 @@ for trial in range(N_TOTAL_TRIALS):
 		# assign words/nonwords for each probe
 		condition = np.random.choice(['word', 'nonword']) 
 		col_name = 'word{:d}'.format(probe)
-		col_name_cond = 'word{:d}'.format(probe)
+		col_name_cond = 'word{:d}_cond'.format(probe)
 
 		# set words and nonwords
 		if condition == 'word':
@@ -363,6 +363,7 @@ for trial in range(N_TOTAL_TRIALS):
 
 		df.loc[trial, col_name] = random_word
 		df.loc[trial, col_name_cond] = condition
+
 
 		# set top and bottom image stimuli 
 		thetaTop_col = 'topTheta{:d}'.format(probe)
@@ -425,7 +426,7 @@ mon.setSizePix(SCREENS[SCRN]['pixel_dims'])
 
 # window set up
 
-fullscreen = False if SUBJ='s999' else True # smaller screen when debugging
+fullscreen = False if SUBJ=='s999' else True # smaller screen when debugging
 win = visual.Window(
 	mon=mon, 
 	colorspace='rgb255',
@@ -454,7 +455,7 @@ stim_fractal = visual.ImageStim(
 	win=win, 
 	mask='circle', 
 	units='pix', 
-	size=fractal_size,
+	size=FRACTAL_SIZE,
 	)
 
 # feedback behind fractals
@@ -542,38 +543,42 @@ def feedback_circles(trial_i, probe_n, acc, target_present):
 		drawTwoStims(trial_i, probe_n)
 		win.flip()
 
-
-def getResp(trial_i, probe_n, stimDraw):
+def getResp(trial_i, probe_n, stimDraw, lastProbe):
+	clear()
 	allResp = [] # array to record all button presses made
 	respRT = [] # array to hold corresponding RTS for presses
 	responded = False 
 	duration = TIMINGS.get('probe')
 
+	if lastProbe: 
+		getResp_targ(trial_i, probe_n, stimDraw)
+
+	else: 
+		
 	# participants only have a certain amount of time to respond
-	while clock.getTime() < duration: 
-		stim_top.autoDraw = stimDraw # only draw if stimDraw is true  
-		stim_bot.autoDraw = stimDraw
+		while clock.getTime() < 5: 
+			stim_top.autoDraw = stimDraw # only draw if stimDraw is true  
+			stim_bot.autoDraw = stimDraw
 
-		if not responded:
-			for key, rt in event.getKeys(timeStamped=clock):
-				allResp += key
-				respRT += rt
-				firstKey = allResp[0] # record all resps but only first resp really matters
-				
-				if lastProbe: 
-					getResp_targ(trial_i, probe_n, stimDraw)
-
-				else: 
+			if not responded:
+				for key, rt in event.getKeys(timeStamped=clock):
+					
+					allResp.append(key)
+					respRT.append(rt)
+					firstKey = allResp[0] # record all resps but only first resp really matters
+					#print(firstKey, " resp ")
+					#print(respRT, "rt")
 					if firstKey in KEYS_WORD: 
 						stim_type = df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))]
-						
+						print(stim_type)
 						# hit word for word or nonword for nonword
 						if (firstKey == '1' and stim_type == 'word') or (firstKey == '2' and stim_type == 'nonword'): 
 							feedback_text(trial_i, probe_n, 1) # 1 for CORRECT 
+							print('correct')
 						# hit word for nonword or nonword for word
-						elif (firstKey == '1' and stim_type != 'word') or (firstKey == '2' and stim_type != 'nonword': # hit nonword for word
+						elif (firstKey == '1' and stim_type != 'word') or (firstKey == '2' and stim_type != 'nonword'): # hit nonword for word
 							feedback_text(trial_i, probe_n, 0) # 0 for INCORRECT
-
+							print('incorrect')
 					# function for feedback if not baseline
 					### add more if adding monitoring and mnm back in 
 					# would need to handle case of response is 3, which 
@@ -582,14 +587,14 @@ def getResp(trial_i, probe_n, stimDraw):
 					else:
 						# picked nothing or a key that wasn't a 1 or 2
 						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0 
-						
-				# record resp and rt
-				df.at[trial_i, 'respProbe{:d}'.format(probe_n)] == allResp[0]
-				df.at[trial_i, 'rtProbe{:d}'.format(probe_n)] == respRT[0]
+						print('incorrect, not in key list')
+					# record resp and rt
+					df.at[trial_i, 'respProbe{:d}'.format(probe_n)] == allResp[0]
+					df.at[trial_i, 'rtProbe{:d}'.format(probe_n)] == respRT[0]
 	
-	else: 
-		stim_top.autoDraw = False
-		stim_bot.autoDraw = False
+	#else: 
+	#	stim_top.autoDraw = False
+	#	stim_bot.autoDraw = False
 		
 
 def getResp_targ(trial_i, probe_n, stimDraw):
@@ -724,11 +729,21 @@ def targetProbe(trial_i, probe_n, lastProbe):
 	win.color = color_gray
 	text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
 
-
-
-
 def iti():
-def resetTrail():
+	# draw fixation cross onto screen for iti
+	stim_top.autoDraw = False
+	stim_bot.autoDraw = False
+	win.flip()
+	text = visual.TextStim(
+		win=win,
+		colorSpace='rgb255',
+		text='+',
+		color=color_black,
+		height=40.0)
+
+def resetTrial():
+	text.color = color_cyan
+	text.size = 40.0
 
 
 ### Block functions
@@ -754,6 +769,7 @@ pract_starts = [106, 126, 146]
 for trial_i in range(N_TOTAL_TRIALS):
 	block_type = df.block[trial_i][0]
 	block = df.block[trial_i][1]
+	print(block_type, 'block_type')
 
 	#if trial_i in block_starts:
 
