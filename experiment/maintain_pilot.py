@@ -136,7 +136,7 @@ N_TOTAL_TRIALS_PRACT = 5 * N_BLOCKS # 5 for each baseline, maintain1, maintain2,
 BLOCK_STRUCT = [106, 20, 20, 20]
 
 # colors
-color_white = [255,255, 255] #[1,1,1]
+color_white = [255,255,255] #[1,1,1]
 color_black = [0,0,0] #[-1,-1,-1]
 color_gray = [85,85,85] #[0,0,0]
 color_cyan = [0,255,255] #[0,1,1]
@@ -429,7 +429,7 @@ mon.setSizePix(SCREENS[SCRN]['pixel_dims'])
 fullscreen = False if SUBJ=='s999' else True # smaller screen when debugging
 win = visual.Window(
 	mon=mon, 
-	colorspace='rgb255',
+	colorSpace='rgb255',
 	units='pix',
 	fullscrn=fullscreen,
 	)
@@ -610,7 +610,7 @@ def getResp_targ(trial_i, probe_n, stimDraw):
 			if (target_present == 1):
 				feedback_circles(trial_i, probe_n, 1) # CORRECT
 				drawTwoStims(trial_i, probe_n)
-			elif (target_present == 0)
+			elif (target_present == 0):
 				feedback_circles(trial_i, probe_n, 0) # INCORRECT
 				drawTwoStims(trial_i, probe_n)
 		elif (firstKey == '4'):
@@ -632,8 +632,7 @@ def getResp_targ(trial_i, probe_n, stimDraw):
 		df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 
 	# set pm acc = to last probe acc
-	df.iloc[trial_i, df.columns.get_loc('pm_acc')] = 
-		df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
+	df.iloc[trial_i, df.columns.get_loc('pm_acc')] = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
 
 def breakMessage(block): 
 	# Insert message instead of PPT image so it's easier to change
