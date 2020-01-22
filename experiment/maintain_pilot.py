@@ -177,7 +177,8 @@ BLOCK_ORDER = {
 # create an empty dataframe that will hold all parameters for every trial
 # start by creating column names
 columns = ['subj', #subject id 
-	'block', #block 
+	'block_num', #block number
+	'block_name', #block type/name
 	'targTheta', #angle for memory target
 	'targTheta2', #angle for updated memory target (BLOCK 4 ONLY)
 	'n_probes',  #num of probes in trial 
@@ -208,19 +209,24 @@ df = pd.DataFrame(columns = df_columns, index = df_index)
 ## DF - Subject 
 df['subj'] = SUBJ
 
-block_list = list(BLOCK_ORDER.keys()) 
+block_num_list = list(BLOCK_ORDER.values())
+block_type_list = list(BLOCK_ORDER.keys()) 
 
 ## DF - Block
 # set the block number for each trial
 for index, row in df.iterrows(): 
 	if index in range(0,106): 
-		df.iloc[index, df.columns.get_loc('block')] = block_list[0]  
+		df.iloc[index, df.columns.get_loc('block_num')] = block_num_list[0]
+		df.iloc[index, df.columns.get_loc('block_name')] = block_type_list[0]  
 	elif index in range(106,126): 
-		df.iloc[index, df.columns.get_loc('block')] = block_list[1] 
+		df.iloc[index, df.columns.get_loc('block_num')] = block_num_list[1]
+		df.iloc[index, df.columns.get_loc('block_name')] = block_type_list[1] 
 	elif index in range(126,146): 
-		df.iloc[index, df.columns.get_loc('block')] = block_list[2] 		
+		df.iloc[index, df.columns.get_loc('block_num')] = block_num_list[2]
+		df.iloc[index, df.columns.get_loc('block_name')] = block_type_list[2] 		
 	elif index in range(146,166): 
-		df.iloc[index, df.columns.get_loc('block')] = block_list[3] 
+		df.iloc[index, df.columns.get_loc('block_num')] = block_num_list[3]
+		df.iloc[index, df.columns.get_loc('block_name')] = block_type_list[3] 
 
 ## DF - Target fractal/theta
 # 20 possible thetas to pick from
@@ -720,13 +726,24 @@ def ogProbe():
 
 	win.flip()
 	clear()
+
 	getResp(trial_i, probe_n, stimDraw=True)
 	resetTrial()
 
 def targetProbe(trial_i, probe_n, lastProbe):
 	win.flip()
 	win.color = color_gray
+
 	text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
+	if block_type == 'maintain*' and lastProbe: 
+		text.text = ''
+	text.draw()
+
+	drawTwoStims(trial_i, probe_n)
+	win.flip()
+	clear()
+	print(lastProbe, 'last probe')
+	getResp(trial_i, probe_n, stimDraw = True, lastProbe = lastProbe)
 
 def iti():
 	# draw fixation cross onto screen for iti
@@ -745,9 +762,15 @@ def resetTrial():
 	text.size = 40.0
 
 
+###
 ### Block functions
+###
 
-def baseline(): 
+def baseline(trial_i): 
+	probe_n = 0
+	print(trial_i)
+	targetProbe(trial_i, probe_n = 0, lastProbe = False)
+	resetTrial()
 
 def maintain_1(): 
 
@@ -760,22 +783,26 @@ def maintain_3():
 #def mnm():
 
 
+###
 ### Experiment
+###
+
 block_starts = [0, 106, 126, 146]
 #block_starts = [0, 106, 126, 146, 166, 186, 206, 226]
 pract_starts = [106, 126, 146]
 
 for trial_i in range(N_TOTAL_TRIALS):
-	block_type = df.block[trial_i][0]
-	block = df.block[trial_i][1]
-	print(block_type, 'block_type')
+	block_type = df.block_name[trial_i]
+	block_num = df.block_num[trial_i]
+	#print(block_type, 'block_type')
 
 	#if trial_i in block_starts:
 
 
 	## BASELINE
-	if block == 1: 
-		baseline()
+	if block_num == 1: 
+		#print(trial_i)
+		baseline(trial_i)
 
 	## MAINTAIN 1
 	elif block == 2: 
