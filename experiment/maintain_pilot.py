@@ -179,8 +179,7 @@ BLOCK_ORDER = {
 columns = ['subj', #subject id 
 	'block_num', #block number
 	'block_name', #block type/name
-	'targTheta', #angle for memory target
-	'targTheta2', #angle for updated memory target (BLOCK 4 ONLY)
+	'targTheta', #angle for memory target #tuple for possibility of 2 mem targs
 	'n_probes',  #num of probes in trial 
 	'probeTheta_loc', #where target probe is on last probe
 	'targOrNoTarg', #is target present on final probe?
@@ -232,9 +231,12 @@ for index, row in df.iterrows():
 # 20 possible thetas to pick from
 # before the stimuli were called theta so I'm sticking
 # with that in my code and with my naming convention
-possible_thetas = np.array(range(1,21))
 def pickTheta(x): 
-	return np.random.choice(possible_thetas)
+	possible_thetas = np.array(range(1,21))
+	theta_1 = np.random.choice(possible_thetas)
+	possible_thetas_minus1 = [x for x in possible_thetas if x not in [theta_1]]
+	theta_2 = np.random.choice(possible_thetas_minus1)
+	return theta_1, theta_2
 
 # apply function to df
 df['targTheta'] = df.targTheta.apply(pickTheta)
@@ -347,9 +349,9 @@ for trial in range(N_TOTAL_TRIALS):
 	# you progress through the loop
 	n_probes = df.loc[trial, 'n_probes']
 	probe_loc = df.loc[trial, 'probeTheta_loc']
-	memTarg = df.loc[trial, 'targTheta']
-	memTarg2 = df.loc[trial, 'targTheta2']
-	currentBlock = df.block[trial]
+	memTarg = df.loc[trial, 'targTheta'][0]
+	memTarg2 = df.loc[trial, 'targTheta'][0]
+	currentBlock = df.block_num[trial]
 	possible_thetas_minusTarg = [x for x in possible_thetas if x not in [memTarg, memTarg2]]
 
 	# for every trial, there are a series of probes that need
@@ -457,36 +459,58 @@ instructImage = visual.ImageStim(
 	)
 
 # fractal positions - top, middle, bottom
-stim_fractal = visual.ImageStim(
+stim_top = visual.ImageStim(
 	win=win, 
 	mask='circle', 
 	units='pix', 
 	size=FRACTAL_SIZE,
+	pos = TOP_POS
+	)
+
+stim_mid = visual.ImageStim(
+	win=win, 
+	mask='circle', 
+	units='pix', 
+	size=FRACTAL_SIZE,
+	pos = MID_POS
+	)
+
+stim_bot = visual.ImageStim(
+	win=win, 
+	mask='circle', 
+	units='pix', 
+	size=FRACTAL_SIZE,
+	pos = BOT_POS
 	)
 
 # feedback behind fractals
-feedback_circle = visual.Circle(
+feedback_top = visual.Circle(
 	win=win, 
 	units='pix', 
 	radius=70, 
 	lineColor=None, 
 	fillColorSpace='rgb255',
+	pos = TOP_POS
 	)
 
-stim_top = stim_fractal
-stim_top.pos = TOP_POS
-feedback_top = feedback_circle
-feedback_top.pos = TOP_POS
+feedback_mid = visual.Circle(
+	win=win, 
+	units='pix', 
+	radius=70, 
+	lineColor=None, 
+	fillColorSpace='rgb255',
+	pos = MID_POS
+	)
 
-stim_mid = stim_fractal
-stim_mid.pos = MID_POS
-feedback_mid = feedback_circle
-feedback_mid.pos = MID_POS
+feedback_bot = visual.Circle(
+	win=win, 
+	units='pix', 
+	radius=70, 
+	lineColor=None, 
+	fillColorSpace='rgb255',
+	pos = BOT_POS
+	)
 
-stim_bot = stim_fractal
-stim_bot.pos = BOT_POS
-feedback_bot = feedback_circle
-feedback_bot.pos = BOT_POS
 
 ## TEXT 
 
@@ -519,11 +543,11 @@ def pressSpace():
 				return
 
 def drawTwoStims(trial_i, probe_n):
-	topLoc = df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))]
+	topLoc = int(df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))])
 	stim_top.image = image_dict['frac_{:d}'.format(topLoc)].image
 	stim_top.draw()
 
-	botLoc = df.iloc[trial_i, df.columns.get_loc('botTheta{:d}'.format(probe_n))]
+	botLoc = int(df.iloc[trial_i, df.columns.get_loc('botTheta{:d}'.format(probe_n))])
 	stim_bot.image = image_dict['frac_{:d}'.format(botLoc)].image
 	stim_bot.draw()
 
@@ -562,7 +586,7 @@ def getResp(trial_i, probe_n, stimDraw, lastProbe):
 	else: 
 		
 	# participants only have a certain amount of time to respond
-		while clock.getTime() < 5: 
+		while clock.getTime() < duration: 
 			stim_top.autoDraw = stimDraw # only draw if stimDraw is true  
 			stim_bot.autoDraw = stimDraw
 
@@ -640,11 +664,11 @@ def getResp_targ(trial_i, probe_n, stimDraw):
 	# set pm acc = to last probe acc
 	df.iloc[trial_i, df.columns.get_loc('pm_acc')] = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
 
-def breakMessage(block): 
+def breakMessage(block_num): 
 	# Insert message instead of PPT image so it's easier to change
 	# display of block number
 	breakText = 'This is the end of block {:d}. \
-		\nPlease hold down the space bar to move onto the next section.'.format(block-1)
+		\nPlease hold down the space bar to move onto the next section.'.format(block_num-1)
 
 	text.text = breakText
 	text.height = 40.0
@@ -676,18 +700,17 @@ def presentSlides(slide):
 ###
 
 # draw target onto middle of the screen
-def target(trial_i):
+def target():
 	win.color = color_white
 	win.flip()
 
 	# draw target onto middle of screen
 	stim_mid.pos = MID_POS
-	stim_mid.image = image_dict['frac_{:d}'.format(df.iloc[trial_i, 
-		df.columns.get_loc('targTheta')])].image
+	stim_mid.image = image_dict['frac_{:d}'.format(df.targTheta[trial_i][0])].image
 	stim_mid.draw()
 	
 	win.flip()
-	core.wait(TIMINGS.get['target'])
+	core.wait(TIMINGS.get('target'))
 
 # just like target() except increased load, so 2 targets - 
 # one on top and one on bottom
@@ -697,16 +720,14 @@ def target_2():
 
 	# draw targets onto top and bottom of screen
 	stim_top.pos = TOP_POS
-	stim_top.image = image_dict['frac_{:d}'.format(df.iloc[trial_i, 
-		df.columns.get_loc('targTheta')])].image
+	stim_top.image = image_dict['frac_{:d}'.format(df.targTheta[trial_i][0])].image
 	stim_bot.pos = BOT_POS
-	stim_bot.image = image_dict['frac_{:d}'.format(df.iloc[trial_i, 
-		df.columns.get_loc('targTheta2')])].image
+	stim_bot.image = image_dict['frac_{:d}'.format(df.targTheta[trial_i][1])].image
 	stim_top.draw()
 	stim_bot.draw()
 
 	win.flip()
-	core.wait(TIMINGS.get['target'])
+	core.wait(TIMINGS.get('target'))
 
 def delay():
 	win.color = color_gray
@@ -739,11 +760,14 @@ def targetProbe(trial_i, probe_n, lastProbe):
 		text.text = ''
 	text.draw()
 
-	drawTwoStims(trial_i, probe_n)
+	if 'base' not in block_type:
+		print(block_type)
+		drawTwoStims(trial_i, probe_n)
 	win.flip()
 	clear()
 	print(lastProbe, 'last probe')
 	getResp(trial_i, probe_n, stimDraw = True, lastProbe = lastProbe)
+	resetTrial()
 
 def iti():
 	# draw fixation cross onto screen for iti
@@ -772,9 +796,27 @@ def baseline(trial_i):
 	targetProbe(trial_i, probe_n = 0, lastProbe = False)
 	resetTrial()
 
-def maintain_1(): 
+def maintain_1(trial_i): 
+	target()
+	delay()
+	probes_in_trial = df.n_probes[trial_i]
+	for probe in range(probes_in_trial - 1):
+		print(probe, " probe")
+		targetProbe(trial_i, probe, lastProbe=False)
+	targetProbe(trial_i, probes_in_trial-1, lastProbe=True)
+	iti()
+	resetTrial()
 
 def maintain_2():
+	target_2()
+	delay()
+	probes_in_trial = df.n_probes[trial_i]
+	for probe in range(probes_in_trial - 1):
+		print(probe, " probe")
+		targetProbe(trial_i, probe, lastProbe=False)
+	targetProbe(trial_i, probes_in_trial-1, lastProbe=True)
+	iti()
+	resetTrial()
 
 def maintain_3():
 
@@ -801,20 +843,22 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	## BASELINE
 	if block_num == 1: 
+		pass
 		#print(trial_i)
-		baseline(trial_i)
+		#baseline(trial_i)
 
 	## MAINTAIN 1
-	elif block == 2: 
-		maintain1()
+	elif block_num == 2: 
+		#maintain_1(trial_i)
+		pass
 
 	## MAINTAIN 2
-	elif block == 3:
-		maintain2()
+	elif block_num == 3:
+		maintain_2()
 
 	## MAINTAIN 3
-	elif block == 4: 
-		maintain3()
+	elif block_num == 4: 
+		maintain_3()
 
 # Save output at end
 df.to_csv(DATA_FNAME)
