@@ -231,14 +231,15 @@ for index, row in df.iterrows():
 # 20 possible thetas to pick from
 # before the stimuli were called theta so I'm sticking
 # with that in my code and with my naming convention
+
 def pickTheta(x): 
-	possible_thetas = np.array(range(1,21))
 	theta_1 = np.random.choice(possible_thetas)
 	possible_thetas_minus1 = [x for x in possible_thetas if x not in [theta_1]]
 	theta_2 = np.random.choice(possible_thetas_minus1)
 	return theta_1, theta_2
 
 # apply function to df
+possible_thetas = np.array(range(1,21))
 df['targTheta'] = df.targTheta.apply(pickTheta)
 
 
@@ -352,7 +353,11 @@ for trial in range(N_TOTAL_TRIALS):
 	memTarg = df.loc[trial, 'targTheta'][0]
 	memTarg2 = df.loc[trial, 'targTheta'][0]
 	currentBlock = df.block_num[trial]
-	possible_thetas_minusTarg = [x for x in possible_thetas if x not in [memTarg, memTarg2]]
+	if df.block_name[trial] != 'maintain2':
+		targets = [memTarg]
+	else: 
+		targets = [memTarg, memTarg2]
+	possible_thetas_minusTarg = [x for x in possible_thetas if x not in targets]
 
 	# for every trial, there are a series of probes that need
 	# info updated so the experiment knows 
@@ -580,24 +585,22 @@ def getResp(trial_i, probe_n, stimDraw, lastProbe):
 	responded = False 
 	duration = TIMINGS.get('probe')
 
-	if lastProbe: 
-		getResp_targ(trial_i, probe_n, stimDraw)
+# participants only have a certain amount of time to respond
+	while clock.getTime() < duration: 
+		stim_top.autoDraw = stimDraw # only draw if stimDraw is true  
+		stim_bot.autoDraw = stimDraw
 
-	else: 
-		
-	# participants only have a certain amount of time to respond
-		while clock.getTime() < duration: 
-			stim_top.autoDraw = stimDraw # only draw if stimDraw is true  
-			stim_bot.autoDraw = stimDraw
-
-			if not responded:
-				for key, rt in event.getKeys(timeStamped=clock):
-					
-					allResp.append(key)
-					respRT.append(rt)
-					firstKey = allResp[0] # record all resps but only first resp really matters
-					#print(firstKey, " resp ")
-					#print(respRT, "rt")
+		if not responded:
+			for key, rt in event.getKeys(timeStamped=clock):
+				
+				allResp.append(key)
+				respRT.append(rt)
+				firstKey = allResp[0] # record all resps but only first resp really matters
+				if lastProbe: 
+					getResp_targ(firstKey, trial_i, probe_n, stimDraw)
+				else: 
+				#print(firstKey, " resp ")
+				#print(respRT, "rt")
 					if firstKey in KEYS_WORD: 
 						stim_type = df.iloc[trial_i, df.columns.get_loc('word{:d}_cond'.format(probe_n))]
 						print(stim_type)
@@ -621,13 +624,13 @@ def getResp(trial_i, probe_n, stimDraw, lastProbe):
 					# record resp and rt
 					df.at[trial_i, 'respProbe{:d}'.format(probe_n)] == allResp[0]
 					df.at[trial_i, 'rtProbe{:d}'.format(probe_n)] == respRT[0]
-	
+
 	#else: 
 	#	stim_top.autoDraw = False
 	#	stim_bot.autoDraw = False
 		
 
-def getResp_targ(trial_i, probe_n, stimDraw):
+def getResp_targ(firstKey, trial_i, probe_n, stimDraw):
 	keysPossible = KEYS_TARGET + KEYS_NONTARGET 
 	target_present = df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]
 	# if adding monitor and mnm, add if/else statements because
@@ -759,6 +762,7 @@ def targetProbe(trial_i, probe_n, lastProbe):
 	if block_type == 'maintain*' and lastProbe: 
 		text.text = ''
 	text.draw()
+	print('text  ', text.text)
 
 	if 'base' not in block_type:
 		print(block_type)
@@ -780,6 +784,11 @@ def iti():
 		text='+',
 		color=color_black,
 		height=40.0)
+	clear()
+	duration = TIMINGS.get('iti')
+	while clock.getTime() < duration: 
+		text.draw()
+		win.flip()
 
 def resetTrial():
 	text.color = color_cyan
@@ -808,6 +817,7 @@ def maintain_1(trial_i):
 	resetTrial()
 
 def maintain_2():
+	print("")
 	target_2()
 	delay()
 	probes_in_trial = df.n_probes[trial_i]
