@@ -279,6 +279,11 @@ def pickProbes(n_blocks, catch_range, N_CATCH_PER_BLOCK):
 	probe_ravel = np.ravel(probe_count_list) # array of num of probes for trial
 	return probe_ravel
 
+def pickProbes_maintain3():
+	catch_subset = np.random.choice(catch_range, size=N_CATCH_PER_BLOCK)
+	### PICK BACK UP HERE
+
+
 #BLOCK 1 probe num
 baseline_probe_range = np.repeat([1],106)
 df.iloc[0:106, df.columns.get_loc('n_probes')] = baseline_probe_range
@@ -817,7 +822,6 @@ def maintain_1(trial_i):
 	resetTrial()
 
 def maintain_2():
-	print("")
 	target_2()
 	delay()
 	probes_in_trial = df.n_probes[trial_i]
@@ -829,6 +833,8 @@ def maintain_2():
 	resetTrial()
 
 def maintain_3():
+	target()
+	delay()
 
 ## Add below functions back if running entire experiment
 #def monitor():
