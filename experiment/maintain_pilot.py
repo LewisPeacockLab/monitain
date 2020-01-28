@@ -522,16 +522,14 @@ feedback_bot = visual.Circle(
 
 
 ## TEXT 
-
 text = visual.TextStim(
-
 	win=win, 
-	units='deg',
+	wrapWidth = 50,	
+	alignHoriz = 'center',
 	color=color_cyan, 
 	colorSpace='rgb255', 
 	height=40.0, 
-	font='Calibri'),
-	pos = MID_POS
+	font='Calibri', 
 	)
 
 
