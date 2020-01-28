@@ -443,13 +443,12 @@ mon.setWidth(SCREENS[SCRN]['width_cm'])
 mon.setSizePix(SCREENS[SCRN]['pixel_dims'])
 
 # window set up
-
 fullscreen = False if SUBJ=='s999' else True # smaller screen when debugging
 win = visual.Window(
 	mon=mon, 
 	colorSpace='rgb255',
 	units='pix',
-	fullscrn=fullscreen,
+	fullscr=fullscreen,
 	)
 
 # create a dictionary of fractals using list comprehension
@@ -525,11 +524,14 @@ feedback_bot = visual.Circle(
 ## TEXT 
 
 text = visual.TextStim(
+
 	win=win, 
+	units='deg',
 	color=color_cyan, 
 	colorSpace='rgb255', 
 	height=40.0, 
-	font='Calibri',
+	font='Calibri'),
+	pos = MID_POS
 	)
 
 
@@ -766,6 +768,7 @@ def targetProbe(trial_i, probe_n, lastProbe):
 	text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
 	if block_type == 'maintain*' and lastProbe: 
 		text.text = ''
+	text.pos = MID_POS
 	text.draw()
 	print('text  ', text.text)
 
@@ -793,6 +796,7 @@ def iti():
 	duration = TIMINGS.get('iti')
 	while clock.getTime() < duration: 
 		text.draw()
+		print(text.text)
 		win.flip()
 
 def resetTrial():
