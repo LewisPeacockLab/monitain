@@ -348,6 +348,21 @@ def assignMemTarg(probe_num, possible_thetas_minusTarg):
 		top_theta = np.random.choice(possible_thetas_minusTarg)
 		bot_theta = memTarg
 
+# Create separate conditions for maintain3 block
+# requires updating so you need to know when second target will appear
+def create_m3_df():
+	m3_columns = ['targ2_probe', 'targ2_bool']
+	m3_index = range(block_starts[3], last_trial) 
+	maintain3_df = pd.DataFrame(columns = m3_columns, index = m3_index)
+	for i in m3_index: 
+		probes = df.n_probes[i]
+		if probes > 2:
+			t2_probe = randint(2, probes-1)
+			maintain3_df.targ2_probe[i] = t2_probe
+			maintain3_df.targ2_bool[i] = True
+		else: 
+			maintain3_df.targ2_bool[i] = False
+	return maintain3_df
 
 
 for trial in range(N_TOTAL_TRIALS):
@@ -421,6 +436,10 @@ for trial in range(N_TOTAL_TRIALS):
 		df.loc[trial, resp_probe] = np.nan
 		df.loc[trial, rt_probe] = np.nan
 		df.loc[trial, acc_probe] = np.nan
+
+		maintain3_df = create_m3_df()
+
+
 
 # Columns in DF that will be filled in as subjects participate: 
 # acc, pm acc
@@ -523,8 +542,7 @@ feedback_bot = visual.Circle(
 
 ## TEXT 
 text = visual.TextStim(
-	win=win, 
-	wrapWidth = 50,	
+	win=win, 	
 	alignHoriz = 'center',
 	color=color_cyan, 
 	colorSpace='rgb255', 
@@ -569,6 +587,7 @@ def feedback_text(trial_i, probe_n, acc):
 		text.color = color_green
 	else: 
 		text.color = color_red
+	text.wrapWidth = 10 * len(text.text)
 	text.draw()
 	win.flip()
 
@@ -630,18 +649,20 @@ def getResp(trial_i, probe_n, stimDraw, lastProbe):
 					df.at[trial_i, 'respProbe{:d}'.format(probe_n)] == allResp[0]
 					df.at[trial_i, 'rtProbe{:d}'.format(probe_n)] == respRT[0]
 
-	#else: 
-	#	stim_top.autoDraw = False
-	#	stim_bot.autoDraw = False
+	
+	stim_top.autoDraw = False
+	stim_bot.autoDraw = False
 		
 
 def getResp_targ(firstKey, trial_i, probe_n, stimDraw):
 	keysPossible = KEYS_TARGET + KEYS_NONTARGET 
-	target_present = df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]
+	if blocktype != 'maintain3':
+		target_present = df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]		
 	# if adding monitor and mnm, add if/else statements because
 	# those blocks only allow KEYS_TARGET
 
 	if firstKey in keysPossible: 
+		text.wrapWidth = 10 * len(text.text)
 		text.draw()
 
 		if (firstKey == '3'): # hit target
@@ -663,6 +684,7 @@ def getResp_targ(firstKey, trial_i, probe_n, stimDraw):
 	elif firstKey in KEYS_WORD: # picked a word when should have hit target or nontarget
 		df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 		text.color = color_blue
+		text.wrapWidth = 10 * len(text.text)
 		text.draw()
 		win.flip()
 
@@ -671,6 +693,9 @@ def getResp_targ(firstKey, trial_i, probe_n, stimDraw):
 
 	# set pm acc = to last probe acc
 	df.iloc[trial_i, df.columns.get_loc('pm_acc')] = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
+
+	stim_top.autoDraw = False
+	stim_bot.autoDraw = False
 
 def breakMessage(block_num): 
 	# Insert message instead of PPT image so it's easier to change
@@ -681,6 +706,7 @@ def breakMessage(block_num):
 	text.text = breakText
 	text.height = 40.0
 	text.color = color_white
+	text.wrapWidth = 10 * len(text.text)
 	text.draw()
 
 	win.color = color_black
@@ -708,13 +734,21 @@ def presentSlides(slide):
 ###
 
 # draw target onto middle of the screen
-def target():
+def target(target2):
+	stim_top.autoDraw = False
+	stim_bot.autoDraw = False
+
 	win.color = color_white
 	win.flip()
 
+	if target2:
+		imageNum = df.targTheta[trial_i][1]
+	else: 
+		imageNum = df.targTheta[trial_i][0]
+
 	# draw target onto middle of screen
 	stim_mid.pos = MID_POS
-	stim_mid.image = image_dict['frac_{:d}'.format(df.targTheta[trial_i][0])].image
+	stim_mid.image = image_dict['frac_{:d}'.format(imageNum)].image
 	stim_mid.draw()
 	
 	win.flip()
@@ -743,39 +777,39 @@ def delay():
 	win.flip()
 	core.wait(TIMINGS.get('delay'))
 
-def ogProbe():
-	win.flip()
-	win.color = color_gray
+# def ogProbe():
+# 	win.flip()
+# 	win.color = color_gray
 
-	text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
-	text.draw()
+# 	text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
+# 	text.draw()
 
-	stim_top.draw()
-	stim_bot.draw()
+# 	stim_top.draw()
+# 	stim_bot.draw()
 
-	win.flip()
-	clear()
+# 	win.flip()
+# 	clear()
 
-	getResp(trial_i, probe_n, stimDraw=True)
-	resetTrial()
+# 	getResp(trial_i, probe_n, stimDraw=True)
+# 	resetTrial()
 
 def targetProbe(trial_i, probe_n, lastProbe):
 	win.flip()
 	win.color = color_gray
 
 	text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
-	if block_type == 'maintain*' and lastProbe: 
+	if 'maintain' in block_type and lastProbe: 
 		text.text = ''
 	text.pos = MID_POS
+	text.wrapWidth = 10 * len(text.text)
+	if text.wrapWidth==0: 
+		text.wrapWidth=1
 	text.draw()
-	print('text  ', text.text)
 
 	if 'base' not in block_type:
-		print(block_type)
 		drawTwoStims(trial_i, probe_n)
 	win.flip()
 	clear()
-	print(lastProbe, 'last probe')
 	getResp(trial_i, probe_n, stimDraw = True, lastProbe = lastProbe)
 	resetTrial()
 
@@ -784,17 +818,19 @@ def iti():
 	stim_top.autoDraw = False
 	stim_bot.autoDraw = False
 	win.flip()
-	text = visual.TextStim(
-		win=win,
-		colorSpace='rgb255',
-		text='+',
-		color=color_black,
-		height=40.0)
-	clear()
+	text.text = '+'
+	text.color = color_black
+	#text = visual.TextStim(
+	#	win=win,
+	#	colorSpace='rgb255',
+	#	text='+',
+	#	color=color_black,
+	#	height=40.0)	
 	duration = TIMINGS.get('iti')
+	clear() 
 	while clock.getTime() < duration: 
+		text.wrapWidth = 10 * len(text.text)
 		text.draw()
-		print(text.text)
 		win.flip()
 
 def resetTrial():
@@ -808,7 +844,6 @@ def resetTrial():
 
 def baseline(trial_i): 
 	probe_n = 0
-	print(trial_i)
 	targetProbe(trial_i, probe_n = 0, lastProbe = False)
 	resetTrial()
 
@@ -817,26 +852,40 @@ def maintain_1(trial_i):
 	delay()
 	probes_in_trial = df.n_probes[trial_i]
 	for probe in range(probes_in_trial - 1):
-		print(probe, " probe")
 		targetProbe(trial_i, probe, lastProbe=False)
 	targetProbe(trial_i, probes_in_trial-1, lastProbe=True)
 	iti()
 	resetTrial()
 
-def maintain_2():
+def maintain_2(trial_i):
 	target_2()
 	delay()
 	probes_in_trial = df.n_probes[trial_i]
 	for probe in range(probes_in_trial - 1):
-		print(probe, " probe")
 		targetProbe(trial_i, probe, lastProbe=False)
 	targetProbe(trial_i, probes_in_trial-1, lastProbe=True)
 	iti()
 	resetTrial()
 
-def maintain_3():
-	target()
+def maintain_3(trial_i):
+	target(target2=False)
 	delay()
+	probes_in_trial = df.n_probes[trial_i]
+	targ2 = maintain3_df.targ2_bool[trial_i]
+	targ2_probe = maintain3_df.targ2_probe[trial_i]
+	for probe in range(probes_in_trial-1): 
+		if targ2 and probe == targ2_probe:  
+			print('targ2')
+			target(target2=True)
+			delay()
+		else: 
+			targetProbe(trial_i, probe, lastProbe=False)
+	targetProbe(trial_i, probes_in_trial-1, lastProbe=True)
+	iti()
+	resetTrial()
+	#probes
+
+
 
 ## Add below functions back if running entire experiment
 #def monitor():
@@ -848,6 +897,7 @@ def maintain_3():
 ###
 
 block_starts = [0, 106, 126, 146]
+last_trial = 166
 #block_starts = [0, 106, 126, 146, 166, 186, 206, 226]
 pract_starts = [106, 126, 146]
 
@@ -872,11 +922,12 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	## MAINTAIN 2
 	elif block_num == 3:
-		maintain_2()
+		#maintain_2(trial_i)
+		pass
 
 	## MAINTAIN 3
 	elif block_num == 4: 
-		maintain_3()
+		maintain_3(trial_i)
 
 # Save output at end
 df.to_csv(DATA_FNAME)
