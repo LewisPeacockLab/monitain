@@ -854,7 +854,7 @@ def baseline(trial_i):
 	resetTrial()
 
 def maintain_1(trial_i): 
-	target()
+	target(target2=False)
 	delay()
 	probes_in_trial = df.n_probes[trial_i]
 	for probe in range(probes_in_trial - 1):
