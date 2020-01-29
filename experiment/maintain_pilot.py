@@ -26,6 +26,7 @@ from itertools import product, compress
 from sklearn.utils import shuffle
 from psychopy import visual, core, event, monitors
 from psychopy.iohub import launchHubServer
+from random import randint
 
 # screen size options
 SCREENS = {
@@ -153,6 +154,11 @@ KEYS_NONTARGET = ['4']
 TOP_POS = [0, 150]
 MID_POS = [0, 0]
 BOT_POS = [0, -150]
+
+block_starts = [0, 106, 126, 146]
+last_trial = 166
+#block_starts = [0, 106, 126, 146, 166, 186, 206, 226]
+pract_starts = [106, 126, 146]
 
 # event timings
 TIMINGS = {
@@ -408,7 +414,7 @@ for trial in range(N_TOTAL_TRIALS):
 		if probe+1 != n_probes: 
 			top_theta, bot_theta = assignTheta(probe, possible_thetas_minusTarg)
 		elif probe+1 == n_probes: 
-			if targOrNah == 0: # target not present for MAINTAIn
+			if targOrNah == 0: # target not present for MAINTAIN
 				top_theta, bot_theta = assignTheta(probe, possible_thetas_minusTarg)
 			elif targOrNah == 1: #target present for MAINTAIN
 				assignMemTarg(probe, possible_thetas_minusTarg)
@@ -896,10 +902,7 @@ def maintain_3(trial_i):
 ### Experiment
 ###
 
-block_starts = [0, 106, 126, 146]
-last_trial = 166
-#block_starts = [0, 106, 126, 146, 166, 186, 206, 226]
-pract_starts = [106, 126, 146]
+
 
 for trial_i in range(N_TOTAL_TRIALS):
 	block_type = df.block_name[trial_i]
