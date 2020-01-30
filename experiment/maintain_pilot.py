@@ -597,18 +597,24 @@ def feedback_text(trial_i, probe_n, acc):
 	text.draw()
 	win.flip()
 
-def feedback_circles(trial_i, probe_n, acc, target_present):
-	# set correct or incorrect in df
-	df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = acc
-	if acc == 1: 
-		circle_top.fillColor = color_green
-		circle_bot.fillColor = color_green
+def feedback_circles(trial_i, probe_n, acc):
+	if base not in block_type:
+		# set correct or incorrect in df
+		df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = acc
+		print('accuracy is ', acc)
+		if acc == 1: 
+			circle_top.fillColor = color_green
+			circle_bot.fillColor = color_green
+		else: 
+			circle_top.fillColor = color_red
+			circle_bot.fillColor = color_red
 		circle_top.draw()
 		circle_bot.draw()
 		drawTwoStims(trial_i, probe_n)
 		win.flip()
 
 def getResp(trial_i, probe_n, stimDraw, lastProbe):
+	print('probe_n ', probe_n)
 	clear()
 	allResp = [] # array to record all button presses made
 	respRT = [] # array to hold corresponding RTS for presses
@@ -636,11 +642,11 @@ def getResp(trial_i, probe_n, stimDraw, lastProbe):
 						print(stim_type)
 						# hit word for word or nonword for nonword
 						if (firstKey == '1' and stim_type == 'word') or (firstKey == '2' and stim_type == 'nonword'): 
-							feedback_text(trial_i, probe_n, 1) # 1 for CORRECT 
+							acc = 1										
 							print('correct')
 						# hit word for nonword or nonword for word
 						elif (firstKey == '1' and stim_type != 'word') or (firstKey == '2' and stim_type != 'nonword'): # hit nonword for word
-							feedback_text(trial_i, probe_n, 0) # 0 for INCORRECT
+							acc = 0
 							print('incorrect')
 					# function for feedback if not baseline
 					### add more if adding monitoring and mnm back in 
@@ -649,18 +655,30 @@ def getResp(trial_i, probe_n, stimDraw, lastProbe):
 
 					else:
 						# picked nothing or a key that wasn't a 1 or 2
-						df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0 
+						acc = 0						
 						print('incorrect, not in key list')
+
+
+					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = acc
+
+					feedback_text(trial_i, probe_n, acc) # 1 for CORRECT 
+					feedback_circles(trial_i, probe_n, acc)
+
 					# record resp and rt
 					df.at[trial_i, 'respProbe{:d}'.format(probe_n)] == allResp[0]
 					df.at[trial_i, 'rtProbe{:d}'.format(probe_n)] == respRT[0]
 
-	
 	stim_top.autoDraw = False
 	stim_bot.autoDraw = False
-		
 
+	print('resp to probe')
+	print(df.at[trial_i, 'respProbe{:d}'.format(probe_n)])
+	print('rt')
+	print(df.at[trial_i, 'rtProbe{:d}'.format(probe_n)])
+	print('')
+		
 def getResp_targ(firstKey, trial_i, probe_n, stimDraw):
+	print('probe_n ', probe_n)
 	keysPossible = KEYS_TARGET + KEYS_NONTARGET 
 	if blocktype != 'maintain3':
 		target_present = df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]		
@@ -673,18 +691,23 @@ def getResp_targ(firstKey, trial_i, probe_n, stimDraw):
 
 		if (firstKey == '3'): # hit target
 			if (target_present == 1):
-				feedback_circles(trial_i, probe_n, 1) # CORRECT
-				drawTwoStims(trial_i, probe_n)
+				acc = 1				
+				print('correct')
 			elif (target_present == 0):
-				feedback_circles(trial_i, probe_n, 0) # INCORRECT
-				drawTwoStims(trial_i, probe_n)
+				acc = 0		
+				print('incorrect')
 		elif (firstKey == '4'):
 			if (target_present == 0):
-				feedback_circles(trial_i, probe_n, 1) # CORRECT
-				drawTwoStims(trial_i, probe_n)
+				acc = 0
+				print('correct')
 			elif (target_present == 1):
-				feedback_circles(trial_i, probe_n, 0)
-				drawTwoStims(trial_i, probe_n)
+				acc = 0
+				
+				print('incorrect')
+		df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = acc
+		feedback_circles(trial_i, probe_n, acc)
+		feedback_circles(trial_i, probe_n, acc)
+		drawTwoStims(trial_i, probe_n)
 		win.flip()
 		
 	elif firstKey in KEYS_WORD: # picked a word when should have hit target or nontarget
@@ -702,6 +725,12 @@ def getResp_targ(firstKey, trial_i, probe_n, stimDraw):
 
 	stim_top.autoDraw = False
 	stim_bot.autoDraw = False
+
+	print('TARGET - resp to probe')
+	print(df.at[trial_i, 'respProbe{:d}'.format(probe_n)])
+	print('TARGET - rt')
+	print(df.at[trial_i, 'rtProbe{:d}'.format(probe_n)])
+	print('')
 
 def breakMessage(block_num): 
 	# Insert message instead of PPT image so it's easier to change
@@ -731,8 +760,6 @@ def presentSlides(slide):
 	instructImage.draw()
 	win.flip()
 	pressSpace()
-
-
 
 
 ###
@@ -914,22 +941,23 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	## BASELINE
 	if block_num == 1: 
-		pass
-		#print(trial_i)
-		#baseline(trial_i)
+		#pass
+		print('trial ', trial_i)
+		baseline(trial_i)
 
 	## MAINTAIN 1
-	elif block_num == 2: 
-		#maintain_1(trial_i)
-		pass
+	elif block_num == 2:
+		print('trial ', trial_i)
+		maintain_1(trial_i)
 
 	## MAINTAIN 2
 	elif block_num == 3:
-		#maintain_2(trial_i)
-		pass
+		print('trial ', trial_i)
+		maintain_2(trial_i)
 
 	## MAINTAIN 3
 	elif block_num == 4: 
+		print('trial ', trial_i)
 		maintain_3(trial_i)
 
 # Save output at end
