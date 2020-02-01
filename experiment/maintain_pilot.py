@@ -598,18 +598,18 @@ def feedback_text(trial_i, probe_n, acc):
 	win.flip()
 
 def feedback_circles(trial_i, probe_n, acc):
-	if base not in block_type:
+	if 'base' not in block_type:
 		# set correct or incorrect in df
 		df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = acc
 		print('accuracy is ', acc)
 		if acc == 1: 
-			circle_top.fillColor = color_green
-			circle_bot.fillColor = color_green
+			feedback_top.fillColor = color_green
+			feedback_bot.fillColor = color_green
 		else: 
-			circle_top.fillColor = color_red
-			circle_bot.fillColor = color_red
-		circle_top.draw()
-		circle_bot.draw()
+			feedback_top.fillColor = color_red
+			feedback_bot.fillColor = color_red
+		feedback_top.draw()
+		feedback_bot.draw()
 		drawTwoStims(trial_i, probe_n)
 		win.flip()
 
@@ -631,6 +631,7 @@ def getResp(trial_i, probe_n, stimDraw, lastProbe):
 				
 				allResp.append(key)
 				respRT.append(rt)
+				print('key ', key)
 				firstKey = allResp[0] # record all resps but only first resp really matters
 				if lastProbe: 
 					getResp_targ(firstKey, trial_i, probe_n, stimDraw)
@@ -662,15 +663,16 @@ def getResp(trial_i, probe_n, stimDraw, lastProbe):
 					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = acc
 
 					feedback_text(trial_i, probe_n, acc) # 1 for CORRECT 
-					feedback_circles(trial_i, probe_n, acc)
+					#feedback_circles(trial_i, probe_n, acc)
 
 					# record resp and rt
-					df.at[trial_i, 'respProbe{:d}'.format(probe_n)] == allResp[0]
-					df.at[trial_i, 'rtProbe{:d}'.format(probe_n)] == respRT[0]
+					df.loc[trial_i, 'respProbe{:d}'.format(probe_n)] = allResp[0]
+					df.loc[trial_i, 'rtProbe{:d}'.format(probe_n)] = respRT[0]
 
 	stim_top.autoDraw = False
 	stim_bot.autoDraw = False
 
+	print(allResp)
 	print('resp to probe')
 	print(df.at[trial_i, 'respProbe{:d}'.format(probe_n)])
 	print('rt')
@@ -680,13 +682,15 @@ def getResp(trial_i, probe_n, stimDraw, lastProbe):
 def getResp_targ(firstKey, trial_i, probe_n, stimDraw):
 	print('probe_n ', probe_n)
 	keysPossible = KEYS_TARGET + KEYS_NONTARGET 
-	if blocktype != 'maintain3':
+	if block_type != 'maintain3':
 		target_present = df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]		
 	# if adding monitor and mnm, add if/else statements because
 	# those blocks only allow KEYS_TARGET
 
 	if firstKey in keysPossible: 
 		text.wrapWidth = 10 * len(text.text)
+		if (len(text.text)==0): 
+			text.wrapWidth = 1
 		text.draw()
 
 		if (firstKey == '3'): # hit target
@@ -704,14 +708,14 @@ def getResp_targ(firstKey, trial_i, probe_n, stimDraw):
 				acc = 0
 				
 				print('incorrect')
-		df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = acc
+		
 		feedback_circles(trial_i, probe_n, acc)
 		feedback_circles(trial_i, probe_n, acc)
 		drawTwoStims(trial_i, probe_n)
 		win.flip()
 		
 	elif firstKey in KEYS_WORD: # picked a word when should have hit target or nontarget
-		df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
+		acc = 0
 		text.color = color_blue
 		text.wrapWidth = 10 * len(text.text)
 		text.draw()
@@ -720,6 +724,8 @@ def getResp_targ(firstKey, trial_i, probe_n, stimDraw):
 	else: 
 		df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = 0
 
+	# save accuracy
+	df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = acc
 	# set pm acc = to last probe acc
 	df.iloc[trial_i, df.columns.get_loc('pm_acc')] = df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))]
 
@@ -831,6 +837,7 @@ def targetProbe(trial_i, probe_n, lastProbe):
 	win.color = color_gray
 
 	text.text = df.iloc[trial_i, df.columns.get_loc('word{:d}'.format(probe_n))]
+	text.wrapWidth = True
 	if 'maintain' in block_type and lastProbe: 
 		text.text = ''
 	text.pos = MID_POS
@@ -851,6 +858,7 @@ def iti():
 	stim_top.autoDraw = False
 	stim_bot.autoDraw = False
 	win.flip()
+	text.wrapWidth = True
 	text.text = '+'
 	text.color = color_black
 	#text = visual.TextStim(
@@ -941,7 +949,6 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	## BASELINE
 	if block_num == 1: 
-		#pass
 		print('trial ', trial_i)
 		baseline(trial_i)
 
