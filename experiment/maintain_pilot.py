@@ -218,8 +218,7 @@ topTheta_cols = ['topTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
 #fractal num for bottom image
 botTheta_cols = ['botTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
 
-# set target present for half of maintain blocks, not present for other half
-targetOutcome = np.repeat([0,1], MAINTAIN_TRIALS/2)
+
 
 possible_thetas = np.array(range(1,21))
 
@@ -279,9 +278,11 @@ def pickTheta(x):
 	theta_2 = np.random.choice(possible_thetas_minus1)
 	return theta_1, theta_2
 
-def targetPresent(block_start, block_end, df): 
+def targetPresent(): 
+	# set target present for half of maintain blocks, not present for other half
+	targetOutcome = np.repeat([0,1], MAINTAIN_TRIALS/2)
 	np.random.shuffle(targetOutcome)
-	df.iloc[block_start:block_end, df.columns.get_loc('targOrNoTarg')] = targetOutcome
+	return targetOutcome
 
 ## DF - wordx / nonwordx and topTheta/botTheta
 # assign word/nonwords stimuli that will appear in each trial 
@@ -298,13 +299,14 @@ def assignTheta(probe_num, possible_thetas_minusTarg):
 	return top_theta, bot_theta
 
 # assign the memory target to top or bottom, based on the trial's parameters
-def assignMemTarg(probe_num, possible_thetas_minusTarg):
+def assignMemTarg(probe_loc, possible_thetas_minusTarg, memTarg):
 	if probe_loc == 'top':
 		top_theta = memTarg
 		bot_theta = np.random.choice(possible_thetas_minusTarg)
 	elif probe_loc == 'bot':
 		top_theta = np.random.choice(possible_thetas_minusTarg)
 		bot_theta = memTarg
+	return top_theta, bot_theta
 
 # Create separate conditions for maintain3 block
 # requires updating so you need to know when second target will appear
@@ -354,14 +356,16 @@ def create_master_df():
 	# with that in my code and with my naming convention
 
 
-
 	# apply function to df
 	df['targTheta'] = df.targTheta.apply(pickTheta)
 
+	## DF - Target or no target
+	df['targOrNoTarg'] = np.nan
+
 	# assign target presence (0 or 1/no or yes) for each block
-	targetPresent(106,126, df)
-	targetPresent(126,146, df)
-	targetPresent(146,166, df)
+	df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targetPresent()
+	df.iloc[126:146, df.columns.get_loc('targOrNoTarg')] = targetPresent()
+	df.iloc[146:166, df.columns.get_loc('targOrNoTarg')] = targetPresent()
 
 	## add more
 
@@ -382,8 +386,7 @@ def create_master_df():
 
 	df['probeTheta_loc'] = pickProbeLoc()
 
-	## DF - Target or no target
-	df['targOrNoTarg'] = np.nan
+	
 
 	for trial in range(N_TOTAL_TRIALS):
 		# set variables for each trial to reference as 
@@ -431,7 +434,7 @@ def create_master_df():
 				if targOrNah == 0: # target not present for MAINTAIN
 					top_theta, bot_theta = assignTheta(probe, possible_thetas_minusTarg)
 				elif targOrNah == 1: #target present for MAINTAIN
-					assignMemTarg(probe, possible_thetas_minusTarg)
+					top_theta, bot_theta = assignMemTarg(probe_loc, possible_thetas_minusTarg, memTarg)
 				else: # targOrNah = np.nan in monitor and mnm
 					# REWRITE this if adding in monitor and mnm
 					top_theta = np.nan
@@ -456,8 +459,6 @@ def create_master_df():
 			df.loc[trial, resp_probe] = np.nan
 			df.loc[trial, rt_probe] = np.nan
 			df.loc[trial, acc_probe] = np.nan
-
-			maintain3_df = create_m3_df(df)
 
 	return df
 
@@ -606,7 +607,7 @@ def feedback_text(trial_i, probe_n, acc, df):
 		text.color = color_green
 	else: 
 		text.color = color_red
-	text.wrapWidth = 10 * len(text.text)
+	#text.wrapWidth = 10 * len(text.text)
 	text.draw()
 	win.flip()
 
@@ -701,9 +702,9 @@ def getResp_targ(firstKey, trial_i, probe_n, stimDraw, df):
 	# those blocks only allow KEYS_TARGET
 
 	if firstKey in keysPossible: 
-		text.wrapWidth = 10 * len(text.text)
-		if (len(text.text)==0): 
-			text.wrapWidth = 1
+		#text.wrapWidth = 10 * len(text.text)
+		#if (len(text.text)==0): 
+		#	text.wrapWidth = 1
 		text.draw()
 
 		if (firstKey == '3'): # hit target
@@ -730,7 +731,7 @@ def getResp_targ(firstKey, trial_i, probe_n, stimDraw, df):
 	elif firstKey in KEYS_WORD: # picked a word when should have hit target or nontarget
 		acc = 0
 		text.color = color_blue
-		text.wrapWidth = 10 * len(text.text)
+		#text.wrapWidth = 10 * len(text.text)
 		text.draw()
 		win.flip()
 
@@ -760,7 +761,7 @@ def breakMessage(block_num):
 	text.text = breakText
 	text.height = 40.0
 	text.color = color_white
-	text.wrapWidth = 10 * len(text.text)
+	#text.wrapWidth = 10 * len(text.text)
 	text.draw()
 
 	win.color = color_black
@@ -864,7 +865,7 @@ def targetProbe(trial_i, probe_n, lastProbe, df):
 	if 'maintain' in block_type and lastProbe: 
 		text.text = ''
 	text.pos = MID_POS
-	text.wrapWidth = 10 * len(text.text)
+	#text.wrapWidth = 10 * len(text.text)
 	if text.wrapWidth==0: 
 		text.wrapWidth=1
 	text.draw()
@@ -893,7 +894,7 @@ def iti():
 	duration = TIMINGS.get('iti')
 	clear() 
 	while clock.getTime() < duration: 
-		text.wrapWidth = 10 * len(text.text)
+		#text.wrapWidth = 10 * len(text.text)
 		text.draw()
 		win.flip()
 
@@ -958,8 +959,12 @@ def maintain_3(trial_i, df):
 ### Experiment
 ###
 
-pract_df = create_master_df()
 df = create_master_df()
+pract_df = create_master_df()
+
+maintain3_df = create_m3_df(df)
+pract_maintain3_df = create_m3_df(pract_df)
+
 
 for trial_i in range(N_TOTAL_TRIALS):
 	block_type = df.block_name[trial_i]
