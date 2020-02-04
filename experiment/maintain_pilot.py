@@ -956,7 +956,7 @@ def maintain_3(trial_i, df):
 
 
 ###
-### Experiment
+### Create dataframes that power the experiment
 ###
 
 df = create_master_df()
@@ -965,6 +965,10 @@ pract_df = create_master_df()
 maintain3_df = create_m3_df(df)
 pract_maintain3_df = create_m3_df(pract_df)
 
+
+###
+### Experiment
+###
 
 for trial_i in range(N_TOTAL_TRIALS):
 	block_type = df.block_name[trial_i]
