@@ -590,7 +590,7 @@ def pressSpace():
 				win.flip()
 				return
 
-def drawTwoStims(trial_i, probe_n):
+def drawTwoStims(trial_i, probe_n, df):
 	topLoc = int(df.iloc[trial_i, df.columns.get_loc('topTheta{:d}'.format(probe_n))])
 	stim_top.image = image_dict['frac_{:d}'.format(topLoc)].image
 	stim_top.draw()
@@ -599,7 +599,7 @@ def drawTwoStims(trial_i, probe_n):
 	stim_bot.image = image_dict['frac_{:d}'.format(botLoc)].image
 	stim_bot.draw()
 
-def feedback_text(trial_i, probe_n, acc):
+def feedback_text(trial_i, probe_n, acc, df):
 	# set correct or incorrect in df
 	df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = acc
 	if acc == 1: 
@@ -610,7 +610,7 @@ def feedback_text(trial_i, probe_n, acc):
 	text.draw()
 	win.flip()
 
-def feedback_circles(trial_i, probe_n, acc):
+def feedback_circles(trial_i, probe_n, acc, df):
 	if 'base' not in block_type:
 		# set correct or incorrect in df
 		df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = acc
@@ -623,10 +623,10 @@ def feedback_circles(trial_i, probe_n, acc):
 			feedback_bot.fillColor = color_red
 		feedback_top.draw()
 		feedback_bot.draw()
-		drawTwoStims(trial_i, probe_n)
+		drawTwoStims(trial_i, probe_n, df)
 		win.flip()
 
-def getResp(trial_i, probe_n, stimDraw, lastProbe):
+def getResp(trial_i, probe_n, stimDraw, lastProbe, df):
 	print('probe_n ', probe_n)
 	clear()
 	allResp = [] # array to record all button presses made
@@ -647,7 +647,7 @@ def getResp(trial_i, probe_n, stimDraw, lastProbe):
 				print('key ', key)
 				firstKey = allResp[0] # record all resps but only first resp really matters
 				if lastProbe: 
-					getResp_targ(firstKey, trial_i, probe_n, stimDraw)
+					getResp_targ(firstKey, trial_i, probe_n, stimDraw, df)
 				else: 
 				#print(firstKey, " resp ")
 				#print(respRT, "rt")
@@ -675,8 +675,8 @@ def getResp(trial_i, probe_n, stimDraw, lastProbe):
 
 					df.iloc[trial_i, df.columns.get_loc('probe{:d}_acc'.format(probe_n))] = acc
 
-					feedback_text(trial_i, probe_n, acc) # 1 for CORRECT 
-					#feedback_circles(trial_i, probe_n, acc)
+					feedback_text(trial_i, probe_n, acc, df) # 1 for CORRECT 
+					#feedback_circles(trial_i, probe_n, acc, df)
 
 					# record resp and rt
 					df.loc[trial_i, 'respProbe{:d}'.format(probe_n)] = allResp[0]
@@ -692,7 +692,7 @@ def getResp(trial_i, probe_n, stimDraw, lastProbe):
 	print(df.at[trial_i, 'rtProbe{:d}'.format(probe_n)])
 	print('')
 		
-def getResp_targ(firstKey, trial_i, probe_n, stimDraw):
+def getResp_targ(firstKey, trial_i, probe_n, stimDraw, df):
 	print('probe_n ', probe_n)
 	keysPossible = KEYS_TARGET + KEYS_NONTARGET 
 	if block_type != 'maintain3':
@@ -722,9 +722,9 @@ def getResp_targ(firstKey, trial_i, probe_n, stimDraw):
 				
 				print('incorrect')
 		
-		feedback_circles(trial_i, probe_n, acc)
-		feedback_circles(trial_i, probe_n, acc)
-		drawTwoStims(trial_i, probe_n)
+		feedback_circles(trial_i, probe_n, acc, df)
+		feedback_circles(trial_i, probe_n, acc, df)
+		drawTwoStims(trial_i, probe_n, df)
 		win.flip()
 		
 	elif firstKey in KEYS_WORD: # picked a word when should have hit target or nontarget
@@ -855,7 +855,7 @@ def delay():
 	win.flip()
 	core.wait(TIMINGS.get('delay'))
 
-def targetProbe(trial_i, probe_n, lastProbe):
+def targetProbe(trial_i, probe_n, lastProbe, df):
 	win.flip()
 	win.color = color_gray
 
@@ -870,10 +870,10 @@ def targetProbe(trial_i, probe_n, lastProbe):
 	text.draw()
 
 	if 'base' not in block_type:
-		drawTwoStims(trial_i, probe_n)
+		drawTwoStims(trial_i, probe_n, df)
 	win.flip()
 	clear()
-	getResp(trial_i, probe_n, stimDraw = True, lastProbe = lastProbe)
+	getResp(trial_i, probe_n, stimDraw = True, lastProbe = lastProbe, df = df)
 	resetTrial()
 
 def iti():
@@ -906,32 +906,32 @@ def resetTrial():
 ### Block functions
 ###
 
-def baseline(trial_i): 
+def baseline(trial_i, df): 
 	probe_n = 0
-	targetProbe(trial_i, probe_n = 0, lastProbe = False)
+	targetProbe(trial_i, probe_n = 0, lastProbe = False, df = df)
 	resetTrial()
 
-def maintain_1(trial_i): 
+def maintain_1(trial_i, df): 
 	target(target2=False)
 	delay()
 	probes_in_trial = df.n_probes[trial_i]
 	for probe in range(probes_in_trial - 1):
-		targetProbe(trial_i, probe, lastProbe=False)
-	targetProbe(trial_i, probes_in_trial-1, lastProbe=True)
+		targetProbe(trial_i, probe, lastProbe=False, df = df)
+	targetProbe(trial_i, probes_in_trial-1, lastProbe=True, df = df)
 	iti()
 	resetTrial()
 
-def maintain_2(trial_i):
+def maintain_2(trial_i, df):
 	target_2()
 	delay()
 	probes_in_trial = df.n_probes[trial_i]
 	for probe in range(probes_in_trial - 1):
-		targetProbe(trial_i, probe, lastProbe=False)
-	targetProbe(trial_i, probes_in_trial-1, lastProbe=True)
+		targetProbe(trial_i, probe, lastProbe=False, df = df)
+	targetProbe(trial_i, probes_in_trial-1, lastProbe=True, df = df)
 	iti()
 	resetTrial()
 
-def maintain_3(trial_i):
+def maintain_3(trial_i, df):
 	target(target2=False)
 	delay()
 	probes_in_trial = df.n_probes[trial_i]
@@ -943,8 +943,8 @@ def maintain_3(trial_i):
 			target(target2=True)
 			delay()
 		else: 
-			targetProbe(trial_i, probe, lastProbe=False)
-	targetProbe(trial_i, probes_in_trial-1, lastProbe=True)
+			targetProbe(trial_i, probe, lastProbe=False, df = df)
+	targetProbe(trial_i, probes_in_trial-1, lastProbe=True, df = df)
 	iti()
 	resetTrial()
 	#probes
@@ -982,8 +982,8 @@ for trial_i in range(N_TOTAL_TRIALS):
 		if trial_i in pract_starts:
 			for pract_trial in range(5):
 				current_trial = pract_trial + trial_i
-				baseline(current_trial)
-		baseline(trial_i)
+				baseline(current_trial, pract_df)
+		baseline(trial_i, df)
 
 	## MAINTAIN 1
 	elif block_num == 2:
@@ -991,8 +991,8 @@ for trial_i in range(N_TOTAL_TRIALS):
 		if trial_i in pract_starts:
 			for pract_trial in range(5):
 				current_trial = pract_trial + trial_i
-				maintain_1(current_trial)
-		maintain_1(trial_i)
+				maintain_1(current_trial, pract_df)
+		maintain_1(trial_i, df)
 
 	## MAINTAIN 2
 	elif block_num == 3:
@@ -1000,8 +1000,8 @@ for trial_i in range(N_TOTAL_TRIALS):
 		if trial_i in pract_starts:
 			for pract_trial in range(5):
 				current_trial = pract_trial + trial_i
-				maintain2(current_trial)
-		maintain_2(trial_i)
+				maintain_2(current_trial, pract_df)
+		maintain_2(trial_i, df)
 
 	## MAINTAIN 3
 	elif block_num == 4: 
@@ -1009,8 +1009,8 @@ for trial_i in range(N_TOTAL_TRIALS):
 		if trial_i in pract_starts:
 			for pract_trial in range(5):
 				current_trial = pract_trial + trial_i
-				maintain3(current_trial)
-		maintain_3(trial_i)
+				maintain_3(current_trial, pract_df)
+		maintain_3(trial_i, df)
 
 ## UPDATE slide num
 presentSlides(22)
