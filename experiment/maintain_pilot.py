@@ -776,7 +776,7 @@ def breakMessage(block_num):
 	win.flip()
 
 def presentSlides(slide): 
-	instructImage.image = 'exptInstruct_v1.1/exptInstruct.{:d}.png'.format(slide)
+	instructImage.image = 'exptInstruct_maintainPilot/exptInstruct_maintainPilot.{:d}.png'.format(slide)
 	instructImage.draw()
 	win.flip()
 	pressSpace()
@@ -786,16 +786,16 @@ def presentSlides(slide):
 def instructionSlides(block_type):
 	if (block_type is 'base1'):
 		start_slide = 1
-		end_slide = 6
+		end_slide = 5
 	elif block_type is 'maintain1':
 		start_slide = 6
-		end_slide = 11
+		end_slide = 10
 	elif block_type is 'maintain2':
-		start_slide = 6
-		end_slide = 11
+		start_slide = 10
+		end_slide = 13
 	elif block_type is 'maintain3':
-		start_slide = 6
-		end_slide = 11
+		start_slide = 14
+		end_slide = 18
 
 	for slide in range(start_slide,end_slide):
 		presentSlides(slide)
@@ -806,7 +806,6 @@ def instructionSlides(block_type):
 	text.draw()
 	win.flip()
 	pressSpace()
-
 
 ###
 ### Task functions
@@ -948,7 +947,6 @@ def maintain_3(trial_i, df):
 	targetProbe(trial_i, probes_in_trial-1, lastProbe=True, df = df)
 	iti()
 	resetTrial()
-	#probes
 
 ## Add below functions back if running entire experiment
 #def monitor():
@@ -1022,7 +1020,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		maintain_3(trial_i, df)
 
 ## UPDATE slide num
-presentSlides(22)
+presentSlides(19)
 
 # Save output at end
 df.to_csv(DATA_FNAME)
