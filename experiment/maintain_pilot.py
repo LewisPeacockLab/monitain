@@ -3,7 +3,7 @@
 Monitain v1.1
 Pilot for maintenance only 
 Katie Hedgpeth
-January 2020
+February 2020
 
 '''
 
@@ -57,6 +57,7 @@ SCRN = args.scrn
 # debug true if subj is default (s999)
 DEBUG = SUBJ == 's999'
 
+
 ###
 ### Set up Slack 
 ###
@@ -67,9 +68,9 @@ SLACK = False
 def slack(msg):
 	if SLACK: 
 		payload = {'text': msg, 
-		'channel': SLACK['channel'], 
-		'username': SLACK['botname'], 
-		'icon_emoji': SLACK['emoji']}
+				   'channel': SLACK['channel'], 
+				   'username': SLACK['botname'], 
+				   'icon_emoji': SLACK['emoji']}
 	try: 
 		requests.post(SLACK['url'], json=payload)
 	except ConnectionError: 
