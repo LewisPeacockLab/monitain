@@ -163,7 +163,7 @@ BOT_POS = [0, -150]
 block_starts = [0, 106, 126, 146]
 last_trial = 166
 #block_starts = [0, 106, 126, 146, 166, 186, 206, 226]
-pract_starts = [106, 126, 146]
+pract_starts = [0, 106, 126, 146]
 
 # event timings
 TIMINGS = {
@@ -480,7 +480,7 @@ mon.setWidth(SCREENS[SCRN]['width_cm'])
 mon.setSizePix(SCREENS[SCRN]['pixel_dims'])
 
 # window set up
-fullscreen = False if SUBJ=='s999' else True # smaller screen when debugging
+fullscreen = False #if SUBJ=='s999' else True # smaller screen when debugging
 win = visual.Window(
 	mon=mon, 
 	colorSpace='rgb255',
@@ -775,37 +775,60 @@ def breakMessage(block_num):
 			break
 	win.flip()
 
+# present a certain sequence of slides based on the block type
+## UPDATE NEEDED for slide nums
+def instructionSlides(block_type):
+	if (block_type is 'base1'):
+		start_slide = 1
+		end_slide = 6
+	elif block_type is 'maintain1':
+		start_slide = 6
+		end_slide = 11
+	elif block_type is 'maintain2':
+		start_slide = 11
+		end_slide = 14
+	elif block_type is 'maintain3':
+		start_slide = 14
+		end_slide = 19
+
+	for slide in range(start_slide,end_slide):
+		presentSlides(slide)
+	win.color = color_gray
+	win.flip()
+	text.text = 'Press space to begin practice trials'
+	text.color = color_white
+	text.draw()
+	win.flip()
+	pressSpace()
+
 def presentSlides(slide): 
 	instructImage.image = 'exptInstruct_maintainPilot/exptInstruct_maintainPilot.{:d}.png'.format(slide)
 	instructImage.draw()
 	win.flip()
 	pressSpace()
 
-# present a certain sequence of slides based on the block type
-## UPDATE NEEDED for slide nums
-def instructionSlides(block_type):
-	if (block_type is 'base1'):
-		start_slide = 1
-		end_slide = 5
-	elif block_type is 'maintain1':
-		start_slide = 6
-		end_slide = 10
-	elif block_type is 'maintain2':
-		start_slide = 10
-		end_slide = 13
-	elif block_type is 'maintain3':
-		start_slide = 14
-		end_slide = 18
+def practiceEnd(): 
+	practiceText = "This is the end of your practice trials. \
+	\nPlease hold down the space bar to start the next section."
 
-	for slide in range(start_slide,end_slide):
-		presentSlides(slide)
-	win.color = color_gray
-	win.flip()
-	text.text = 'Press space to begin'
+	text.text = practiceText
+	text.height=40.0
 	text.color = color_white
 	text.draw()
+	win.color = color_black
 	win.flip()
-	pressSpace()
+
+	pressContinue = False
+	while pressContinue == False: 
+		if not DEBUG:
+			keyPress = event.waitKeys()
+			if keyPress == ['space']: 
+				pressContinue = True
+				break 
+		else: 
+			break
+
+	win.flip()
 
 ###
 ### Task functions
@@ -988,8 +1011,10 @@ for trial_i in range(N_TOTAL_TRIALS):
 		print('trial ', trial_i)
 		if trial_i in pract_starts:
 			for pract_trial in range(5):
+				print('pract trial ', pract_trial)
 				current_trial = pract_trial + trial_i
 				baseline(current_trial, pract_df)
+			practiceEnd()
 		baseline(trial_i, df)
 
 	## MAINTAIN 1
@@ -997,8 +1022,10 @@ for trial_i in range(N_TOTAL_TRIALS):
 		print('trial ', trial_i)
 		if trial_i in pract_starts:
 			for pract_trial in range(5):
+				print('pract trial ', pract_trial)
 				current_trial = pract_trial + trial_i
 				maintain_1(current_trial, pract_df)
+			practiceEnd()
 		maintain_1(trial_i, df)
 
 	## MAINTAIN 2
@@ -1006,8 +1033,10 @@ for trial_i in range(N_TOTAL_TRIALS):
 		print('trial ', trial_i)
 		if trial_i in pract_starts:
 			for pract_trial in range(5):
+				print('pract trial ', pract_trial)
 				current_trial = pract_trial + trial_i
 				maintain_2(current_trial, pract_df)
+			practiceEnd()
 		maintain_2(trial_i, df)
 
 	## MAINTAIN 3
@@ -1015,8 +1044,10 @@ for trial_i in range(N_TOTAL_TRIALS):
 		print('trial ', trial_i)
 		if trial_i in pract_starts:
 			for pract_trial in range(5):
+				print('pract trial ', pract_trial)
 				current_trial = pract_trial + trial_i
 				maintain_3(current_trial, pract_df)
+			practiceEnd()
 		maintain_3(trial_i, df)
 
 ## UPDATE slide num
