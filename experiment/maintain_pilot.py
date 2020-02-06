@@ -53,7 +53,6 @@ args = parser.parse_args()
 SUBJ = args.subj
 SCRN = args.scrn
 
-
 # debug true if subj is default (s999)
 DEBUG = SUBJ == 's999'
 
@@ -83,7 +82,7 @@ def slack(msg):
 ### Directories and import data ## 
 ###
 
-DATA_PATH = 'monitain_v1.1_MAINTAIN_' + str(SUBJ)
+DATA_PATH = 'data/monitain_v1.1_MAINTAIN_' + str(SUBJ)
 DATA_FNAME = DATA_PATH + '.csv'
 if os.path.exists(DATA_FNAME) and not DEBUG:
 	sys.exit('Filename ' + DATA_FNAME + " already exists!")
@@ -249,7 +248,6 @@ new_range = np.append(catch_range, possible_probes)
 baseline_probe_range = np.repeat([1],106)
 
 
-
 # pick probes to populate each block type in dataframe
 def pickProbes(n_blocks, catch_range, N_CATCH_PER_BLOCK):
 	probe_count_list = []
@@ -264,9 +262,9 @@ def pickProbes(n_blocks, catch_range, N_CATCH_PER_BLOCK):
 	return probe_ravel
 
 
-## DF - Probe fractal/theta location 
-# Will the top or bottom be probed?
+## DF - Probe fractal/theta location
 
+# Will the top or bottom be probed?
 def pickProbeLoc():
 	# list that repeats 'top', 'bot', ..., for total num trials
 	location_list = np.repeat(['top', 'bot'], N_TOTAL_TRIALS/2)
@@ -274,12 +272,17 @@ def pickProbeLoc():
 	np.ravel(location_list)
 	return location_list
 
+# pick which image will appear on top and bottom
+# 20 possible thetas to pick from
+# before the stimuli were called theta so I'm sticking
+# with that in my code and with my naming convention
 def pickTheta(x): 
 	theta_1 = np.random.choice(possible_thetas)
 	possible_thetas_minus1 = [x for x in possible_thetas if x not in [theta_1]]
 	theta_2 = np.random.choice(possible_thetas_minus1)
 	return theta_1, theta_2
 
+# Will the target be present at the end of the trial?
 def targetPresent(): 
 	# set target present for half of maintain blocks, not present for other half
 	targetOutcome = np.repeat([0,1], MAINTAIN_TRIALS/2)
@@ -287,10 +290,10 @@ def targetPresent():
 	return targetOutcome
 
 ## DF - wordx / nonwordx and topTheta/botTheta
+
 # assign word/nonwords stimuli that will appear in each trial 
 # based on how many probes that trial will have
 # also assign which images will appear on the top or bottom
-
 def assignTheta(probe_num, possible_thetas_minusTarg):
 	top_theta = np.random.choice(possible_thetas_minusTarg)
 	bot_theta = np.random.choice(possible_thetas_minusTarg)
@@ -326,9 +329,15 @@ def create_m3_df(df):
 			maintain3_df.targ2_bool[i] = False
 	return maintain3_df
 
-def create_master_df():
+
+
+# create master data frame to power experiment
+def create_master_df(word_file, nonword_file):
 	# actually create the empty dataframe
 	df = pd.DataFrame(columns = df_columns, index = df_index)
+
+	word_df = pd.read_csv(word_file, names=['stimuli']) 
+	nonword_df = pd.read_csv(nonword_file, names = ['stimuli'])
 
 	## DF - Subject 
 	df['subj'] = SUBJ
@@ -352,12 +361,6 @@ def create_master_df():
 			df.iloc[index, df.columns.get_loc('block_num')] = block_num_list[3]
 			df.iloc[index, df.columns.get_loc('block_name')] = block_type_list[3] 
 
-	## DF - Target fractal/theta
-	# 20 possible thetas to pick from
-	# before the stimuli were called theta so I'm sticking
-	# with that in my code and with my naming convention
-
-
 	# apply function to df
 	df['targTheta'] = df.targTheta.apply(pickTheta)
 
@@ -369,11 +372,7 @@ def create_master_df():
 	df.iloc[126:146, df.columns.get_loc('targOrNoTarg')] = targetPresent()
 	df.iloc[146:166, df.columns.get_loc('targOrNoTarg')] = targetPresent()
 
-	## add more
-
 	## DF - Number of probes
-
-
 	df.iloc[0:106, df.columns.get_loc('n_probes')] = baseline_probe_range
 
 	#BLOCKS 2-4 probe num
@@ -388,7 +387,8 @@ def create_master_df():
 
 	df['probeTheta_loc'] = pickProbeLoc()
 
-	
+	#getridof = word_list.pop(0)
+	#print(getridof, '  ELIMINATE')
 
 	for trial in range(N_TOTAL_TRIALS):
 		# set variables for each trial to reference as 
@@ -398,6 +398,9 @@ def create_master_df():
 		memTarg = df.loc[trial, 'targTheta'][0]
 		memTarg2 = df.loc[trial, 'targTheta'][0]
 		currentBlock = df.block_num[trial]
+
+		# maintain2 (pilot block) has increased load in initial screen so it may be one
+		# of 2 targets
 		if df.block_name[trial] != 'maintain2':
 			targets = [memTarg]
 		else: 
@@ -407,6 +410,7 @@ def create_master_df():
 		# for every trial, there are a series of probes that need
 		# info updated so the experiment knows 
 		# which stimuli to put on the screen for each probe
+
 		for probe in range(n_probes):
 			# assign words/nonwords for each probe
 			condition = np.random.choice(['word', 'nonword']) 
@@ -414,14 +418,22 @@ def create_master_df():
 			col_name_cond = 'word{:d}_cond'.format(probe)
 
 			# set words and nonwords
+		
 			if condition == 'word':
-				random_word = word_list.pop(0)
+				#random_word = word_list.stimuli[0]
+				#random_word = word_list.pop(0)
+				random_word = word_df.stimuli[len(word_df)-1]
+				word_df = word_df.drop(len(word_df)-1)
+
 			elif condition == 'nonword':
-				random_word = nonword_list.pop(0)
+				#random_word = nonword_list.pop(0)
+				random_word = nonword_df.stimuli[len(nonword_df)-1]
+				nonword_df = nonword_df.drop(len(nonword_df)-1)
+
+			#random_word = str(random_word).split('['']')
 
 			df.loc[trial, col_name] = random_word
 			df.loc[trial, col_name_cond] = condition
-
 
 			# set top and bottom image stimuli 
 			thetaTop_col = 'topTheta{:d}'.format(probe)
@@ -468,9 +480,7 @@ def create_master_df():
 	return df
 
 
-
-
-# Columns in DF that will be filled in as subjects participate: 
+# NOTE: Columns in DF that will be filled in as subjects participate: 
 # acc, pm acc
 
 ###
@@ -632,6 +642,7 @@ def feedback_circles(trial_i, probe_n, acc, df):
 		drawTwoStims(trial_i, probe_n, df)
 		win.flip()
 
+# get response from participant and give feedback
 def getResp(trial_i, probe_n, stimDraw, lastProbe, df):
 	print('probe_n ', probe_n)
 	clear()
@@ -697,7 +708,8 @@ def getResp(trial_i, probe_n, stimDraw, lastProbe, df):
 	print('rt')
 	print(df.at[trial_i, 'rtProbe{:d}'.format(probe_n)])
 	print('')
-		
+
+# get response for probe that's at the end of the trial		
 def getResp_targ(firstKey, trial_i, probe_n, stimDraw, df):
 	print('probe_n ', probe_n)
 	print('first key on getResp_targ', firstKey)
@@ -710,8 +722,6 @@ def getResp_targ(firstKey, trial_i, probe_n, stimDraw, df):
 	if firstKey in keysPossible: 
 		#text.wrapWidth = 10 * len(text.text)
 		#if (len(text.text)==0): 
-		#	text.wrapWidth = 1
-		print("HERREE")
 		text.draw()
 
 		if (firstKey == '3'): # hit target
@@ -782,7 +792,6 @@ def breakMessage(block_num):
 	win.flip()
 
 # present a certain sequence of slides based on the block type
-## UPDATE NEEDED for slide nums
 def instructionSlides(block_type):
 	if (block_type is 'base1'):
 		start_slide = 1
@@ -841,6 +850,9 @@ def practiceEnd():
 ###
 
 # draw target onto middle of the screen
+# target 2 input is a boolean of whether or not 2 targets will be used for single trial in increased
+# load trial type 
+# if load is increased, second and most recent target should be tested
 def target(target2, df):
 	stim_top.autoDraw = False
 	stim_bot.autoDraw = False
@@ -885,6 +897,7 @@ def delay():
 	win.flip()
 	core.wait(TIMINGS.get('delay'))
 
+# lastProbe is a boolean as to whether or not it's the last probe for the trial
 def targetProbe(trial_i, probe_n, lastProbe, df):
 	win.flip()
 	win.color = color_gray
@@ -895,8 +908,9 @@ def targetProbe(trial_i, probe_n, lastProbe, df):
 		text.text = ''
 	text.pos = MID_POS
 	#text.wrapWidth = 10 * len(text.text)
-	if text.wrapWidth==0: 
-		text.wrapWidth=1
+	#if text.wrapWidth==0: 
+	#	text.wrapWidth=1
+	print(text.text, ' text.text')
 	text.draw()
 
 	if 'base' not in block_type:
@@ -911,15 +925,10 @@ def iti():
 	stim_top.autoDraw = False
 	stim_bot.autoDraw = False
 	win.flip()
-	text.wrapWidth = True
+
 	text.text = '+'
 	text.color = color_black
-	#text = visual.TextStim(
-	#	win=win,
-	#	colorSpace='rgb255',
-	#	text='+',
-	#	color=color_black,
-	#	height=40.0)	
+
 	duration = TIMINGS.get('iti')
 	clear() 
 	while clock.getTime() < duration: 
@@ -937,6 +946,7 @@ def resetTrial():
 ###
 
 def baseline(trial_i, df): 
+	resetTrial()
 	probe_n = 0
 	targetProbe(trial_i, probe_n = 0, lastProbe = False, df = df)
 	resetTrial()
@@ -987,8 +997,8 @@ def maintain_3(trial_i, df):
 ### Create dataframes that power the experiment
 ###
 
-main_df = create_master_df()
-pract_df = create_master_df()
+main_df = create_master_df(word_file, nonword_file)
+pract_df = create_master_df(pract_word_file, pract_nonword_file)
 
 maintain3_df = create_m3_df(main_df)
 pract_maintain3_df = create_m3_df(pract_df)
