@@ -95,24 +95,11 @@ nonword_file = 'stimuli/nonwords.csv'
 pract_word_file = 'stimuli/pract_words.csv'
 pract_nonword_file = 'stimuli/pract_nonwords.csv'
 
-def read_csv(filename):
-	export_list = []
-	# open and read csv
-	with open(filename, 'r') as csvfile: 
-		csvreader = csv.reader(csvfile)
-		for row in csvreader: 
-			export_list.append(row)
-	# shuffle stimuli
-	random.shuffle(export_list) 
-	# return shuffled list 
-	return export_list
 
-# import words and nonwords
-word_list = read_csv(word_file)
-nonword_list = read_csv(nonword_file)
-pract_word_list = read_csv(pract_word_file)
-pract_nonword_list = read_csv(pract_nonword_file)
-
+# import words and nonwords into dfs
+word_df = pd.read_csv(word_file, names=['stimuli']) 
+nonword_df = pd.read_csv(nonword_file, names = ['stimuli'])
+ 
 
 ###
 ### General experiment parameters ###
@@ -218,8 +205,6 @@ topTheta_cols = ['topTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
 
 #fractal num for bottom image
 botTheta_cols = ['botTheta{:d}'.format(i+1) for i in range(N_MAX_PROBES)]
-
-
 
 possible_thetas = np.array(range(1,21))
 
@@ -332,12 +317,9 @@ def create_m3_df(df):
 
 
 # create master data frame to power experiment
-def create_master_df(word_file, nonword_file):
+def create_master_df(word_df, nonword_df):
 	# actually create the empty dataframe
 	df = pd.DataFrame(columns = df_columns, index = df_index)
-
-	word_df = pd.read_csv(word_file, names=['stimuli']) 
-	nonword_df = pd.read_csv(nonword_file, names = ['stimuli'])
 
 	## DF - Subject 
 	df['subj'] = SUBJ
@@ -396,8 +378,9 @@ def create_master_df(word_file, nonword_file):
 		n_probes = df.loc[trial, 'n_probes']
 		probe_loc = df.loc[trial, 'probeTheta_loc']
 		memTarg = df.loc[trial, 'targTheta'][0]
-		memTarg2 = df.loc[trial, 'targTheta'][0]
+		memTarg2 = df.loc[trial, 'targTheta'][1]
 		currentBlock = df.block_num[trial]
+		block_type = df.block_name[trial]
 
 		# maintain2 (pilot block) has increased load in initial screen so it may be one
 		# of 2 targets
@@ -451,7 +434,10 @@ def create_master_df(word_file, nonword_file):
 				elif int(targOrNah) == 0: # target not present for MAINTAIN
 					top_theta, bot_theta = assignTheta(probe, possible_thetas_minusTarg)
 				elif int(targOrNah) == 1: #target present for MAINTAIN
-					top_theta, bot_theta = assignTheta_withTarg(probe_loc, possible_thetas_minusTarg, memTarg)
+					if block_type == 'maintain3':
+						top_theta, bot_theta = assignTheta_withTarg(probe_loc, possible_thetas_minusTarg, memTarg2)
+					else: 
+						top_theta, bot_theta = assignTheta_withTarg(probe_loc, possible_thetas_minusTarg, memTarg)
 				else: # targOrNah = np.nan in monitor and mnm
 					# REWRITE this if adding in monitor and mnm
 					top_theta = np.nan
@@ -477,7 +463,9 @@ def create_master_df(word_file, nonword_file):
 			df.loc[trial, rt_probe] = np.nan
 			df.loc[trial, acc_probe] = np.nan
 
-	return df
+	# return word_df and nonword_df so you have dfs to pull into next round
+	# that have already removed the used words
+	return df, word_df, nonword_df
 
 
 # NOTE: Columns in DF that will be filled in as subjects participate: 
@@ -714,8 +702,7 @@ def getResp_targ(firstKey, trial_i, probe_n, stimDraw, df):
 	print('probe_n ', probe_n)
 	print('first key on getResp_targ', firstKey)
 	keysPossible = KEYS_TARGET + KEYS_NONTARGET 
-	if block_type != 'maintain3':
-		target_present = df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]		
+	target_present = df.iloc[trial_i, df.columns.get_loc('targOrNoTarg')]		
 	# if adding monitor and mnm, add if/else statements because
 	# those blocks only allow KEYS_TARGET
 
@@ -731,6 +718,8 @@ def getResp_targ(firstKey, trial_i, probe_n, stimDraw, df):
 			elif (target_present == 0):
 				acc = 0		
 				print('incorrect')
+		# all maintain block types have the option of target and no target
+		# monitor and mnm in full expt do not
 		elif (firstKey == '4'):
 			if (target_present == 0):
 				acc = 1
@@ -971,12 +960,12 @@ def maintain_2(trial_i, df):
 	iti()
 	resetTrial()
 
-def maintain_3(trial_i, df):
+def maintain_3(trial_i, df, m3_df):
 	target(target2=False, df=df)
 	delay()
 	probes_in_trial = df.n_probes[trial_i]
-	targ2 = maintain3_df.targ2_bool[trial_i]
-	targ2_probe = maintain3_df.targ2_probe[trial_i]
+	targ2 = m3_df.targ2_bool[trial_i]
+	targ2_probe = m3_df.targ2_probe[trial_i]
 	for probe in range(probes_in_trial-1): 
 		if targ2 and probe == targ2_probe:  
 			print('targ2')
@@ -997,8 +986,8 @@ def maintain_3(trial_i, df):
 ### Create dataframes that power the experiment
 ###
 
-main_df = create_master_df(word_file, nonword_file)
-pract_df = create_master_df(pract_word_file, pract_nonword_file)
+main_df, word_df, nonword_df = create_master_df(word_df, nonword_df)
+pract_df, word_df, nonword_df = create_master_df(word_df, nonword_df)
 
 maintain3_df = create_m3_df(main_df)
 pract_maintain3_df = create_m3_df(pract_df)
@@ -1025,36 +1014,40 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	## BASELINE
 	if block_num == 1: 
-		print('trial ', trial_i)
-		if trial_i in pract_starts:
-		 	for pract_trial in range(5):
-		 		print('pract trial ', pract_trial)
-		 		trial_i = pract_trial + trial_i
-		 		baseline(trial_i, pract_df)
-		 	practiceEnd()
-		baseline(trial_i, main_df)
+		# print('trial ', trial_i)
+		# if trial_i in pract_starts:
+		#  	for pract_trial in range(5):
+		#  		print('pract trial ', pract_trial)
+		#  		trial_i = pract_trial + trial_i
+		#  		baseline(trial_i, pract_df)
+		#  	practiceEnd()
+		# win.color = color_gray
+		# baseline(trial_i, main_df)
+		pass
 
 	## MAINTAIN 1
 	elif block_num == 2:
-		print('trial ', trial_i)
-		if trial_i in pract_starts:
-			for pract_trial in range(5):
-				print('pract trial ', pract_trial)
-				trial_i = pract_trial + trial_i
-				maintain_1(trial_i, pract_df)
-			practiceEnd()
-		maintain_1(trial_i, main_df)
+		# print('trial ', trial_i)
+		# if trial_i in pract_starts:
+		# 	for pract_trial in range(5):
+		# 		print('pract trial ', pract_trial)
+		# 		trial_i = pract_trial + trial_i
+		# 		maintain_1(trial_i, pract_df)
+		# 	practiceEnd()
+		# maintain_1(trial_i, main_df)
+		pass
 
 	## MAINTAIN 2
 	elif block_num == 3:
-		print('trial ', trial_i)
-		if trial_i in pract_starts:
-			for pract_trial in range(5):
-				print('pract trial ', pract_trial)
-				trial_i = pract_trial + trial_i
-				maintain_2(trial_i, pract_df)
-			practiceEnd()
-		maintain_2(trial_i, main_df)
+		# print('trial ', trial_i)
+		# if trial_i in pract_starts:
+		# 	for pract_trial in range(5):
+		# 		print('pract trial ', pract_trial)
+		# 		trial_i = pract_trial + trial_i
+		# 		maintain_2(trial_i, pract_df)
+		# 	practiceEnd()
+		# maintain_2(trial_i, main_df)
+		pass
 
 	## MAINTAIN 3
 	elif block_num == 4: 
@@ -1063,9 +1056,9 @@ for trial_i in range(N_TOTAL_TRIALS):
 			for pract_trial in range(5):
 				print('pract trial ', pract_trial)
 				trial_i = pract_trial + trial_i
-				maintain_3(trial_i, pract_df)
+				maintain_3(trial_i, pract_df, pract_maintain3_df)
 			practiceEnd()
-		maintain_3(trial_i, main_df)
+		maintain_3(trial_i, main_df, maintain3_df)
 
 ## UPDATE slide num
 presentSlides(19)
