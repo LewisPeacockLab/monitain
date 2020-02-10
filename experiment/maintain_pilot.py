@@ -90,10 +90,10 @@ if os.path.exists(DATA_FNAME) and not DEBUG:
 # import images
 images = glob.glob('stimuli/grayscale/frac_*.png')
 
-word_file = 'stimuli/words.csv'
-nonword_file = 'stimuli/nonwords.csv'
-pract_word_file = 'stimuli/pract_words.csv'
-pract_nonword_file = 'stimuli/pract_nonwords.csv'
+word_file = 'stimuli/words_all.csv'
+nonword_file = 'stimuli/nonwords_all.csv'
+#pract_word_file = 'stimuli/pract_words.csv'
+#pract_nonword_file = 'stimuli/pract_nonwords.csv'
 
 
 # import words and nonwords into dfs
@@ -124,10 +124,12 @@ N_TRIALS = range(N_MIN_PROBES, N_MAX_PROBES+1)
 BASELINE_TRIALS = 106
 MAINTAIN_TRIALS = 20
 
-N_TOTAL_TRIALS = (BASELINE_TRIALS*1) + (MAINTAIN_TRIALS*3)
+BUFFER_TRIALS = 10
+
+N_TOTAL_TRIALS = (BASELINE_TRIALS*1) + (MAINTAIN_TRIALS*3) + (BUFFER_TRIALS*1)
 N_TOTAL_TRIALS_PRACT = 5 * N_BLOCKS # 5 for each baseline, maintain1, maintain2, maintain3
 
-BLOCK_STRUCT = [106, 20, 20, 20]
+BLOCK_STRUCT = [106, 20, 20, 20+BUFFER_TRIALS]
 
 # colors
 color_white = [255,255,255] #[1,1,1]
@@ -149,7 +151,7 @@ MID_POS = [0, 0]
 BOT_POS = [0, -150]
 
 block_starts = [0, 106, 126, 146]
-last_trial = 166
+last_trial = 166 + BUFFER_TRIALS
 #block_starts = [0, 106, 126, 146, 166, 186, 206, 226]
 pract_starts = [0, 106, 126, 146]
 
@@ -310,6 +312,7 @@ def create_m3_df(df):
 			t2_probe = randint(2, probes-1)
 			maintain3_df.targ2_probe[i] = t2_probe
 			maintain3_df.targ2_bool[i] = True
+
 		else: 
 			maintain3_df.targ2_bool[i] = False
 	return maintain3_df
@@ -327,6 +330,8 @@ def create_master_df(word_df, nonword_df):
 	block_num_list = list(BLOCK_ORDER.values())
 	block_type_list = list(BLOCK_ORDER.keys()) 
 
+	updateOrNah = shuffle(np.repeat([True, True, False], 10))
+
 	## DF - Block
 	# set the block number for each trial
 	for index, row in df.iterrows(): 
@@ -339,9 +344,13 @@ def create_master_df(word_df, nonword_df):
 		elif index in range(126,146): 
 			df.iloc[index, df.columns.get_loc('block_num')] = block_num_list[2]
 			df.iloc[index, df.columns.get_loc('block_name')] = block_type_list[2] 		
-		elif index in range(146,166): 
-			df.iloc[index, df.columns.get_loc('block_num')] = block_num_list[3]
-			df.iloc[index, df.columns.get_loc('block_name')] = block_type_list[3] 
+		elif index in range(146,176):
+			if updateOrNah[index-146]: #update trial
+				df.iloc[index, df.columns.get_loc('block_num')] = block_num_list[3]
+				df.iloc[index, df.columns.get_loc('block_name')] = block_type_list[3] 
+			else: #no update trial
+				df.iloc[index, df.columns.get_loc('block_num')] = block_num_list[3]
+				df.iloc[index, df.columns.get_loc('block_name')] = block_type_list[1] 
 
 	# apply function to df
 	df['targTheta'] = df.targTheta.apply(pickTheta)
@@ -353,6 +362,7 @@ def create_master_df(word_df, nonword_df):
 	df.iloc[106:126, df.columns.get_loc('targOrNoTarg')] = targetPresent()
 	df.iloc[126:146, df.columns.get_loc('targOrNoTarg')] = targetPresent()
 	df.iloc[146:166, df.columns.get_loc('targOrNoTarg')] = targetPresent()
+	df.iloc[166:176, df.columns.get_loc('targOrNoTarg')] = targetPresent()[0:10]
 
 	## DF - Number of probes
 	df.iloc[0:106, df.columns.get_loc('n_probes')] = baseline_probe_range
@@ -360,12 +370,12 @@ def create_master_df(word_df, nonword_df):
 	#BLOCKS 2-4 probe num
 	maintainProbes1 = pickProbes(N_BLOCKS_MAINTAIN_1, catch_range, N_CATCH_PER_BLOCK)
 	maintainProbes2 = pickProbes(N_BLOCKS_MAINTAIN_2, catch_range, N_CATCH_PER_BLOCK)
-	maintainProbes3 = pickProbes(N_BLOCKS_MAINTAIN_3, catch_range, N_CATCH_PER_BLOCK)
+	maintainProbes3 = pickProbes(N_BLOCKS_MAINTAIN_3*2, catch_range, N_CATCH_PER_BLOCK)
 
 	# set probe num for each trial and each block in df
 	df.iloc[106:126, df.columns.get_loc('n_probes')] = maintainProbes1
 	df.iloc[126:146, df.columns.get_loc('n_probes')] = maintainProbes2
-	df.iloc[146:166, df.columns.get_loc('n_probes')] = maintainProbes3
+	df.iloc[146:176, df.columns.get_loc('n_probes')] = maintainProbes3[0:30]
 
 	df['probeTheta_loc'] = pickProbeLoc()
 
@@ -428,9 +438,8 @@ def create_master_df(word_df, nonword_df):
 			if probe+1 != n_probes: 
 				top_theta, bot_theta = assignTheta(probe, possible_thetas_minusTarg)
 			elif probe+1 == n_probes: 
-				if math.isnan(targOrNah):
-					top_theta = np.nan
-					bot_theta = np.nan
+				if block_type == 'base1':
+					top_theta, bot_theta = assignTheta(probe, possible_thetas_minusTarg)
 				elif int(targOrNah) == 0: # target not present for MAINTAIN
 					top_theta, bot_theta = assignTheta(probe, possible_thetas_minusTarg)
 				elif int(targOrNah) == 1: #target present for MAINTAIN
@@ -438,6 +447,7 @@ def create_master_df(word_df, nonword_df):
 						top_theta, bot_theta = assignTheta_withTarg(probe_loc, possible_thetas_minusTarg, memTarg2)
 					else: 
 						top_theta, bot_theta = assignTheta_withTarg(probe_loc, possible_thetas_minusTarg, memTarg)
+
 				else: # targOrNah = np.nan in monitor and mnm
 					# REWRITE this if adding in monitor and mnm
 					top_theta = np.nan
@@ -565,7 +575,7 @@ feedback_bot = visual.Circle(
 ## TEXT 
 text = visual.TextStim(
 	win=win, 	
-	alignHoriz = 'center',
+	#alignHoriz = 'center',
 	color=color_cyan, 
 	colorSpace='rgb255', 
 	height=40.0, 
@@ -902,8 +912,7 @@ def targetProbe(trial_i, probe_n, lastProbe, df):
 	print(text.text, ' text.text')
 	text.draw()
 
-	if 'base' not in block_type:
-		drawTwoStims(trial_i, probe_n, df)
+	drawTwoStims(trial_i, probe_n, df)
 	win.flip()
 	clear()
 	getResp(trial_i, probe_n, stimDraw = True, lastProbe = lastProbe, df = df)
@@ -1039,14 +1048,14 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	## MAINTAIN 2
 	elif block_num == 3:
-		# print('trial ', trial_i)
-		# if trial_i in pract_starts:
-		# 	for pract_trial in range(5):
-		# 		print('pract trial ', pract_trial)
-		# 		trial_i = pract_trial + trial_i
-		# 		maintain_2(trial_i, pract_df)
-		# 	practiceEnd()
-		# maintain_2(trial_i, main_df)
+		print('trial ', trial_i)
+		if trial_i in pract_starts:
+			for pract_trial in range(5):
+				print('pract trial ', pract_trial)
+				trial_i = pract_trial + trial_i
+				maintain_2(trial_i, pract_df)
+			practiceEnd()
+		maintain_2(trial_i, main_df)
 		pass
 
 	## MAINTAIN 3
@@ -1058,7 +1067,10 @@ for trial_i in range(N_TOTAL_TRIALS):
 				trial_i = pract_trial + trial_i
 				maintain_3(trial_i, pract_df, pract_maintain3_df)
 			practiceEnd()
-		maintain_3(trial_i, main_df, maintain3_df)
+		if block_type == 'maintain3':
+			maintain_3(trial_i, main_df, maintain3_df)
+		else: 
+			maintain_1(trial_i, main_df)
 
 ## UPDATE slide num
 presentSlides(19)
