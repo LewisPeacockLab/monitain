@@ -188,23 +188,23 @@ practDict = OrderedDict([
 
 
 # Put .txt files into dataframes
-words_df = pd.read_table("words.csv", header=None)
+words_df = pd.read_table('stimuli/words.csv', header=None)
 words_df = words_df.rename(columns={0:'stimuli'})
 words_df['type'] = 1
 words_df = shuffle(words_df)
 
-nonwords_df = pd.read_table("nonwords.csv", header=None)
+nonwords_df = pd.read_table('stimuli/nonwords.csv', header=None)
 nonwords_df = nonwords_df.rename(columns={0:'stimuli'})
 nonwords_df['type'] = 2
 nonwords_df = shuffle(nonwords_df)
 
 # Practice stimuli 
-pract_words_df = pd.read_table("pract_words.csv", header=None)
+pract_words_df = pd.read_table('stimuli/pract_words.csv', header=None)
 pract_words_df = pract_words_df.rename(columns={0:'stimuli'})
 pract_words_df['type'] = 1
 pract_words_df = shuffle(pract_words_df)
 
-pract_nonwords_df = pd.read_table("pract_nonwords.csv", header=None)
+pract_nonwords_df = pd.read_table('stimuli/pract_nonwords.csv', header=None)
 pract_nonwords_df = pract_nonwords_df.rename(columns={0:'stimuli'})
 pract_nonwords_df['type'] = 2
 pract_nonwords_df = shuffle(pract_nonwords_df)
