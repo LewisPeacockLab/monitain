@@ -56,6 +56,8 @@ SCRN = args.scrn
 # debug true if subj is default (s999)
 DEBUG = SUBJ == 's999'
 
+QUIT_KEY = 'x'
+
 
 ###
 ### Set up Slack 
@@ -76,7 +78,6 @@ def slack(msg):
 		print('Slack messaging failed - no internet connection')
 
 	print(msg)
-
 
 ###
 ### Directories and import data ## 
@@ -587,6 +588,35 @@ text = visual.TextStim(
 ### Utilitiy functions
 ###
 
+def check_for_quit(): 
+	win.flip()
+
+	quit = False
+	text.text = 'Are you sure you want to quit? ' '\nPress space to quit and any other key to continue'
+	text.wrapWidth = 500
+	text.color = color_white
+	text.draw()
+	win.flip()
+	responded = False
+	keys = event.waitKeys()
+	print("keys pressed are ", keys)
+	return ('space' in keys)
+	
+	# while True: 
+	# 	for key in event.getKeys(): 
+	# 		if key == 'space':
+	# 			print('Quit fo sho')
+	# 			quit = True
+	# 			responded = True
+	# 			return quit
+	# 		elif key != 'space': 
+	# 			print('nahhh')
+	# 			return quit
+
+	# 	return quit
+			
+	#return quit;
+
 def clear(): 
 	clock.reset()
 
@@ -656,7 +686,17 @@ def getResp(trial_i, probe_n, stimDraw, lastProbe, df):
 
 		if not responded:
 			for key, rt in event.getKeys(timeStamped=clock):
-				
+				if key == QUIT_KEY: 
+					stim_top.autoDraw = False
+					stim_bot.autoDraw = False
+					quit = check_for_quit()
+					if quit: 
+						raise Warning('Quit key has been hit!!')
+						win.close()
+						sys.exit() 
+					else: 
+						stim_top.autoDraw = True
+						stim_bot.autoDraw = True
 				allResp.append(key)
 				respRT.append(rt)
 				print('key ', key)
@@ -776,6 +816,7 @@ def breakMessage(block_num):
 	text.text = breakText
 	text.height = 40.0
 	text.color = color_white
+	text.wrapWidth = 500
 	#text.wrapWidth = 10 * len(text.text)
 	text.draw()
 
@@ -823,9 +864,9 @@ def presentSlides(slide):
 
 def practiceEnd(): 
 	practiceText = "This is the end of your practice trials. \
-	\nPlease hold down the space bar to start the next section."
-
+	\nPlease hold down the space bar to start the next section."	
 	text.text = practiceText
+	text.wrapWidth = 500
 	text.height=40.0
 	text.color = color_white
 	text.draw()
@@ -1023,27 +1064,27 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	## BASELINE
 	if block_num == 1: 
-		# print('trial ', trial_i)
-		# if trial_i in pract_starts:
-		#  	for pract_trial in range(5):
-		#  		print('pract trial ', pract_trial)
-		#  		trial_i = pract_trial + trial_i
-		#  		baseline(trial_i, pract_df)
-		#  	practiceEnd()
-		# win.color = color_gray
-		# baseline(trial_i, main_df)
+		print('trial ', trial_i)
+		if trial_i in pract_starts:
+		 	for pract_trial in range(5):
+		 		print('pract trial ', pract_trial)
+		 		trial_i = pract_trial + trial_i
+		 		baseline(trial_i, pract_df)
+		 	practiceEnd()
+		win.color = color_gray
+		baseline(trial_i, main_df)
 		pass
 
 	## MAINTAIN 1
 	elif block_num == 2:
-		# print('trial ', trial_i)
-		# if trial_i in pract_starts:
-		# 	for pract_trial in range(5):
-		# 		print('pract trial ', pract_trial)
-		# 		trial_i = pract_trial + trial_i
-		# 		maintain_1(trial_i, pract_df)
-		# 	practiceEnd()
-		# maintain_1(trial_i, main_df)
+		print('trial ', trial_i)
+		if trial_i in pract_starts:
+			for pract_trial in range(5):
+				print('pract trial ', pract_trial)
+				trial_i = pract_trial + trial_i
+				maintain_1(trial_i, pract_df)
+			practiceEnd()
+		maintain_1(trial_i, main_df)
 		pass
 
 	## MAINTAIN 2
