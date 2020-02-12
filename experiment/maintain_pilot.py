@@ -1064,39 +1064,39 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	## BASELINE
 	if block_num == 1: 
-		print('trial ', trial_i)
-		if trial_i in pract_starts:
-		 	for pract_trial in range(5):
-		 		print('pract trial ', pract_trial)
-		 		trial_i = pract_trial + trial_i
-		 		baseline(trial_i, pract_df)
-		 	practiceEnd()
-		win.color = color_gray
-		baseline(trial_i, main_df)
+		# print('trial ', trial_i)
+		# if trial_i in pract_starts:
+		#  	for pract_trial in range(5):
+		#  		print('pract trial ', pract_trial)
+		#  		trial_i = pract_trial + trial_i
+		#  		baseline(trial_i, pract_df)
+		#  	practiceEnd()
+		# win.color = color_gray
+		# baseline(trial_i, main_df)
 		pass
 
 	## MAINTAIN 1
 	elif block_num == 2:
-		print('trial ', trial_i)
-		if trial_i in pract_starts:
-			for pract_trial in range(5):
-				print('pract trial ', pract_trial)
-				trial_i = pract_trial + trial_i
-				maintain_1(trial_i, pract_df)
-			practiceEnd()
-		maintain_1(trial_i, main_df)
+		# print('trial ', trial_i)
+		# if trial_i in pract_starts:
+		# 	for pract_trial in range(5):
+		# 		print('pract trial ', pract_trial)
+		# 		trial_i = pract_trial + trial_i
+		# 		maintain_1(trial_i, pract_df)
+		# 	practiceEnd()
+		# maintain_1(trial_i, main_df)
 		pass
 
 	## MAINTAIN 2
 	elif block_num == 3:
-		print('trial ', trial_i)
-		if trial_i in pract_starts:
-			for pract_trial in range(5):
-				print('pract trial ', pract_trial)
-				trial_i = pract_trial + trial_i
-				maintain_2(trial_i, pract_df)
-			practiceEnd()
-		maintain_2(trial_i, main_df)
+		# print('trial ', trial_i)
+		# if trial_i in pract_starts:
+		# 	for pract_trial in range(5):
+		# 		print('pract trial ', pract_trial)
+		# 		trial_i = pract_trial + trial_i
+		# 		maintain_2(trial_i, pract_df)
+		# 	practiceEnd()
+		# maintain_2(trial_i, main_df)
 		pass
 
 	## MAINTAIN 3
