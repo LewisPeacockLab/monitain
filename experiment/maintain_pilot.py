@@ -309,11 +309,10 @@ def create_m3_df(df):
 	maintain3_df = pd.DataFrame(columns = m3_columns, index = m3_index)
 	for i in m3_index: 
 		probes = df.n_probes[i]
-		if probes > 2:
+		if probes > 2 and df.block_name[i] == 'maintain3':
 			t2_probe = randint(2, probes-1)
 			maintain3_df.targ2_probe[i] = t2_probe
 			maintain3_df.targ2_bool[i] = True
-
 		else: 
 			maintain3_df.targ2_bool[i] = False
 	return maintain3_df
