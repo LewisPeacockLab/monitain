@@ -46,7 +46,7 @@ SCREENS = {
 # default is camilla (testing room comp)
 parser = argparse.ArgumentParser(description='Monitain experimental display')
 parser.add_argument('--subj', default='s999', type=str, help='sXXX format')
-parser.add_argument('--scrn', default='misspiggy_main', type=str, choices=SCREENS.keys(), 
+parser.add_argument('--scrn', default='camilla', type=str, choices=SCREENS.keys(), 
 	help='computer used for experiment')
 args = parser.parse_args()
 
@@ -493,7 +493,7 @@ mon.setWidth(SCREENS[SCRN]['width_cm'])
 mon.setSizePix(SCREENS[SCRN]['pixel_dims'])
 
 # window set up
-fullscreen = False #if SUBJ=='s999' else True # smaller screen when debugging
+fullscreen = False if SUBJ=='s999' else True # smaller screen when debugging
 win = visual.Window(
 	mon=mon, 
 	colorSpace='rgb255',
@@ -575,11 +575,12 @@ feedback_bot = visual.Circle(
 ## TEXT 
 text = visual.TextStim(
 	win=win, 	
-	#alignHoriz = 'center',
+	#alignText = 'center',
 	color=color_cyan, 
 	colorSpace='rgb255', 
 	height=40.0, 
-	font='Calibri', 
+	font='Calibri',
+	wrapWidth = 500, 
 	)
 
 
@@ -1063,40 +1064,37 @@ for trial_i in range(N_TOTAL_TRIALS):
 
 	## BASELINE
 	if block_num == 1: 
-		# print('trial ', trial_i)
-		# if trial_i in pract_starts:
-		#  	for pract_trial in range(5):
-		#  		print('pract trial ', pract_trial)
-		#  		trial_i = pract_trial + trial_i
-		#  		baseline(trial_i, pract_df)
-		#  	practiceEnd()
-		# win.color = color_gray
-		# baseline(trial_i, main_df)
-		pass
+		print('trial ', trial_i)
+		if trial_i in pract_starts:
+		 	for pract_trial in range(5):
+		 		print('pract trial ', pract_trial)
+		 		trial_i = pract_trial + trial_i
+		 		baseline(trial_i, pract_df)
+		 	practiceEnd()
+		win.color = color_gray
+		baseline(trial_i, main_df)
 
 	## MAINTAIN 1
 	elif block_num == 2:
-		# print('trial ', trial_i)
-		# if trial_i in pract_starts:
-		# 	for pract_trial in range(5):
-		# 		print('pract trial ', pract_trial)
-		# 		trial_i = pract_trial + trial_i
-		# 		maintain_1(trial_i, pract_df)
-		# 	practiceEnd()
-		# maintain_1(trial_i, main_df)
-		pass
+		print('trial ', trial_i)
+		if trial_i in pract_starts:
+			for pract_trial in range(5):
+				print('pract trial ', pract_trial)
+				trial_i = pract_trial + trial_i
+				maintain_1(trial_i, pract_df)
+			practiceEnd()
+		maintain_1(trial_i, main_df)
 
 	## MAINTAIN 2
 	elif block_num == 3:
-		# print('trial ', trial_i)
-		# if trial_i in pract_starts:
-		# 	for pract_trial in range(5):
-		# 		print('pract trial ', pract_trial)
-		# 		trial_i = pract_trial + trial_i
-		# 		maintain_2(trial_i, pract_df)
-		# 	practiceEnd()
-		# maintain_2(trial_i, main_df)
-		pass
+		print('trial ', trial_i)
+		if trial_i in pract_starts:
+			for pract_trial in range(5):
+				print('pract trial ', pract_trial)
+				trial_i = pract_trial + trial_i
+				maintain_2(trial_i, pract_df)
+			practiceEnd()
+		maintain_2(trial_i, main_df)
 
 	## MAINTAIN 3
 	elif block_num == 4: 

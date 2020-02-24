@@ -1,3 +1,6 @@
+# to install:
+# $ conda env create -n katie_env -f katie_env.yml
+
 name: katie_env
 channels:
   - defaults
@@ -167,5 +170,5 @@ dependencies:
     - xarray==0.14.0
     - zipp==0.6.0
     - zmq==0.0.0
-prefix: /Users/krh2382/opt/anaconda3/envs/myenv
+
 
