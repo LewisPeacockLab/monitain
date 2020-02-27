@@ -833,16 +833,16 @@ def breakMessage(block_num):
 
 # present a certain sequence of slides based on the block type
 def instructionSlides(block_type):
-	if (block_type is 'base1'):
+	if block_num == 1:
 		start_slide = 1
 		end_slide = 6
-	elif block_type is 'maintain1':
+	elif block_num == 2:
 		start_slide = 6
 		end_slide = 11
-	elif block_type is 'maintain2':
+	elif block_num == 3:
 		start_slide = 11
 		end_slide = 14
-	elif block_type is 'maintain3':
+	elif block_num == 4:
 		start_slide = 14
 		end_slide = 19
 
@@ -1058,7 +1058,7 @@ for trial_i in range(N_TOTAL_TRIALS):
 		main_df.to_csv(DATA_FNAME)
 		win.color = color_black
 		win.flip()
-		instructionSlides(block_type)
+		instructionSlides(block_num)
 	win.color = color_gray
 	win.flip()
 
